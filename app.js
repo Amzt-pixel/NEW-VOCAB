@@ -4,7 +4,7 @@
 
 // ── Constants ──
 const PASSWORD = 'dictionary'; // Change this to your password
-const CSV_URL = 'https://raw.githubusercontent.com/Amzt-pixel/Vocabulary/main/dictionary-v18-5-Sun-00_05__1_.csv';
+const CSV_URL = 'https://raw.githubusercontent.com/Amzt-pixel/NEW_VOCAB/main/csvs/dictionary1.csv';
 const HOLD_DURATION = 700; // ms for press-and-hold
 
 // ── State ──
