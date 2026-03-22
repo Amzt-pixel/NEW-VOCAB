@@ -4,7 +4,7 @@
    ══════════════════════════════════════ */
 
 const PASSWORD = 'dictionary';
-const CSV_URL  = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/csvs/dictionary1.csv';
+const CSV_URL  = 'https://raw.githubusercontent.com/Amzt-pixel/Vocabulary/main/csvs/dictionary1.csv';
 const HOLD_DURATION = 700;
 
 // ── State ──
@@ -223,13 +223,13 @@ function buildStudyList(order, filter) {
 // ══════════════════════════════════════
 // HOME — ROOT WORD LIST
 // ══════════════════════════════════════
-const HOME_LIST_LIMIT = 30;
-let homeListExpanded = false;
+const HOME_LIST_CHUNK = 30;
+let homeListShown = 30;
 
-function renderHomeWordList(expanded) {
-  homeListExpanded = expanded;
-  const container = document.getElementById('rootWordItems');
-  const countEl   = document.getElementById('rootWordCount');
+function renderHomeWordList(showCount) {
+  homeListShown = showCount || HOME_LIST_CHUNK;
+  const container  = document.getElementById('rootWordItems');
+  const countEl    = document.getElementById('rootWordCount');
   const showAllBtn = document.getElementById('showAllWordsBtn');
 
   const sorted = [...csvData]
@@ -237,18 +237,10 @@ function renderHomeWordList(expanded) {
     .sort((a,b) => a.word.localeCompare(b.word));
 
   countEl.textContent = `${sorted.length} words`;
+  const visible = sorted.slice(0, homeListShown);
+  const remaining = sorted.length - homeListShown;
 
-  const visible = expanded ? sorted : sorted.slice(0, HOME_LIST_LIMIT);
-
-  // Change 8: show "Show all" button when not expanded
-  if (sorted.length > HOME_LIST_LIMIT) {
-    showAllBtn.classList.remove('hidden');
-    showAllBtn.textContent = expanded ? 'Show less' : `Show all (${sorted.length})`;
-  } else {
-    showAllBtn.classList.add('hidden');
-  }
-
-  container.innerHTML = visible.map((r, i) => {
+  let html = visible.map((r, i) => {
     const hasSyn = getSynonyms(r.word).length > 0;
     const hasAnt = getAntonyms(r.word).length > 0;
     const dotClass = hasSyn && hasAnt ? 'dot-both' : hasSyn ? 'dot-syn' : hasAnt ? 'dot-ant' : '';
@@ -258,6 +250,19 @@ function renderHomeWordList(expanded) {
       ${dotClass ? `<span class="dot-indicator ${dotClass}"></span>` : ''}
     </div>`;
   }).join('');
+
+  // View more / View all at the bottom
+  if (remaining > 0) {
+    html += `<div class="home-list-footer">
+      <button class="home-list-btn" onclick="renderHomeWordList(${homeListShown + HOME_LIST_CHUNK})">View more (${Math.min(HOME_LIST_CHUNK, remaining)})</button>
+      <button class="home-list-btn home-list-btn-all" onclick="renderHomeWordList(${sorted.length})">View all (${sorted.length})</button>
+    </div>`;
+    showAllBtn.classList.add('hidden');
+  } else {
+    showAllBtn.classList.add('hidden');
+  }
+
+  container.innerHTML = html;
 }
 
 // ══════════════════════════════════════
@@ -296,7 +301,44 @@ function startSessionAtWord(word) {
   displayWord();
 }
 
-function jumpToWord(word) { startSessionAtWord(word); }
+function getDeviceName() {
+  const ua = navigator.userAgent;
+  if (/android/i.test(ua)) return 'Android';
+  if (/iphone|ipad/i.test(ua)) return 'iOS';
+  if (/windows/i.test(ua)) return 'Windows';
+  if (/mac/i.test(ua)) return 'Mac';
+  return 'Device';
+}
+
+function generateListName(prefix) {
+  const now = new Date();
+  const hh  = String(now.getHours()).padStart(2,'0');
+  const mm  = String(now.getMinutes()).padStart(2,'0');
+  const dd  = String(now.getDate()).padStart(2,'0');
+  const mo  = String(now.getMonth()+1).padStart(2,'0');
+  const yy  = String(now.getFullYear()).slice(2);
+  return `${prefix}-${hh}:${mm}&${dd}-${mo}-${yy}@${getDeviceName()}`;
+}
+
+function updatePanelSaveBar() {
+  const nameEl = document.getElementById('panelSaveName');
+  const prefixes = { list: 'List1', queue: 'CustomList', history: 'CurrentSession' };
+  nameEl.textContent = generateListName(prefixes[panelTab] || 'List');
+}
+
+function savePanelList() {
+  const name  = document.getElementById('panelSaveName').textContent;
+  let   words = [];
+  if (panelTab === 'list')    words = studyList;
+  if (panelTab === 'queue')   words = customQueue.map(q => q.word);
+  if (panelTab === 'history') words = readHistory.map(h => h.word);
+  if (!words.length) { alert('Nothing to save.'); return; }
+
+  const saved = JSON.parse(localStorage.getItem('dictSavedLists') || '[]');
+  saved.push({ name, words, type: panelTab === 'queue' ? 2 : panelTab === 'history' ? 1 : 0, savedAt: new Date().toISOString() });
+  localStorage.setItem('dictSavedLists', JSON.stringify(saved));
+  alert(`Saved as "${name}"`);
+}
 
 function updateSessionBar(order) {
   const labels = { az: 'A→Z', za: 'Z→A', random: 'Random' };
@@ -327,19 +369,20 @@ function displayWord() {
 
   // Word hero
   document.getElementById('currentWord').textContent = word;
-  document.getElementById('currentPos').textContent  = entry ? getLevelLabel(entry.level) : '';
+  // Role field (word type: Noun, Adjective etc.) — from 'role' column (not in CSV yet, blank until full schema)
+  document.getElementById('currentRole').textContent = entry?.role || '';
 
-  // Change 3: level badge
+  // Level badge — always shown, level 0 = Common
   const badge = document.getElementById('levelBadge');
-  const levelMeta = { 1: ['Unique', 'level-1'], 2: ['Specific', 'level-2'], 3: ['Colloquial', 'level-3'] };
-  if (entry?.level && levelMeta[entry.level]) {
-    const [label, cls] = levelMeta[entry.level];
-    badge.textContent  = label;
-    badge.className    = `word-level-badge ${cls}`;
-    badge.classList.remove('hidden');
-  } else {
-    badge.classList.add('hidden');
-  }
+  const levelMeta = {
+    0: ['Common',      'level-0'],
+    1: ['Unique',      'level-1'],
+    2: ['Specific',    'level-2'],
+    3: ['Colloquial',  'level-3'],
+  };
+  const [label, cls] = levelMeta[entry?.level ?? 0] || levelMeta[0];
+  badge.textContent = label;
+  badge.className   = `word-level-badge ${cls}`;
 
   // Build chips helper
   function buildChip(w, type) {
@@ -386,9 +429,7 @@ function displayWord() {
   updateWordListPanel();
 }
 
-function getLevelLabel(level) {
-  return { 1: 'Unique / Rare', 2: 'Specific / Formal', 3: 'Colloquial' }[level] || '';
-}
+// getLevelLabel removed — level shown via badge in displayWord
 
 // ══════════════════════════════════════
 // TABS
@@ -464,11 +505,11 @@ function openWordDetail(word) {
   document.getElementById('detailWord').textContent = word;
 
   const metaEl = document.getElementById('detailMeta');
-  const badges = [];
-  if (entry?.level > 0) {
-    const ll = { 1:'Unique', 2:'Specific', 3:'Colloquial' };
-    badges.push(`<span class="detail-badge badge-word">${ll[entry.level]}</span>`);
-  }
+  const levelLabels = { 0:'Common', 1:'Unique', 2:'Specific', 3:'Colloquial' };
+  const levelClasses = { 0:'badge-common', 1:'badge-unique', 2:'badge-specific', 3:'badge-colloquial' };
+  const lv = entry?.level ?? 0;
+  const badges = [`<span class="detail-badge ${levelClasses[lv]}">${levelLabels[lv]}</span>`];
+  if (entry?.role) badges.push(`<span class="detail-badge badge-role">${escapeHtml(entry.role)}</span>`);
   metaEl.innerHTML = badges.join('');
 
   let html = '';
@@ -576,6 +617,7 @@ function openWordListPanel() {
   panelFilter = '';
   document.getElementById('panelSearchInput').value = '';
   document.querySelectorAll('.panel-tab').forEach(t => t.classList.toggle('active', t.dataset.panelTab === 'list'));
+  updatePanelSaveBar();
   updateWordListPanel();
   document.getElementById('wordListOverlay').classList.remove('hidden');
 }
@@ -732,7 +774,7 @@ function bindAddTo() {
 }
 
 // ══════════════════════════════════════
-// INFO MODAL
+// INFO MODAL — Close + Quit
 // ══════════════════════════════════════
 function showInfo() {
   const elapsed = startTime ? Math.floor((new Date() - startTime) / 1000) : 0;
@@ -748,6 +790,29 @@ function showInfo() {
     <div class="info-row"><span class="info-row-label">Queue Size</span><span class="info-row-value">${customQueue.length}</span></div>
   `;
   document.getElementById('infoOverlay').classList.remove('hidden');
+}
+
+function quitSession() {
+  // Auto-save custom queue if non-empty
+  if (customQueue.length > 0) {
+    const name = generateListName('CustomList');
+    const saved = JSON.parse(localStorage.getItem('dictSavedLists') || '[]');
+    saved.push({ name, words: customQueue.map(q => q.word), type: 2, savedAt: new Date().toISOString() });
+    localStorage.setItem('dictSavedLists', JSON.stringify(saved));
+  }
+  // Clear current session
+  localStorage.removeItem('dictCurrentSession');
+  localStorage.removeItem('dictCurrentQueue');
+  // Reset in-memory state
+  studyList    = [];
+  currentIndex = 0;
+  wordsSeen    = 0;
+  startTime    = null;
+  readHistory  = [];
+  customQueue  = [];
+  sessionLive  = false;
+  closeModal('infoOverlay');
+  showScreen('home');
 }
 
 // ══════════════════════════════════════
@@ -899,15 +964,19 @@ function bindEvents() {
     showScreen(sessionLive ? 'study' : 'home');
   });
 
-  // Panel tabs (Change 6)
+  // Panel tabs
   document.querySelectorAll('.panel-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
       panelTab = tab.dataset.panelTab;
+      updatePanelSaveBar();
       updateWordListPanel();
     });
   });
+
+  // Panel save
+  document.getElementById('panelSaveBtn').addEventListener('click', savePanelList);
 
   // Panel search (Change 5)
   document.getElementById('panelSearchInput').addEventListener('input', e => {
@@ -921,7 +990,11 @@ function bindEvents() {
 
   // Info
   document.getElementById('infoClose').addEventListener('click', () => closeModal('infoOverlay'));
+  document.getElementById('infoQuit').addEventListener('click', quitSession);
   document.getElementById('infoOverlay').addEventListener('click', e => closeOnOverlay('infoOverlay', e));
+
+  // Change 8: show all removed, view more/all now inline in list
+  document.getElementById('showAllWordsBtn').classList.add('hidden');
 
   // Word detail — Change 1: View Word
   document.getElementById('wordDetailClose').addEventListener('click', () => closeModal('wordDetailOverlay'));
