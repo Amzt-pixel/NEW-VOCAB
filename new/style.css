@@ -271,7 +271,8 @@ input  { font-family: 'DM Sans', sans-serif; }
 
 /* Panel save bar */
 .panel-save-bar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--border); background: var(--surface2); }
-.panel-save-name { flex: 1; font-size: 11px; color: var(--text-secondary); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-style: italic; }
+.panel-save-name { flex: 1; font-size: 11px; color: var(--text); font-weight: 500; font-style: italic; background: var(--surface); border: 1.5px solid var(--border); border-radius: 7px; padding: 5px 8px; outline: none; min-width: 0; transition: border-color .2s; font-family: 'DM Sans', sans-serif; }
+.panel-save-name:focus { border-color: var(--accent); font-style: normal; }
 .panel-save-btn { padding: 5px 14px; border-radius: 8px; border: none; background: var(--accent); color: var(--navy); font-size: 12px; font-weight: 700; cursor: pointer; transition: all .15s; white-space: nowrap; flex-shrink: 0; }
 .panel-save-btn:hover { opacity: .85; }
 
