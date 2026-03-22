@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dictionary</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body class="accent-gold">
+
+  <!-- ══════════════ PASSWORD GATE ══════════════ -->
+  <div class="screen active" id="gateScreen">
+    <div class="gate-wrap">
+      <div class="gate-title">Dictionary</div>
+      <div class="gate-subtitle">Personal Vocabulary Library</div>
+      <div class="gate-form">
+        <input type="password" id="gateInput" class="gate-input" placeholder="Enter password" autocomplete="off"/>
+        <button class="gate-btn" id="gateBtn">Unlock</button>
+        <div class="gate-error hidden" id="gateError">Incorrect password</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ HOME SCREEN ══════════════ -->
+  <div class="screen" id="homeScreen">
+    <nav class="navbar">
+      <div class="app-title">Dictionary</div>
+      <div class="nav-right">
+        <button class="nav-btn" id="homeSearchBtn" title="Search">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+        <!-- Change 7: Book icon to resume/open study -->
+        <button class="nav-btn" id="homeBookBtn" title="Continue Reading">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </button>
+      </div>
+    </nav>
+
+    <div class="home-screen">
+      <div class="home-hero">
+        <div class="home-title">Dictionary</div>
+        <div class="home-subtitle">Your personal vocabulary library</div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-card"><div class="stat-num" id="statRootWords">—</div><div class="stat-label">Root Words</div></div>
+        <div class="stat-card"><div class="stat-num" id="statTotalWords">—</div><div class="stat-label">Total Words</div></div>
+        <div class="stat-card"><div class="stat-num" id="statCategories">1</div><div class="stat-label">Categories</div></div>
+      </div>
+
+      <div>
+        <div class="section-label">Start a Session</div>
+        <div class="selector-row">
+          <select class="styled-select" id="categorySelect">
+            <option value="1">Dictionary</option>
+            <option value="2">Idioms &amp; Phrases</option>
+            <option value="3">Phrasal Verbs</option>
+          </select>
+          <select class="styled-select" id="orderSelect">
+            <option value="az">A → Z</option>
+            <option value="za">Z → A</option>
+            <option value="random">Random</option>
+          </select>
+          <button class="start-btn" id="startBtn">Study</button>
+        </div>
+      </div>
+
+      <!-- Change 5: View more / View all at bottom -->
+      <div>
+        <div class="section-label">Root Words</div>
+        <div class="word-list-card">
+          <div class="word-list-header">
+            <span>Alphabetical</span>
+            <span class="count" id="rootWordCount">—</span>
+          </div>
+          <div id="rootWordItems"><div class="list-loading">Loading words…</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ STUDY SCREEN ══════════════ -->
+  <div class="screen" id="studyScreen">
+    <nav class="navbar">
+      <!-- Change 7: Home btn goes to home WITHOUT resetting -->
+      <button class="nav-btn" id="studyHomeBtn" title="Home">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </button>
+      <div class="app-title">Dictionary</div>
+      <div class="nav-right">
+        <button class="nav-btn" id="infoBtn" title="Info">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </button>
+        <button class="nav-btn" id="settingsBtn" title="Settings">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+        <button class="nav-btn" id="wordListBtn" title="Word List">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        </button>
+      </div>
+    </nav>
+
+    <div class="session-bar">
+      <div class="session-meta">
+        <div class="meta-chip">Set <span id="sessionSetName">Dictionary</span></div>
+        <div class="meta-chip">Step <span id="sessionStep">1</span></div>
+        <div class="meta-chip">Order <span id="sessionOrder">A→Z</span></div>
+      </div>
+      <div class="progress-pill" id="progressPill">— / —</div>
+    </div>
+
+    <div class="main" id="studyMain">
+
+      <!-- Word hero: level badge top-right, role below word -->
+      <div class="word-hero">
+        <div class="word-main">
+          <div class="word-label">Current Word</div>
+          <div class="word-text" id="currentWord">—</div>
+          <div class="word-role" id="currentRole"></div>
+        </div>
+        <div class="word-level-wrap">
+          <div class="word-level-badge" id="levelBadge">Common</div>
+        </div>
+      </div>
+
+      <div class="focus-tabs" id="focusTabs">
+        <button class="focus-tab syn active" id="tabSyn" onclick="switchTab('syn')">Synonyms <span class="tab-count" id="synCount"></span></button>
+        <button class="focus-tab ant" id="tabAnt" onclick="switchTab('ant')">Antonyms <span class="tab-count" id="antCount"></span></button>
+        <button class="focus-tab def" id="tabDef" onclick="switchTab('def')">Meaning</button>
+      </div>
+
+      <div class="content-card hidden" id="synCard">
+        <div class="card-header syn-header"><span class="dot"></span> Synonyms</div>
+        <div class="chips-wrap" id="synChips"></div>
+      </div>
+
+      <div class="content-card hidden" id="antCard">
+        <div class="card-header ant-header"><span class="dot"></span> Antonyms</div>
+        <div class="chips-wrap" id="antChips"></div>
+      </div>
+
+      <div class="content-card hidden" id="defCard">
+        <div class="card-header def-header"><span class="dot"></span> Meaning</div>
+        <div id="defContent"></div>
+      </div>
+
+      <div class="content-card hidden" id="emptyCard">
+        <div class="empty-state">No synonyms, antonyms, or definition available for this word.</div>
+      </div>
+    </div>
+
+    <div class="nav-footer">
+      <button class="nav-foot-btn prev-btn" id="prevBtn">← Previous</button>
+      <button class="nav-foot-btn next-btn" id="nextBtn">Next →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════ SEARCH SCREEN ══════════════ -->
+  <div class="screen" id="searchScreen">
+    <nav class="navbar">
+      <button class="nav-btn" id="searchBackBtn" title="Back">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      </button>
+      <div class="app-title">Search</div>
+    </nav>
+    <div class="search-wrap">
+      <div class="search-bar">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search words… (min 3 chars)"/>
+        <button class="search-clear hidden" id="searchClear">✕</button>
+      </div>
+      <div class="search-results" id="searchResults">
+        <div class="search-hint">Type at least 3 characters to search</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ WORD LIST PANEL — Changes 2, 5, 6 ══════════════ -->
+  <div class="panel-overlay hidden" id="wordListOverlay">
+    <div class="panel" id="wordListPanel">
+      <div class="panel-header">
+        <span class="panel-title">Word List</span>
+        <button class="panel-close" id="wordListClose">✕</button>
+      </div>
+      <!-- Change 5: search inside panel -->
+      <div class="panel-search-wrap">
+        <input type="text" id="panelSearchInput" class="panel-search-input" placeholder="Filter…"/>
+      </div>
+      <!-- Change 6: Words / Queue / History tabs -->
+      <div class="panel-tabs">
+        <button class="panel-tab active" data-panel-tab="list">Words</button>
+        <button class="panel-tab" data-panel-tab="queue">Queue</button>
+        <button class="panel-tab" data-panel-tab="history">History</button>
+      </div>
+      <!-- Save bar -->
+      <div class="panel-save-bar">
+        <div class="panel-save-name" id="panelSaveName">—</div>
+        <button class="panel-save-btn" id="panelSaveBtn">Save</button>
+      </div>
+      <div class="panel-content" id="wordListContent"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ INFO MODAL ══════════════ -->
+  <div class="modal-overlay hidden" id="infoOverlay">
+    <div class="modal">
+      <div class="modal-title">Session Info</div>
+      <div id="infoContent"></div>
+      <div class="settings-btn-row">
+        <button class="modal-btn-secondary" id="infoClose">Close</button>
+        <button class="modal-btn-quit" id="infoQuit">Quit Session</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ SETTINGS MODAL — Change 4: Save + Close ══════════════ -->
+  <div class="modal-overlay hidden" id="settingsOverlay">
+    <div class="modal">
+      <div class="modal-title">Settings</div>
+
+      <div class="setting-section">
+        <div class="setting-section-title">Appearance</div>
+        <div class="setting-row">
+          <div class="setting-label">Font Size</div>
+          <div class="size-btns">
+            <button class="size-btn" data-size="small">S</button>
+            <button class="size-btn active" data-size="normal">M</button>
+            <button class="size-btn" data-size="large">L</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Accent Color</div>
+          <div class="color-picker">
+            <div class="color-swatch gold selected" data-accent="gold" title="Gold"></div>
+            <div class="color-swatch green" data-accent="green" title="Green"></div>
+            <div class="color-swatch blue" data-accent="blue" title="Sky Blue"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="setting-section">
+        <div class="setting-section-title">Navigation</div>
+        <div class="setting-row">
+          <div class="setting-label">Step Size</div>
+          <div class="size-btns">
+            <button class="size-btn active" data-step="1">1</button>
+            <button class="size-btn" data-step="3">3</button>
+            <button class="size-btn" data-step="5">5</button>
+            <button class="size-btn" data-step="10">10</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Loop Mode</div>
+          <label class="toggle"><input type="checkbox" id="loopToggle"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Word List Filter</div>
+          <div class="size-btns">
+            <button class="size-btn active" data-filter="all">All</button>
+            <button class="size-btn" data-filter="root">Root</button>
+            <button class="size-btn" data-filter="synant">Syn/Ant</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="setting-section">
+        <div class="setting-section-title">Read Mode</div>
+        <div class="setting-row">
+          <div class="setting-label">Show Translation</div>
+          <label class="toggle"><input type="checkbox" id="translationToggle"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Word Highlight</div>
+          <label class="toggle"><input type="checkbox" id="highlightToggle"/><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+
+      <div class="settings-btn-row">
+        <button class="modal-btn-secondary" id="settingsClose">Close</button>
+        <button class="modal-close-btn flex1" id="settingsSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ WORD DETAIL MODAL — Change 1: View Word btn ══════════════ -->
+  <div class="modal-overlay hidden" id="wordDetailOverlay">
+    <div class="modal modal-tall">
+      <div class="modal-title" id="detailWord">—</div>
+      <div class="detail-meta" id="detailMeta"></div>
+      <div id="detailContent"></div>
+      <div class="settings-btn-row">
+        <button class="modal-btn-secondary" id="wordDetailClose">Close</button>
+        <button class="modal-close-btn flex1" id="wordDetailView">View Word</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ ADD TO POPUP — Change 2 ══════════════ -->
+  <div class="modal-overlay hidden" id="addToOverlay">
+    <div class="modal modal-small">
+      <div class="modal-title" id="addToWordTitle">Add to…</div>
+      <div class="addto-grid">
+        <button class="addto-btn" data-flag="bookmark">🔖<span>Bookmark</span></button>
+        <button class="addto-btn" data-flag="important">⭐<span>Important</span></button>
+        <button class="addto-btn" data-flag="learned">✅<span>Learned</span></button>
+        <button class="addto-btn" data-flag="favorite">❤️<span>Favorite</span></button>
+        <button class="addto-btn" data-flag="queue">📋<span>Queue</span></button>
+      </div>
+      <button class="modal-close-btn" id="addToClose">Done</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
