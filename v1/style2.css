@@ -133,10 +133,10 @@ input  { font-family: 'DM Sans', sans-serif; }
 .list-loading { padding: 20px; text-align: center; color: var(--text-secondary); font-size: 13px; }
 
 /* View more / View all — plain text links with | divider */
-.home-list-footer { display: flex; align-items: center; justify-content: center; padding: 11px 16px; border-top: 1px solid var(--border); gap: 0; }
-.home-list-link { background: none; border: none; font-size: 13px; font-weight: 500; color: var(--text-secondary); cursor: pointer; padding: 2px 12px; font-family: 'DM Sans', sans-serif; transition: color .15s; }
+.home-list-footer { display: flex; align-items: center; border-top: 1px solid var(--border); }
+.home-list-link { flex: 1; text-align: center; background: none; border: none; font-size: 13px; font-weight: 500; color: var(--text-secondary); cursor: pointer; padding: 11px 8px; font-family: 'DM Sans', sans-serif; transition: color .15s; }
 .home-list-link:hover { color: var(--accent); }
-.home-list-divider { color: var(--border); font-size: 16px; border-left: 1.5px solid var(--border); height: 14px; width: 0; }
+.home-list-divider { width: 1.5px; height: 14px; background: var(--border); flex-shrink: 0; }
 
 /* ── Session bar ── */
 .session-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 8px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
