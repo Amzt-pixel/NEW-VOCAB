@@ -37,6 +37,9 @@
         <button class="nav-btn" id="homeSearchBtn" title="Search">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         </button>
+        <button class="nav-btn" id="customiseBtn" title="Customise">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        </button>
         <button class="nav-btn" id="homeBookBtn" title="Continue Reading">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
         </button>
@@ -222,38 +225,10 @@
     </div>
   </div>
 
-  <!-- ══════════════ SETTINGS MODAL — Change 4: Save + Close ══════════════ -->
+  <!-- ══════════════ SETTINGS MODAL ══════════════ -->
   <div class="modal-overlay hidden" id="settingsOverlay">
     <div class="modal">
       <div class="modal-title">Settings</div>
-
-      <div class="setting-section">
-        <div class="setting-section-title">Appearance</div>
-        <div class="setting-row">
-          <div class="setting-label">Font Size</div>
-          <div class="size-btns">
-            <button class="size-btn" data-size="small">S</button>
-            <button class="size-btn active" data-size="normal">M</button>
-            <button class="size-btn" data-size="large">L</button>
-          </div>
-        </div>
-        <div class="setting-row">
-          <div class="setting-label">Accent Color</div>
-          <div class="color-picker">
-            <div class="color-swatch gold selected" data-accent="gold" title="Gold"></div>
-            <div class="color-swatch green" data-accent="green" title="Green"></div>
-            <div class="color-swatch blue" data-accent="blue" title="Sky Blue"></div>
-          </div>
-        </div>
-        <div class="setting-row">
-          <div class="setting-label">Theme Color</div>
-          <div class="color-picker">
-            <div class="color-swatch theme-navy selected" data-theme="navy" title="Navy"></div>
-            <div class="color-swatch theme-charcoal" data-theme="charcoal" title="Charcoal"></div>
-            <div class="color-swatch theme-forest" data-theme="forest" title="Forest"></div>
-          </div>
-        </div>
-      </div>
 
       <div class="setting-section">
         <div class="setting-section-title">Navigation</div>
@@ -324,6 +299,44 @@
         <button class="addto-btn" data-flag="queue">📋<span>Queue</span></button>
       </div>
       <button class="modal-close-btn" id="addToClose">Done</button>
+    </div>
+  </div>
+
+  <!-- ══════════════ CUSTOMISE MODAL ══════════════ -->
+  <div class="modal-overlay hidden" id="customiseOverlay">
+    <div class="modal">
+      <div class="modal-title">Customise</div>
+      <div class="setting-section">
+        <div class="setting-section-title">Appearance</div>
+        <div class="setting-row">
+          <div class="setting-label">Font Size</div>
+          <div class="size-btns">
+            <button class="size-btn" data-size="small">S</button>
+            <button class="size-btn active" data-size="normal">M</button>
+            <button class="size-btn" data-size="large">L</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Accent Color</div>
+          <div class="color-picker">
+            <div class="color-swatch gold selected" data-accent="gold" title="Gold"></div>
+            <div class="color-swatch green" data-accent="green" title="Green"></div>
+            <div class="color-swatch blue" data-accent="blue" title="Sky Blue"></div>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Theme Color</div>
+          <div class="color-picker">
+            <div class="color-swatch theme-navy selected" data-theme="navy" title="Navy"></div>
+            <div class="color-swatch theme-charcoal" data-theme="charcoal" title="Charcoal"></div>
+            <div class="color-swatch theme-forest" data-theme="forest" title="Forest"></div>
+          </div>
+        </div>
+      </div>
+      <div class="settings-btn-row">
+        <button class="modal-btn-secondary" id="customiseClose">Close</button>
+        <button class="modal-close-btn flex1" id="customiseSave">Save</button>
+      </div>
     </div>
   </div>
 
