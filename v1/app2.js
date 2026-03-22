@@ -865,32 +865,32 @@ function quitSession() {
 // SETTINGS — Change 4: pending + Save/Close
 // ══════════════════════════════════════
 function openSettings() {
-  // Snapshot current settings as pending
   pendingSettings = { ...settings };
   syncSettingsUI(pendingSettings);
   document.getElementById('settingsOverlay').classList.remove('hidden');
 }
 
+function openCustomise() {
+  pendingSettings = { ...settings };
+  syncCustomiseUI(pendingSettings);
+  document.getElementById('customiseOverlay').classList.remove('hidden');
+}
+
 function syncSettingsUI(s) {
-  document.querySelectorAll('[data-size]').forEach(b => b.classList.toggle('active', b.dataset.size === s.fontSize));
   document.querySelectorAll('[data-step]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.step) === s.stepNumber));
   document.querySelectorAll('[data-filter]').forEach(b => b.classList.toggle('active', b.dataset.filter === s.filter));
-  document.querySelectorAll('[data-accent]').forEach(s2 => s2.classList.toggle('selected', s2.dataset.accent === s.accent));
-  document.querySelectorAll('[data-theme]').forEach(s2 => s2.classList.toggle('selected', s2.dataset.theme === s.theme));
   document.getElementById('loopToggle').checked        = s.loopMode;
   document.getElementById('translationToggle').checked = s.showTranslation;
   document.getElementById('highlightToggle').checked   = s.wordHighlight;
 }
 
-function bindSettingsEvents() {
-  // All controls update pendingSettings only — nothing applied until Save
-  document.querySelectorAll('[data-size]').forEach(btn => btn.addEventListener('click', () => {
-    if (!pendingSettings) return;
-    document.querySelectorAll('[data-size]').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    pendingSettings.fontSize = btn.dataset.size;
-  }));
+function syncCustomiseUI(s) {
+  document.querySelectorAll('[data-size]').forEach(b => b.classList.toggle('active', b.dataset.size === s.fontSize));
+  document.querySelectorAll('[data-accent]').forEach(b => b.classList.toggle('selected', b.dataset.accent === s.accent));
+  document.querySelectorAll('[data-theme]').forEach(b => b.classList.toggle('selected', b.dataset.theme === s.theme));
+}
 
+function bindSettingsEvents() {
   document.querySelectorAll('[data-step]').forEach(btn => btn.addEventListener('click', () => {
     if (!pendingSettings) return;
     document.querySelectorAll('[data-step]').forEach(b => b.classList.remove('active'));
@@ -903,6 +903,36 @@ function bindSettingsEvents() {
     document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     pendingSettings.filter = btn.dataset.filter;
+  }));
+
+  document.getElementById('loopToggle').addEventListener('change', e => { if (pendingSettings) pendingSettings.loopMode = e.target.checked; });
+  document.getElementById('translationToggle').addEventListener('change', e => { if (pendingSettings) pendingSettings.showTranslation = e.target.checked; });
+  document.getElementById('highlightToggle').addEventListener('change', e => { if (pendingSettings) pendingSettings.wordHighlight = e.target.checked; });
+
+  document.getElementById('settingsSave').addEventListener('click', () => {
+    if (pendingSettings) {
+      Object.assign(settings, pendingSettings);
+      saveSettings();
+      applySettings();
+      document.getElementById('sessionStep').textContent = settings.stepNumber;
+    }
+    pendingSettings = null;
+    closeModal('settingsOverlay');
+  });
+
+  document.getElementById('settingsClose').addEventListener('click', () => {
+    pendingSettings = null;
+    closeModal('settingsOverlay');
+    syncSettingsUI(settings);
+  });
+}
+
+function bindCustomiseEvents() {
+  document.querySelectorAll('[data-size]').forEach(btn => btn.addEventListener('click', () => {
+    if (!pendingSettings) return;
+    document.querySelectorAll('[data-size]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    pendingSettings.fontSize = btn.dataset.size;
   }));
 
   document.querySelectorAll('[data-accent]').forEach(swatch => swatch.addEventListener('click', () => {
@@ -919,28 +949,28 @@ function bindSettingsEvents() {
     pendingSettings.theme = swatch.dataset.theme;
   }));
 
-  document.getElementById('loopToggle').addEventListener('change', e => { if (pendingSettings) pendingSettings.loopMode = e.target.checked; });
-  document.getElementById('translationToggle').addEventListener('change', e => { if (pendingSettings) pendingSettings.showTranslation = e.target.checked; });
-  document.getElementById('highlightToggle').addEventListener('change', e => { if (pendingSettings) pendingSettings.wordHighlight = e.target.checked; });
-
-  // Save — apply pending to real settings
-  document.getElementById('settingsSave').addEventListener('click', () => {
+  document.getElementById('customiseSave').addEventListener('click', () => {
     if (pendingSettings) {
       Object.assign(settings, pendingSettings);
       saveSettings();
       applySettings();
-      document.getElementById('sessionStep').textContent = settings.stepNumber;
     }
     pendingSettings = null;
-    closeModal('settingsOverlay');
+    closeModal('customiseOverlay');
   });
 
-  // Close — discard pending
-  document.getElementById('settingsClose').addEventListener('click', () => {
+  document.getElementById('customiseClose').addEventListener('click', () => {
     pendingSettings = null;
-    closeModal('settingsOverlay');
-    // Restore UI to actual saved settings
-    syncSettingsUI(settings);
+    closeModal('customiseOverlay');
+    syncCustomiseUI(settings);
+  });
+
+  document.getElementById('customiseOverlay').addEventListener('click', e => {
+    if (e.target.id === 'customiseOverlay') {
+      pendingSettings = null;
+      closeModal('customiseOverlay');
+      syncCustomiseUI(settings);
+    }
   });
 }
 
@@ -979,12 +1009,14 @@ function bindEvents() {
   bindGate();
   initSearch();
   bindSettingsEvents();
+  bindCustomiseEvents();
   bindAddTo();
 
   // Home
   document.getElementById('startBtn').addEventListener('click', startSession);
   document.getElementById('homeSearchBtn').addEventListener('click', () => showScreen('search'));
   document.getElementById('homeBookBtn').addEventListener('click', handleBookIcon);
+  document.getElementById('customiseBtn').addEventListener('click', openCustomise);
   document.getElementById('logoutBtn').addEventListener('click', () => {
     localStorage.removeItem('dictSession');
     sessionStorage.removeItem('dictSession');
@@ -1054,7 +1086,6 @@ function bindEvents() {
   document.getElementById('wordDetailView').addEventListener('click', viewDetailWord);
   document.getElementById('wordDetailOverlay').addEventListener('click', e => closeOnOverlay('wordDetailOverlay', e));
 
-  // Settings overlay click-outside
   document.getElementById('settingsOverlay').addEventListener('click', e => {
     if (e.target.id === 'settingsOverlay') { pendingSettings = null; closeModal('settingsOverlay'); syncSettingsUI(settings); }
   });
