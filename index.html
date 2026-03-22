@@ -115,15 +115,15 @@
 
     <div class="main" id="studyMain">
 
-      <!-- Word hero — Change 3: level badge instead of + button -->
+      <!-- Word hero: level badge top-right, role below word -->
       <div class="word-hero">
         <div class="word-main">
           <div class="word-label">Current Word</div>
           <div class="word-text" id="currentWord">—</div>
-          <div class="word-pos" id="currentPos"></div>
+          <div class="word-role" id="currentRole"></div>
         </div>
         <div class="word-level-wrap">
-          <div class="word-level-badge hidden" id="levelBadge"></div>
+          <div class="word-level-badge" id="levelBadge">Common</div>
         </div>
       </div>
 
@@ -195,6 +195,11 @@
         <button class="panel-tab" data-panel-tab="queue">Queue</button>
         <button class="panel-tab" data-panel-tab="history">History</button>
       </div>
+      <!-- Save bar -->
+      <div class="panel-save-bar">
+        <div class="panel-save-name" id="panelSaveName">—</div>
+        <button class="panel-save-btn" id="panelSaveBtn">Save</button>
+      </div>
       <div class="panel-content" id="wordListContent"></div>
     </div>
   </div>
@@ -204,7 +209,10 @@
     <div class="modal">
       <div class="modal-title">Session Info</div>
       <div id="infoContent"></div>
-      <button class="modal-close-btn" id="infoClose">Close</button>
+      <div class="settings-btn-row">
+        <button class="modal-btn-secondary" id="infoClose">Close</button>
+        <button class="modal-btn-quit" id="infoQuit">Quit Session</button>
+      </div>
     </div>
   </div>
 
