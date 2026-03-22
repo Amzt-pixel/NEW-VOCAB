@@ -72,7 +72,13 @@ input  { font-family: 'DM Sans', sans-serif; }
 }
 .app-title { font-family: 'Lora', serif; font-size: 18px; font-weight: 700; color: var(--accent-light); transition: color .3s; }
 .nav-right { display: flex; align-items: center; gap: 4px; }
-.nav-btn { width: 38px; height: 38px; border-radius: 10px; border: none; background: rgba(255,255,255,.08); color: rgba(255,255,255,.8); display: flex; align-items: center; justify-content: center; transition: all .15s; }
+.nav-btn {
+  width: 38px; height: 38px; border-radius: 10px; border: none;
+  background: rgba(255,255,255,.08);
+  color: var(--accent-light); /* accent color on icons */
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
 .nav-btn:hover  { background: rgba(255,255,255,.16); color: #fff; }
 .nav-btn.active { background: var(--accent); color: var(--navy); }
 
@@ -113,6 +119,13 @@ input  { font-family: 'DM Sans', sans-serif; }
 .dot-both { background: linear-gradient(135deg, var(--syn) 50%, var(--ant) 50%); }
 .list-loading { padding: 20px; text-align: center; color: var(--text-secondary); font-size: 13px; }
 
+/* View more / View all footer */
+.home-list-footer { display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--border); background: var(--surface2); }
+.home-list-btn { flex: 1; padding: 9px 8px; border-radius: 10px; border: 1.5px solid var(--border); background: var(--surface); font-size: 12px; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: all .15s; font-family: 'DM Sans', sans-serif; }
+.home-list-btn:hover { border-color: var(--accent); color: var(--accent); }
+.home-list-btn-all { background: var(--navy); color: var(--accent-light); border-color: var(--navy); }
+.home-list-btn-all:hover { background: var(--navy-light); color: var(--accent-light); border-color: var(--navy-light); }
+
 /* ── Session bar ── */
 .session-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 8px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .session-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
@@ -130,14 +143,15 @@ input  { font-family: 'DM Sans', sans-serif; }
 .word-main { z-index: 1; flex: 1; }
 .word-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.4); letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 4px; }
 .word-text { font-family: 'Lora', serif; font-size: 30px; font-weight: 700; color: #fff; letter-spacing: -.3px; line-height: 1.2; word-break: break-word; }
-.word-pos { font-size: 12px; color: var(--accent-light); margin-top: 4px; font-style: italic; transition: color .3s; }
+.word-role { font-size: 12px; color: rgba(255,255,255,.55); margin-top: 4px; font-style: italic; min-height: 16px; }
 
-/* Change 3: level badge */
-.word-level-wrap { z-index: 1; margin-left: 12px; flex-shrink: 0; display: flex; align-items: flex-start; }
+/* Level badge — always visible, top-right corner */
+.word-level-wrap { z-index: 1; margin-left: 12px; flex-shrink: 0; display: flex; align-items: flex-start; padding-top: 2px; }
 .word-level-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: .4px; }
-.level-1 { background: rgba(212,151,59,.2); color: var(--syn-light); }
-.level-2 { background: rgba(91,155,213,.2); color: var(--def-light); }
-.level-3 { background: rgba(42,140,126,.2); color: var(--ant-light); }
+.level-0 { background: rgba(255,255,255,.12); color: rgba(255,255,255,.6); }  /* Common — neutral */
+.level-1 { background: rgba(212,151,59,.25); color: var(--syn-light); }         /* Unique — gold */
+.level-2 { background: rgba(91,155,213,.25); color: var(--def-light); }         /* Specific — blue */
+.level-3 { background: rgba(42,140,126,.25); color: var(--ant-light); }
 
 /* ── Focus tabs ── */
 .focus-tabs { display: flex; gap: 8px; }
@@ -252,6 +266,14 @@ input  { font-family: 'DM Sans', sans-serif; }
 .modal-close-btn.flex1 { flex: 2; }
 .modal-btn-secondary { flex: 1; padding: 14px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text-secondary); font-size: 15px; font-weight: 600; cursor: pointer; transition: all .15s; }
 .modal-btn-secondary:hover { border-color: var(--navy); color: var(--navy); }
+.modal-btn-quit { flex: 1; padding: 14px; border-radius: 12px; border: none; background: #FEE2E2; color: #C62828; font-size: 15px; font-weight: 700; cursor: pointer; transition: all .15s; font-family: 'DM Sans', sans-serif; }
+.modal-btn-quit:hover { background: #FECACA; }
+
+/* Panel save bar */
+.panel-save-bar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--border); background: var(--surface2); }
+.panel-save-name { flex: 1; font-size: 11px; color: var(--text-secondary); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-style: italic; }
+.panel-save-btn { padding: 5px 14px; border-radius: 8px; border: none; background: var(--accent); color: var(--navy); font-size: 12px; font-weight: 700; cursor: pointer; transition: all .15s; white-space: nowrap; flex-shrink: 0; }
+.panel-save-btn:hover { opacity: .85; }
 
 /* Settings */
 .setting-section { margin-bottom: 20px; }
@@ -283,6 +305,11 @@ input  { font-family: 'DM Sans', sans-serif; }
 /* Word detail */
 .detail-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; margin-top: -12px; }
 .detail-badge { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+.badge-common     { background: var(--surface2);  color: var(--text-secondary); }
+.badge-unique     { background: var(--syn-bg);     color: var(--syn); }
+.badge-specific   { background: var(--def-bg);     color: var(--def); }
+.badge-colloquial { background: var(--ant-bg);     color: var(--ant); }
+.badge-role       { background: var(--navy);       color: rgba(255,255,255,.7); font-weight: 500; }
 .badge-word    { background: var(--syn-bg); color: var(--syn); }
 .badge-idiom   { background: var(--def-bg); color: var(--def); }
 .badge-phrasal { background: var(--ant-bg); color: var(--ant); }
