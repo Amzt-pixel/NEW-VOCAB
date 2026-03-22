@@ -15,7 +15,10 @@
       <div class="gate-title">Dictionary</div>
       <div class="gate-subtitle">Personal Vocabulary Library</div>
       <div class="gate-form">
-        <input type="password" id="gateInput" class="gate-input" placeholder="Enter password" autocomplete="off"/>
+        <div class="gate-input-wrap">
+          <input type="password" id="gateInput" class="gate-input" placeholder="Enter password" autocomplete="off"/>
+          <button type="button" class="gate-eye" id="gateEye" title="Show/hide password">👁</button>
+        </div>
         <button class="gate-btn" id="gateBtn">Unlock</button>
         <div class="gate-error hidden" id="gateError">Incorrect password</div>
       </div>
