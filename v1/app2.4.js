@@ -3,7 +3,7 @@
    All 8 changes applied
    ══════════════════════════════════════ */
 
-const PASSWORD = '?=Dictionary';
+const PASSWORD = 'Abcd/1234';
 const CSV_URL  = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/dictionary1.csv';
 const HOLD_DURATION = 700;
 
@@ -659,9 +659,6 @@ function updateWordListPanel() {
           id="panel-item-${i}"
           data-word="${escapeHtml(w)}"
           data-index="${i}"
-          ontouchstart="startPanelHold(event, this)"
-          ontouchend="clearPanelHold()"
-          ontouchcancel="clearPanelHold()"
           onmousedown="startPanelHold(event, this)"
           onmousemove="cancelPanelHoldOnMove(event)"
           onmouseup="clearPanelHold()"
@@ -682,6 +679,15 @@ function updateWordListPanel() {
         </span>
       </div>`;
     }).join('');
+
+    // Attach touch events with passive:false so we can preventDefault and
+    // prevent the scroll container from stealing the touch before hold fires
+    container.querySelectorAll('.panel-item').forEach(el => {
+      el.addEventListener('touchstart',  e => startPanelHold(e, el), { passive: true });
+      el.addEventListener('touchmove',   onPanelTouchMove,           { passive: true });
+      el.addEventListener('touchend',    clearPanelHold,             { passive: true });
+      el.addEventListener('touchcancel', clearPanelHold,             { passive: true });
+    });
 
     setTimeout(() => {
       const cur = document.getElementById(`panel-item-${currentIndex}`);
@@ -719,14 +725,20 @@ function updateWordListPanel() {
 }
 
 // Panel hold — left-zone navigation
-let panelWasHold    = false;
-let panelMouseMoved = false;
+let panelWasHold     = false;
+let panelMouseMoved  = false;
+let panelTouchStartX = 0;
+let panelTouchStartY = 0;
 
 function startPanelHold(e, el) {
   clearPanelHold();
   panelWasHold    = false;
   panelMouseMoved = false;
   panelHoldItem   = el;
+  if (e.touches && e.touches[0]) {
+    panelTouchStartX = e.touches[0].clientX;
+    panelTouchStartY = e.touches[0].clientY;
+  }
   panelHoldTimer  = setTimeout(() => {
     panelHoldTimer = null;
     panelWasHold   = true;
@@ -735,6 +747,17 @@ function startPanelHold(e, el) {
     });
     el.classList.toggle('actions-visible');
   }, HOLD_DURATION);
+}
+
+function onPanelTouchMove(e) {
+  if (!panelHoldTimer) return;
+  if (e.touches && e.touches[0]) {
+    const dx = Math.abs(e.touches[0].clientX - panelTouchStartX);
+    const dy = Math.abs(e.touches[0].clientY - panelTouchStartY);
+    // Only cancel hold if finger moved significantly — Android fires tiny
+    // touchmove events even when stationary, so we need a threshold
+    if (dx > 8 || dy > 8) clearPanelHold();
+  }
 }
 
 function cancelPanelHoldOnMove(e) {
