@@ -3,7 +3,7 @@
    All 8 changes applied
    ══════════════════════════════════════ */
 
-const PASSWORD = '12345678';
+const PASSWORD = 'dicktionary';
 const CSV_URL  = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/dictionary1.csv';
 const HOLD_DURATION = 700;
 
@@ -1069,6 +1069,12 @@ function openCustomise() {
   pendingSettings = { ...settings };
   syncCustomiseUI(pendingSettings);
   document.getElementById('customiseOverlay').classList.remove('hidden');
+}
+
+function syncCustomiseUI(s) {
+  document.querySelectorAll('[data-size]').forEach(b => b.classList.toggle('active', b.dataset.size === s.fontSize));
+  document.querySelectorAll('[data-accent]').forEach(b => b.classList.toggle('selected', b.dataset.accent === s.accent));
+  document.querySelectorAll('[data-theme]').forEach(b => b.classList.toggle('selected', b.dataset.theme === s.theme));
 }
 
 function syncSettingsUI(s) {
