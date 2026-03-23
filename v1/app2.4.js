@@ -3,7 +3,7 @@
    All 8 changes applied
    ══════════════════════════════════════ */
 
-const PASSWORD = '@Dictionary';
+const PASSWORD = '?=Dictionary';
 const CSV_URL  = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/dictionary1.csv';
 const HOLD_DURATION = 700;
 
@@ -659,6 +659,9 @@ function updateWordListPanel() {
           id="panel-item-${i}"
           data-word="${escapeHtml(w)}"
           data-index="${i}"
+          ontouchstart="startPanelHold(event, this)"
+          ontouchend="clearPanelHold()"
+          ontouchcancel="clearPanelHold()"
           onmousedown="startPanelHold(event, this)"
           onmousemove="cancelPanelHoldOnMove(event)"
           onmouseup="clearPanelHold()"
@@ -679,15 +682,6 @@ function updateWordListPanel() {
         </span>
       </div>`;
     }).join('');
-
-    // Attach touch events with passive:false so we can preventDefault and
-    // prevent the scroll container from stealing the touch before hold fires
-    container.querySelectorAll('.panel-item').forEach(el => {
-      el.addEventListener('touchstart',  e => startPanelHold(e, el), { passive: true });
-      el.addEventListener('touchmove',   clearPanelHold,             { passive: true });
-      el.addEventListener('touchend',    clearPanelHold,             { passive: true });
-      el.addEventListener('touchcancel', clearPanelHold,             { passive: true });
-    });
 
     setTimeout(() => {
       const cur = document.getElementById(`panel-item-${currentIndex}`);
