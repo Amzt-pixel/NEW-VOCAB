@@ -3,7 +3,7 @@
    All 8 changes applied
    ══════════════════════════════════════ */
 
-const PASSWORD = 'Dictionary';
+const PASSWORD = '@Dictionary';
 const CSV_URL  = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/dictionary1.csv';
 const HOLD_DURATION = 700;
 
