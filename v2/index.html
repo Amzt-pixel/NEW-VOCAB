@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dictionary</title>
-  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body class="accent-gold">
 
@@ -16,7 +16,7 @@
       <div class="gate-subtitle">Personal Vocabulary Library</div>
       <div class="gate-form">
         <div class="gate-input-wrap">
-          <input type="password" id="gateInput" class="gate-input" placeholder="Enter password" autocomplete="off">
+          <input type="password" id="gateInput" class="gate-input" placeholder="Enter password" autocomplete="off"/>
           <button type="button" class="gate-eye" id="gateEye" title="Show/hide password">👁</button>
         </div>
         <label class="gate-remember">
@@ -265,6 +265,10 @@
           <div class="setting-label">Word Highlight</div>
           <label class="toggle"><input type="checkbox" id="highlightToggle"/><span class="toggle-slider"></span></label>
         </div>
+        <div class="setting-row">
+          <div class="setting-label">Show Similar Words</div>
+          <label class="toggle"><input type="checkbox" id="showSimilarToggle"/><span class="toggle-slider"></span></label>
+        </div>
       </div>
 
       <div class="settings-btn-row">
@@ -299,7 +303,10 @@
         <button class="addto-btn" data-flag="queue">📋<span>Queue</span></button>
         <button class="addto-btn" data-flag="hide" id="addToHideBtn">🚫<span id="addToHideLabel">Hide</span></button>
       </div>
-      <button class="modal-close-btn" id="addToClose">Done</button>
+      <div class="settings-btn-row">
+        <button class="modal-btn-secondary" id="addToClear">Clear</button>
+        <button class="modal-close-btn flex1" id="addToClose">Done</button>
+      </div>
     </div>
   </div>
 
@@ -341,6 +348,6 @@
     </div>
   </div>
 
-  <script src="apps.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
