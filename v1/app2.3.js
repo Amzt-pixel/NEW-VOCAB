@@ -3,8 +3,8 @@
    All 8 changes applied
    ══════════════════════════════════════ */
 
-const PASSWORD = 'dictionary';
-const CSV_URL  = 'https://raw.githubusercontent.com/Amzt-pixel/Vocabulary/main/dictionary-v18-5-Sun-00_05__1_.csv';
+const PASSWORD = 'Dictionary';
+const CSV_URL  = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/dictionary1.csv';
 const HOLD_DURATION = 700;
 
 // ── State ──
