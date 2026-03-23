@@ -3,7 +3,7 @@
    All 8 changes applied
    ══════════════════════════════════════ */
 
-const PASSWORD = 'Dictionary1';
+const PASSWORD = 'FAPfoids';
 const CSV_URL  = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/dictionary1.csv';
 const HOLD_DURATION = 700;
 
@@ -706,13 +706,15 @@ function updateWordListPanel() {
 }
 
 // Panel: tap = navigate, hold = open Add To popup
-let panelWasHold = false;
+let panelWasHold    = false;
+let panelWasScrolling = false;
 
 function startPanelHold(e, el) {
   clearPanelHold();
-  panelWasHold  = false;
-  panelHoldItem = el;
-  panelHoldTimer = setTimeout(() => {
+  panelWasHold      = false;
+  panelWasScrolling = false;
+  panelHoldItem     = el;
+  panelHoldTimer    = setTimeout(() => {
     panelHoldTimer = null;
     panelWasHold   = true;
     const word = el.dataset.word;
@@ -722,7 +724,7 @@ function startPanelHold(e, el) {
 
 function cancelPanelHold() {
   clearPanelHold();
-  panelWasHold = false;
+  panelWasScrolling = true; // finger moved — treat as scroll, not tap
 }
 
 function clearPanelHold() {
@@ -731,8 +733,11 @@ function clearPanelHold() {
 
 function endPanelTouch(e, el) {
   clearPanelHold();
-  if (panelWasHold) { panelWasHold = false; return; }
-  // Short tap — navigate
+  if (panelWasHold || panelWasScrolling) {
+    panelWasHold = false;
+    panelWasScrolling = false;
+    return;
+  }
   const idx = parseInt(el.dataset.index);
   if (!isNaN(idx)) { currentIndex = idx; displayWord(); closeModal('wordListOverlay'); }
 }
