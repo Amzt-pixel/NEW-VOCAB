@@ -4,7 +4,7 @@
    ══════════════════════════════════════ */
 
 const PASSWORD = '12345678';
-const CSV_URL  = 'https://raw.githubusercontent.com/Amzt-pixel/Vocabulary/main/dictionary1.csv';
+const CSV_URL  = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/dictionary1.csv';
 const HOLD_DURATION = 700;
 
 // ── State ──
