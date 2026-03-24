@@ -2,7 +2,7 @@
    DICTIONARY — app.js
    ══════════════════════════════════════ */
 
-const PASSWORD = 'goodieDoodie';
+const PASSWORD = 'VOCAB';
 const CSV_URL  = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/dictionary1.csv';
 const HOLD_DURATION = 700;
 
@@ -628,23 +628,30 @@ function clearPrevHold() { if (prevHoldTimer) { clearTimeout(prevHoldTimer); pre
 function startNextHold() { nextHoldTimer = setTimeout(() => { nextHoldTimer = null; const eff = getEffectiveStudyList(); const ei = eff.indexOf(studyList[currentIndex]); if (ei + settings.stepNumber < eff.length) openWordDetail(eff[ei + settings.stepNumber]); }, HOLD_DURATION); }
 function clearNextHold() { if (nextHoldTimer) { clearTimeout(nextHoldTimer); nextHoldTimer = null; } }
 
-let chipHoldTimer = null;
-let chipWasHold   = false;
+let chipHoldTimer  = null;
+let chipWasHold    = false;
+let chipHoldEvent  = null;
 
 function startChipHold(e, word) {
   clearChipHold();
-  chipWasHold = false;
+  chipWasHold   = false;
+  chipHoldEvent = e;
   chipHoldTimer = setTimeout(() => {
     chipHoldTimer = null;
     chipWasHold   = true;
+    // Prevent the subsequent click from firing on PC
+    if (chipHoldEvent) {
+      chipHoldEvent.preventDefault();
+      chipHoldEvent.stopPropagation();
+    }
     openWordDetail(word);
   }, HOLD_DURATION);
 }
 
 function endChipHold() {
-  // Short tap — just clear timer, do nothing
   clearChipHold();
-  chipWasHold = false;
+  chipWasHold   = false;
+  chipHoldEvent = null;
 }
 
 function clearChipHold() {
@@ -1156,7 +1163,8 @@ function bindSettingsEvents() {
       if (studyList.length) {
         const displayKeys = ['mode','tabOrder','showTranslation','showSimilar','wordHighlight',
           'showMeaning','meaningOptions','correctPercent','randomOptionCount',
-          'minOptions','maxOptions','fixedOptions','revealCorrect'];
+          'minOptions','maxOptions','fixedOptions','revealCorrect',
+          'reviseWordAction','mcqWordAction'];
         const changed = displayKeys.some(k => prev[k] !== settings[k]);
         if (changed) displayWord();
       }
