@@ -2,7 +2,7 @@
    DICTIONARY — app.js
    ══════════════════════════════════════ */
 
-const PASSWORD = 'vocabulary';
+const PASSWORD = 'goodieDoodie';
 const CSV_URL  = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/dictionary1.csv';
 const HOLD_DURATION = 700;
 
@@ -479,12 +479,22 @@ function displayRevise(word, entry) {
   }
 
   function buildReviseChips(options, type) {
-    return options.map(o =>
-      `<button class="chip ${type}-chip revise-chip"
+    const holdEvents = settings.reviseWordAction
+      ? `onmousedown="startChipHold(event,'__WORD__')"
+         onmouseup="endChipHold()"
+         onmouseleave="clearChipHold()"
+         ontouchstart="startChipHold(event,'__WORD__')"
+         ontouchmove="clearChipHold()"
+         ontouchend="endChipHold()"
+         ontouchcancel="clearChipHold()"` : '';
+    return options.map(o => {
+      const events = holdEvents.replace(/__WORD__/g, escapeHtml(o.word));
+      return `<button class="chip ${type}-chip revise-chip"
         data-correct="${o.correct}"
         onclick="handleReviseClick(this)"
-      >${escapeHtml(o.word)}</button>`
-    ).join('');
+        ${events}
+      >${escapeHtml(o.word)}</button>`;
+    }).join('');
   }
 
   if (syns.length > 0) {
@@ -543,7 +553,9 @@ function getReviseDistractors(exclude, count) {
 }
 
 function handleReviseClick(btn) {
-  // Ignore if already clicked
+  // If hold just fired, skip click action
+  if (chipWasHold) { chipWasHold = false; return; }
+  // Ignore if already answered
   if (btn.classList.contains('revise-correct') ||
       btn.classList.contains('revise-incorrect')) return;
 
