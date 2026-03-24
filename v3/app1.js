@@ -2,7 +2,7 @@
    DICTIONARY — app.js
    ══════════════════════════════════════ */
 
-const PASSWORD = 'DICKTIONARY';
+const PASSWORD = 'vocabulary';
 const CSV_URL  = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/dictionary1.csv';
 const HOLD_DURATION = 700;
 
@@ -423,12 +423,12 @@ function displayStudy(word, entry) {
   function buildChip(w, type) {
     const isHidden = hiddenWords.has(w);
     return `<button class="chip ${type}-chip${isHidden ? ' hidden-word' : ''}"
-      ondblclick="openWordDetail('${escapeHtml(w)}')"
       onmousedown="startChipHold(event,'${escapeHtml(w)}')"
-      onmouseup="clearChipHold()"
+      onmouseup="endChipHold()"
       onmouseleave="clearChipHold()"
       ontouchstart="startChipHold(event,'${escapeHtml(w)}')"
-      ontouchend="clearChipHold()"
+      ontouchmove="clearChipHold()"
+      ontouchend="endChipHold()"
       ontouchcancel="clearChipHold()"
     >${escapeHtml(w)}</button>`;
   }
@@ -617,10 +617,27 @@ function startNextHold() { nextHoldTimer = setTimeout(() => { nextHoldTimer = nu
 function clearNextHold() { if (nextHoldTimer) { clearTimeout(nextHoldTimer); nextHoldTimer = null; } }
 
 let chipHoldTimer = null;
+let chipWasHold   = false;
+
 function startChipHold(e, word) {
-  chipHoldTimer = setTimeout(() => { chipHoldTimer = null; openWordDetail(word); }, HOLD_DURATION);
+  clearChipHold();
+  chipWasHold = false;
+  chipHoldTimer = setTimeout(() => {
+    chipHoldTimer = null;
+    chipWasHold   = true;
+    openWordDetail(word);
+  }, HOLD_DURATION);
 }
-function clearChipHold() { if (chipHoldTimer) { clearTimeout(chipHoldTimer); chipHoldTimer = null; } }
+
+function endChipHold() {
+  // Short tap — just clear timer, do nothing
+  clearChipHold();
+  chipWasHold = false;
+}
+
+function clearChipHold() {
+  if (chipHoldTimer) { clearTimeout(chipHoldTimer); chipHoldTimer = null; }
+}
 
 // ══════════════════════════════════════
 // WORD DETAIL MODAL
@@ -652,13 +669,13 @@ function openWordDetail(word) {
   if (syns.length > 0) {
     html += `<div class="detail-section">
       <div class="detail-section-title" style="color:var(--syn)">Synonyms (${syns.length})</div>
-      <div class="chips-wrap">${syns.map(s => `<button class="chip syn-chip" ondblclick="openWordDetail('${escapeHtml(s)}')">${escapeHtml(s)}</button>`).join('')}</div>
+      <div class="chips-wrap">${syns.map(s => `<button class="chip syn-chip" onmousedown="startChipHold(event,'${escapeHtml(s)}')" onmouseup="endChipHold()" onmouseleave="clearChipHold()" ontouchstart="startChipHold(event,'${escapeHtml(s)}')" ontouchmove="clearChipHold()" ontouchend="endChipHold()" ontouchcancel="clearChipHold()">${escapeHtml(s)}</button>`).join('')}</div>
     </div>`;
   }
   if (ants.length > 0) {
     html += `<div class="detail-section">
       <div class="detail-section-title" style="color:var(--ant)">Antonyms (${ants.length})</div>
-      <div class="chips-wrap">${ants.map(a => `<button class="chip ant-chip" ondblclick="openWordDetail('${escapeHtml(a)}')">${escapeHtml(a)}</button>`).join('')}</div>
+      <div class="chips-wrap">${ants.map(a => `<button class="chip ant-chip" onmousedown="startChipHold(event,'${escapeHtml(a)}')" onmouseup="endChipHold()" onmouseleave="clearChipHold()" ontouchstart="startChipHold(event,'${escapeHtml(a)}')" ontouchmove="clearChipHold()" ontouchend="endChipHold()" ontouchcancel="clearChipHold()">${escapeHtml(a)}</button>`).join('')}</div>
     </div>`;
   }
   if (!html) html = `<div class="empty-state">No details available.</div>`;
@@ -1117,11 +1134,20 @@ function bindSettingsEvents() {
 
   document.getElementById('settingsSave').addEventListener('click', () => {
     if (pendingSettings) {
+      const prev = { ...settings };
       Object.assign(settings, pendingSettings);
       saveSettings();
       applySettings();
       document.getElementById('sessionStep').textContent = settings.stepNumber;
-      if (studyList.length) displayWord();
+
+      // Only refresh display if something visually relevant changed
+      if (studyList.length) {
+        const displayKeys = ['mode','tabOrder','showTranslation','showSimilar','wordHighlight',
+          'showMeaning','meaningOptions','correctPercent','randomOptionCount',
+          'minOptions','maxOptions','fixedOptions','revealCorrect'];
+        const changed = displayKeys.some(k => prev[k] !== settings[k]);
+        if (changed) displayWord();
+      }
     }
     pendingSettings = null;
     closeModal('settingsOverlay');
