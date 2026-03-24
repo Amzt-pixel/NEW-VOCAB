@@ -2,7 +2,7 @@
    DICTIONARY — app.js
    ══════════════════════════════════════ */
 
-const PASSWORD     = 'HelloMonster';
+const PASSWORD     = 'dictionary';
 const CSV_URL      = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/dictionary1.csv';
 const HOLD_MS      = 700;
 
@@ -1020,23 +1020,16 @@ function bindSettingsEvents() {
   // Save
   document.getElementById('settingsSave').addEventListener('click', () => {
     if (pending) {
-      const modeChanged     = pending.mode        !== S.mode;
-      const tabOrderChanged = pending.tabOrder     !== S.tabOrder;
+      const modeChanged     = pending.mode     !== S.mode;
+      const tabOrderChanged = pending.tabOrder  !== S.tabOrder;
       const reviseChanged   = S.mode === 'revise' && (
-        pending.showMeaning      !== S.showMeaning      ||
-        pending.meaningOptions   !== S.meaningOptions   ||
-        pending.correctPercent   !== S.correctPercent   ||
-        pending.randomOptionCount!== S.randomOptionCount||
-        pending.minOptions       !== S.minOptions       ||
-        pending.maxOptions       !== S.maxOptions       ||
-        pending.fixedOptions     !== S.fixedOptions     ||
-        pending.revealCorrect    !== S.revealCorrect    ||
-        pending.reviseWordAction !== S.reviseWordAction
-      );
-      const studyChanged = S.mode === 'study' && (
-        pending.showTranslation !== S.showTranslation ||
-        pending.wordHighlight   !== S.wordHighlight   ||
-        pending.showSimilar     !== S.showSimilar
+        pending.showMeaning       !== S.showMeaning       ||
+        pending.meaningOptions    !== S.meaningOptions    ||
+        pending.correctPercent    !== S.correctPercent    ||
+        pending.randomOptionCount !== S.randomOptionCount ||
+        pending.minOptions        !== S.minOptions        ||
+        pending.maxOptions        !== S.maxOptions        ||
+        pending.fixedOptions      !== S.fixedOptions
       );
 
       Object.assign(S, pending);
@@ -1044,7 +1037,7 @@ function bindSettingsEvents() {
       applyAppearance();
       document.getElementById('sessionStep').textContent = S.stepNumber;
 
-      if (studyList.length && (modeChanged || tabOrderChanged || reviseChanged || studyChanged))
+      if (studyList.length && (modeChanged || tabOrderChanged || reviseChanged))
         show();
     }
     pending = null;
