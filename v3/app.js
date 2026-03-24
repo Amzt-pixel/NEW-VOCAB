@@ -1,6 +1,5 @@
 /* ══════════════════════════════════════
-   DICTIONARY — app.js — Phase 1 v2
-   All 8 changes applied
+   DICTIONARY — app.js
    ══════════════════════════════════════ */
 
 const PASSWORD = 'dicktionary';
@@ -15,54 +14,38 @@ let currentIndex = 0;
 let startTime    = null;
 let wordsSeen    = 0;
 
-// Change 6: read history for current session
-let readHistory  = []; // [{word, index, time}]
-// Change 2: custom queue
-let customQueue  = []; // [{word}]
-// Change 2: hidden words (localStorage)
+let readHistory  = [];
+let customQueue  = [];
 let hiddenWords  = new Set();
-
-// Change 7: track if session is live
 let sessionLive  = false;
 
-// Settings — pending copy for Save/Close
+// Settings
 let settings = {
   accent: 'gold', fontSize: 'normal', stepNumber: 1,
   loopMode: false, filter: 'all',
   showTranslation: false, wordHighlight: false, showSimilar: false,
   orderMode: 'az', category: '1', activeTab: 'syn',
   theme: 'navy',
-  // Mode
   mode: 'study',
-  // Tab order: san=Syn→Ant→Meaning, ans=Ant→Syn→Meaning, msa=Meaning→Syn→Ant, mas=Meaning→Ant→Syn
   tabOrder: 'san',
-  // Revise
   showMeaning: false, meaningOptions: false,
   correctPercent: 50, randomOptionCount: false,
   minOptions: 4, maxOptions: 8, fixedOptions: 6,
   revealCorrect: false, reviseWordAction: false,
-  // MCQ
   mcqOptions: 4, mcqMaxCorrect: 1, mcqRandomize: false,
   showClock: false, mcqWordAction: false,
 };
 let pendingSettings = null;
 
-// Panel scroll positions per tab
 const panelScrollPos = { list: 0, queue: 0, history: 0 };
-
-// Add To pending state
 let pendingAddTo = {};
-
-// Current word open in detail modal
 let detailCurrentWord = null;
 
-// Panel state
 let panelTab        = 'list';
 let panelFilter     = '';
 let panelHoldTimer  = null;
 let panelHoldItem   = null;
 
-// Hold timers for prev/next
 let prevHoldTimer = null;
 let nextHoldTimer = null;
 
@@ -87,14 +70,12 @@ function checkSession() {
   }
 }
 
-// On tab close — if session was sessionStorage only, clear current session queues
 window.addEventListener('beforeunload', () => {
   const inSession = sessionStorage.getItem('dictSession') === 'unlocked';
   const inLocal   = localStorage.getItem('dictSession') === 'unlocked';
   if (inSession && !inLocal) {
     localStorage.removeItem('dictCurrentSession');
     localStorage.removeItem('dictCurrentQueue');
-    // dictLastSession intentionally NOT removed
   }
 });
 
@@ -106,18 +87,14 @@ function showScreen(name) {
   document.getElementById(`${name}Screen`).classList.add('active');
 }
 
-// Change 7: go home without resetting session
 function goHome() {
   showScreen('home');
-  // session state (studyList, currentIndex, etc.) preserved
 }
 
-// Change 7: book icon — resume or start
 function handleBookIcon() {
   if (sessionLive) {
     showScreen('study');
   } else {
-    // First time — start a fresh session with current selector values
     startSession();
   }
 }
@@ -305,6 +282,11 @@ function renderHomeWordList(showCount) {
   container.innerHTML = html;
 }
 
+// Fix: jumpToWord was called but never defined
+function jumpToWord(word) {
+  startSessionAtWord(word);
+}
+
 // ══════════════════════════════════════
 // SESSION
 // ══════════════════════════════════════
@@ -396,12 +378,10 @@ function displayWord() {
   const word  = studyList[currentIndex];
   const entry = csvData.find(r => r.word === word);
 
-  // Track history
   if (!readHistory.length || readHistory[readHistory.length - 1].word !== word) {
     readHistory.push({ word, index: currentIndex, time: new Date().toLocaleTimeString() });
   }
 
-  // Progress + hero (shared across all modes)
   document.getElementById('progressPill').textContent = `${currentIndex + 1} / ${studyList.length}`;
   document.getElementById('currentWord').textContent  = word;
   document.getElementById('currentRole').textContent  = entry?.role || '';
@@ -413,7 +393,7 @@ function displayWord() {
 
   if      (settings.mode === 'study')  displayStudy(word, entry);
   else if (settings.mode === 'revise') displayRevise(word, entry);
-  // MCQ: Phase later
+  // MCQ: future phase
 
   updateWordListPanel();
 }
@@ -433,7 +413,6 @@ function displayStudy(word, entry) {
   const ants   = getAntonyms(word);
   const hasDef = !!(entry?.definition);
 
-  // Build read-mode chips
   function buildChip(w, type) {
     const isHidden = hiddenWords.has(w);
     return `<button class="chip ${type}-chip${isHidden ? ' hidden-word' : ''}"
@@ -455,20 +434,18 @@ function displayStudy(word, entry) {
     ? `<div class="def-text">${escapeHtml(entry.definition)}</div>${entry.example ? `<div class="def-example">"${escapeHtml(entry.example)}"</div>` : ''}`
     : '';
 
-  // Visibility — fix 1: Meaning tab hidden if no def
-  document.getElementById('synCard').classList.toggle('hidden',  syns.length === 0);
-  document.getElementById('antCard').classList.toggle('hidden',  ants.length === 0);
-  document.getElementById('defCard').classList.toggle('hidden',  !hasDef);
+  document.getElementById('synCard').classList.toggle('hidden',   syns.length === 0);
+  document.getElementById('antCard').classList.toggle('hidden',   ants.length === 0);
+  document.getElementById('defCard').classList.toggle('hidden',   !hasDef);
   document.getElementById('emptyCard').classList.toggle('hidden', syns.length > 0 || ants.length > 0 || hasDef);
-  document.getElementById('tabSyn').classList.toggle('hidden',   syns.length === 0);
-  document.getElementById('tabAnt').classList.toggle('hidden',   ants.length === 0);
-  document.getElementById('tabDef').classList.toggle('hidden',   !hasDef);
+  document.getElementById('tabSyn').classList.toggle('hidden',    syns.length === 0);
+  document.getElementById('tabAnt').classList.toggle('hidden',    ants.length === 0);
+  document.getElementById('tabDef').classList.toggle('hidden',    !hasDef);
 
   document.getElementById('synCount').textContent = syns.length > 0 ? syns.length : '';
   document.getElementById('antCount').textContent = ants.length > 0 ? ants.length : '';
 
-  // Auto-activate first tab per tab order
-  const order = getTabOrder();
+  const order     = getTabOrder();
   const available = order.filter(t =>
     (t === 'syn' && syns.length) || (t === 'ant' && ants.length) || (t === 'def' && hasDef)
   );
@@ -480,15 +457,14 @@ function displayRevise(word, entry) {
   const ants   = getAntonyms(word);
   const hasDef = !!(entry?.definition);
 
-  // Generate options for a section
   function buildReviseOptions(correctWords, allExclude) {
     const totalOpts = settings.randomOptionCount
       ? Math.floor(Math.random() * (settings.maxOptions - settings.minOptions + 1)) + settings.minOptions
       : settings.fixedOptions;
-    const maxCorrect = Math.max(1, Math.floor(totalOpts * settings.correctPercent / 100));
+    const maxCorrect   = Math.max(1, Math.floor(totalOpts * settings.correctPercent / 100));
     const correctCount = Math.min(correctWords.length, maxCorrect);
     const selectedCorrect = [...correctWords].sort(() => Math.random() - 0.5).slice(0, correctCount);
-    const distractors = getReviseDistractors(allExclude, totalOpts - correctCount);
+    const distractors     = getReviseDistractors(allExclude, totalOpts - correctCount);
     return [...selectedCorrect, ...distractors].sort(() => Math.random() - 0.5)
       .map(w => ({ word: w, correct: selectedCorrect.includes(w) }));
   }
@@ -497,41 +473,34 @@ function displayRevise(word, entry) {
     return options.map(o =>
       `<button class="chip ${type}-chip revise-chip"
         data-correct="${o.correct}"
-        data-revealed="false"
         onclick="handleReviseClick(this)"
       >${escapeHtml(o.word)}</button>`
     ).join('');
   }
 
-  // Syn section
   if (syns.length > 0) {
     const opts = buildReviseOptions(syns, [word, ...syns, ...ants]);
     document.getElementById('synChips').innerHTML = buildReviseChips(opts, 'syn');
   }
 
-  // Ant section
   if (ants.length > 0) {
     const opts = buildReviseOptions(ants, [word, ...ants, ...syns]);
     document.getElementById('antChips').innerHTML = buildReviseChips(opts, 'ant');
   }
 
-  // Meaning section
   const defContent = document.getElementById('defContent');
   if (hasDef && settings.showMeaning) {
     if (settings.meaningOptions) {
-      // Show as MCQ options
-      const allDefs = csvData.filter(r => r.definition && r.word !== word).map(r => r.definition);
+      const allDefs       = csvData.filter(r => r.definition && r.word !== word).map(r => r.definition);
       const distractorDefs = allDefs.sort(() => Math.random() - 0.5).slice(0, settings.fixedOptions - 1);
-      const opts = [entry.definition, ...distractorDefs].sort(() => Math.random() - 0.5);
+      const opts           = [entry.definition, ...distractorDefs].sort(() => Math.random() - 0.5);
       defContent.innerHTML = opts.map(d =>
         `<button class="chip revise-chip" style="width:100%;text-align:left;border-radius:10px;padding:10px 14px;margin-bottom:6px;background:var(--def-bg);color:var(--def);border:1.5px solid var(--def-light)"
           data-correct="${d === entry.definition}"
-          data-revealed="false"
           onclick="handleReviseClick(this)"
         >${escapeHtml(d)}</button>`
       ).join('');
     } else {
-      // Show in read style
       defContent.innerHTML = `<div class="def-text">${escapeHtml(entry.definition)}</div>${entry.example ? `<div class="def-example">"${escapeHtml(entry.example)}"</div>` : ''}`;
     }
   } else {
@@ -539,18 +508,18 @@ function displayRevise(word, entry) {
   }
 
   const showDef = hasDef && settings.showMeaning;
-  document.getElementById('synCard').classList.toggle('hidden',  syns.length === 0);
-  document.getElementById('antCard').classList.toggle('hidden',  ants.length === 0);
-  document.getElementById('defCard').classList.toggle('hidden',  !showDef);
+  document.getElementById('synCard').classList.toggle('hidden',   syns.length === 0);
+  document.getElementById('antCard').classList.toggle('hidden',   ants.length === 0);
+  document.getElementById('defCard').classList.toggle('hidden',   !showDef);
   document.getElementById('emptyCard').classList.toggle('hidden', syns.length > 0 || ants.length > 0 || showDef);
-  document.getElementById('tabSyn').classList.toggle('hidden',   syns.length === 0);
-  document.getElementById('tabAnt').classList.toggle('hidden',   ants.length === 0);
-  document.getElementById('tabDef').classList.toggle('hidden',   !showDef);
+  document.getElementById('tabSyn').classList.toggle('hidden',    syns.length === 0);
+  document.getElementById('tabAnt').classList.toggle('hidden',    ants.length === 0);
+  document.getElementById('tabDef').classList.toggle('hidden',    !showDef);
 
   document.getElementById('synCount').textContent = syns.length > 0 ? syns.length : '';
   document.getElementById('antCount').textContent = ants.length > 0 ? ants.length : '';
 
-  const order = getTabOrder();
+  const order     = getTabOrder();
   const available = order.filter(t =>
     (t === 'syn' && syns.length) || (t === 'ant' && ants.length) || (t === 'def' && showDef)
   );
@@ -566,9 +535,8 @@ function handleReviseClick(btn) {
   const isCorrect  = btn.dataset.correct === 'true';
   const parentCard = btn.closest('.content-card');
 
-  // Toggle selected state
   if (btn.classList.contains('revise-selected') ||
-      btn.classList.contains('revise-correct') ||
+      btn.classList.contains('revise-correct')   ||
       btn.classList.contains('revise-incorrect')) {
     btn.classList.remove('revise-selected','revise-correct','revise-incorrect');
     return;
@@ -577,7 +545,6 @@ function handleReviseClick(btn) {
   btn.classList.add(isCorrect ? 'revise-correct' : 'revise-incorrect');
   btn.classList.add('revise-selected');
 
-  // Reveal correct answers if wrong and setting is on
   if (!isCorrect && settings.revealCorrect) {
     parentCard.querySelectorAll('[data-correct="true"]').forEach(el => {
       if (!el.classList.contains('revise-correct')) {
@@ -586,8 +553,6 @@ function handleReviseClick(btn) {
     });
   }
 }
-
-// getLevelLabel removed — level shown via badge in displayWord
 
 // ══════════════════════════════════════
 // TABS
@@ -605,14 +570,13 @@ function switchTab(tab) {
 // NAVIGATION
 // ══════════════════════════════════════
 function getEffectiveStudyList() {
-  // Skip hidden words
   return studyList.filter(w => !hiddenWords.has(w));
 }
 
 function nextWord() {
   const effective = getEffectiveStudyList();
   if (!effective.length) return;
-  const effIdx = effective.indexOf(studyList[currentIndex]);
+  const effIdx  = effective.indexOf(studyList[currentIndex]);
   const nextEff = effIdx + settings.stepNumber;
   if (nextEff >= effective.length) {
     if (!settings.loopMode) { alert('You\'ve reached the end of the list.'); return; }
@@ -627,7 +591,7 @@ function nextWord() {
 function prevWord() {
   const effective = getEffectiveStudyList();
   if (!effective.length) return;
-  const effIdx = effective.indexOf(studyList[currentIndex]);
+  const effIdx  = effective.indexOf(studyList[currentIndex]);
   const prevEff = effIdx - settings.stepNumber;
   if (prevEff < 0) {
     if (!settings.loopMode) { alert('You\'ve reached the beginning of the list.'); return; }
@@ -644,7 +608,6 @@ function clearPrevHold() { if (prevHoldTimer) { clearTimeout(prevHoldTimer); pre
 function startNextHold() { nextHoldTimer = setTimeout(() => { nextHoldTimer = null; const eff = getEffectiveStudyList(); const ei = eff.indexOf(studyList[currentIndex]); if (ei + settings.stepNumber < eff.length) openWordDetail(eff[ei + settings.stepNumber]); }, HOLD_DURATION); }
 function clearNextHold() { if (nextHoldTimer) { clearTimeout(nextHoldTimer); nextHoldTimer = null; } }
 
-// Change 1: chip double-click opens detail; hold still works
 let chipHoldTimer = null;
 function startChipHold(e, word) {
   chipHoldTimer = setTimeout(() => { chipHoldTimer = null; openWordDetail(word); }, HOLD_DURATION);
@@ -652,7 +615,7 @@ function startChipHold(e, word) {
 function clearChipHold() { if (chipHoldTimer) { clearTimeout(chipHoldTimer); chipHoldTimer = null; } }
 
 // ══════════════════════════════════════
-// WORD DETAIL MODAL — Change 1
+// WORD DETAIL MODAL
 // ══════════════════════════════════════
 function openWordDetail(word) {
   detailCurrentWord = word;
@@ -663,7 +626,7 @@ function openWordDetail(word) {
   document.getElementById('detailWord').textContent = word;
 
   const metaEl = document.getElementById('detailMeta');
-  const levelLabels = { 0:'Common', 1:'Unique', 2:'Specific', 3:'Colloquial' };
+  const levelLabels  = { 0:'Common', 1:'Unique', 2:'Specific', 3:'Colloquial' };
   const levelClasses = { 0:'badge-common', 1:'badge-unique', 2:'badge-specific', 3:'badge-colloquial' };
   const lv = entry?.level ?? 0;
   const badges = [`<span class="detail-badge ${levelClasses[lv]}">${levelLabels[lv]}</span>`];
@@ -696,7 +659,6 @@ function openWordDetail(word) {
   document.getElementById('wordDetailOverlay').classList.remove('hidden');
 }
 
-// Change 1: View Word button
 function viewDetailWord() {
   if (!detailCurrentWord) return;
   closeModal('wordDetailOverlay');
@@ -739,8 +701,9 @@ function renderSearchResults(query, containerId) {
     return `<div>
       <div class="search-group-title">${title}</div>
       ${list.slice(0,20).map(w => {
-        const e = csvData.find(r => r.word === w);
-        const s = getSynonyms(w).length; const a = getAntonyms(w).length;
+        const e    = csvData.find(r => r.word === w);
+        const s    = getSynonyms(w).length;
+        const a    = getAntonyms(w).length;
         const meta = [s>0?`${s} syn`:'', a>0?`${a} ant`:''].filter(Boolean).join(' · ');
         return `<div class="search-item" onclick="jumpToWordFromSearch('${escapeHtml(w)}')">
           <div>
@@ -766,7 +729,7 @@ function jumpToWordFromSearch(word) {
 }
 
 // ══════════════════════════════════════
-// WORD LIST PANEL — Changes 2, 5, 6
+// WORD LIST PANEL
 // ══════════════════════════════════════
 function openWordListPanel() {
   panelTab    = 'list';
@@ -782,7 +745,6 @@ function updateWordListPanel() {
   const container = document.getElementById('wordListContent');
   const filter    = panelFilter.toLowerCase();
 
-  // Save current scroll position before re-rendering
   panelScrollPos[panelTab] = container.scrollTop;
 
   if (panelTab === 'list') {
@@ -839,12 +801,11 @@ function updateWordListPanel() {
     ).join('') || `<div class="panel-empty">No matches.</div>`;
   }
 
-  // Restore scroll position
   container.scrollTop = panelScrollPos[panelTab];
 }
 
 // Panel: tap = navigate, hold = open Add To popup
-let panelWasHold    = false;
+let panelWasHold      = false;
 let panelWasScrolling = false;
 
 function startPanelHold(e, el) {
@@ -862,7 +823,7 @@ function startPanelHold(e, el) {
 
 function cancelPanelHold() {
   clearPanelHold();
-  panelWasScrolling = true; // finger moved — treat as scroll, not tap
+  panelWasScrolling = true;
 }
 
 function clearPanelHold() {
@@ -872,7 +833,7 @@ function clearPanelHold() {
 function endPanelTouch(e, el) {
   clearPanelHold();
   if (panelWasHold || panelWasScrolling) {
-    panelWasHold = false;
+    panelWasHold      = false;
     panelWasScrolling = false;
     return;
   }
@@ -887,41 +848,26 @@ function endPanelMouse(e, el) {
   if (!isNaN(idx)) { currentIndex = idx; displayWord(); closeModal('wordListOverlay'); }
 }
 
-// Change 2: hide/unhide word
-function toggleHideWord(word, e) {
-  e.stopPropagation();
-  if (hiddenWords.has(word)) hiddenWords.delete(word);
-  else hiddenWords.add(word);
-  saveHiddenWords();
-  updateWordListPanel();
-  if (studyList.length) displayWord(); // refresh chips
-}
+function saveHiddenWords() { localStorage.setItem('dictHidden', JSON.stringify([...hiddenWords])); }
+function loadHiddenWords() { try { hiddenWords = new Set(JSON.parse(localStorage.getItem('dictHidden') || '[]')); } catch(e) {} }
 
-function saveHiddenWords()  { localStorage.setItem('dictHidden', JSON.stringify([...hiddenWords])); }
-function loadHiddenWords()  { try { hiddenWords = new Set(JSON.parse(localStorage.getItem('dictHidden') || '[]')); } catch(e) {} }
-
-// Change 2: Add To from panel
 function openAddTo(word, e) {
   e?.stopPropagation();
   document.getElementById('addToWordTitle').textContent = `"${word}"`;
   document.getElementById('addToOverlay').dataset.word = word;
 
-  // Build pending state from actual current state
   pendingAddTo = {
     queue: !!customQueue.find(q => q.word === word),
     hide:  hiddenWords.has(word),
   };
 
-  // Reset all buttons then sync to actual state
   syncAddToUI(word);
   document.getElementById('addToOverlay').classList.remove('hidden');
 }
 
 function syncAddToUI(word) {
-  // Reset all
   document.querySelectorAll('.addto-btn').forEach(b => b.classList.remove('active'));
 
-  // Set queue and hide based on pendingAddTo
   if (pendingAddTo.queue) document.querySelector('[data-flag="queue"]').classList.add('active');
   if (pendingAddTo.hide) {
     const hideBtn = document.getElementById('addToHideBtn');
@@ -951,7 +897,6 @@ function bindAddTo() {
       const word = document.getElementById('addToOverlay').dataset.word;
       if (!word) return;
 
-      // Update pending state and visual only — nothing applied yet
       if (flag === 'queue') {
         pendingAddTo.queue = !pendingAddTo.queue;
         btn.classList.toggle('active', pendingAddTo.queue);
@@ -965,16 +910,13 @@ function bindAddTo() {
     });
   });
 
-  // Done — apply pending state
   document.getElementById('addToClose').addEventListener('click', () => {
     const word = document.getElementById('addToOverlay').dataset.word;
     if (word) {
-      // Apply queue
       const inQueue = !!customQueue.find(q => q.word === word);
       if (pendingAddTo.queue && !inQueue) customQueue.push({ word });
       if (!pendingAddTo.queue && inQueue) customQueue = customQueue.filter(q => q.word !== word);
 
-      // Apply hide
       if (pendingAddTo.hide) hiddenWords.add(word);
       else hiddenWords.delete(word);
 
@@ -985,7 +927,6 @@ function bindAddTo() {
     closeModal('addToOverlay');
   });
 
-  // Clear — reset to actual current state without closing
   document.getElementById('addToClear').addEventListener('click', () => {
     const word = document.getElementById('addToOverlay').dataset.word;
     if (word) {
@@ -999,15 +940,17 @@ function bindAddTo() {
 }
 
 // ══════════════════════════════════════
-// INFO MODAL — Close + Quit
+// INFO MODAL
 // ══════════════════════════════════════
 function showInfo() {
   const elapsed = startTime ? Math.floor((new Date() - startTime) / 1000) : 0;
-  const mins = Math.floor(elapsed / 60); const secs = elapsed % 60;
+  const mins    = Math.floor(elapsed / 60);
+  const secs    = elapsed % 60;
   document.getElementById('infoContent').innerHTML = `
     <div class="info-row"><span class="info-row-label">Time</span><span class="info-row-value accent">${mins}m ${secs}s</span></div>
     <div class="info-row"><span class="info-row-label">Word Set</span><span class="info-row-value">Dictionary</span></div>
     <div class="info-row"><span class="info-row-label">Order</span><span class="info-row-value">${settings.orderMode === 'az' ? 'A→Z' : settings.orderMode === 'za' ? 'Z→A' : 'Random'}</span></div>
+    <div class="info-row"><span class="info-row-label">Mode</span><span class="info-row-value">${settings.mode}</span></div>
     <div class="info-row"><span class="info-row-label">Total Words</span><span class="info-row-value">${studyList.length}</span></div>
     <div class="info-row"><span class="info-row-label">Hidden Words</span><span class="info-row-value">${hiddenWords.size}</span></div>
     <div class="info-row"><span class="info-row-label">Words Seen</span><span class="info-row-value">${wordsSeen}</span></div>
@@ -1018,17 +961,14 @@ function showInfo() {
 }
 
 function quitSession() {
-  // Auto-save custom queue if non-empty
   if (customQueue.length > 0) {
-    const name = generateListName('CustomList');
+    const name  = generateListName('CustomList');
     const saved = JSON.parse(localStorage.getItem('dictSavedLists') || '[]');
     saved.push({ name, words: customQueue.map(q => q.word), type: 2, savedAt: new Date().toISOString() });
     localStorage.setItem('dictSavedLists', JSON.stringify(saved));
   }
-  // Clear current session
   localStorage.removeItem('dictCurrentSession');
   localStorage.removeItem('dictCurrentQueue');
-  // Reset in-memory state
   studyList    = [];
   currentIndex = 0;
   wordsSeen    = 0;
@@ -1041,23 +981,14 @@ function quitSession() {
 }
 
 // ══════════════════════════════════════
-// MODE SWITCHING
-// ══════════════════════════════════════
-function switchMode(mode) {
-  settings.mode = mode;
-  updateSettingsConditional(mode);
-  displayWord();
-}
-
-function updateSettingsConditional(mode) {
-  document.querySelectorAll('.study-only').forEach(el => el.classList.toggle('hidden', mode !== 'study'));
-  document.querySelectorAll('.revise-only').forEach(el => el.classList.toggle('hidden', mode !== 'revise'));
-  document.querySelectorAll('.mcq-only').forEach(el => el.classList.toggle('hidden', mode !== 'mcq'));
-}
-
-// ══════════════════════════════════════
 // SETTINGS
 // ══════════════════════════════════════
+function updateSettingsConditional(mode) {
+  document.querySelectorAll('.study-only').forEach(el  => el.classList.toggle('hidden', mode !== 'study'));
+  document.querySelectorAll('.revise-only').forEach(el => el.classList.toggle('hidden', mode !== 'revise'));
+  document.querySelectorAll('.mcq-only').forEach(el    => el.classList.toggle('hidden', mode !== 'mcq'));
+}
+
 function openSettings() {
   pendingSettings = { ...settings };
   syncSettingsUI(pendingSettings);
@@ -1072,46 +1003,45 @@ function openCustomise() {
 }
 
 function syncCustomiseUI(s) {
-  document.querySelectorAll('[data-size]').forEach(b => b.classList.toggle('active', b.dataset.size === s.fontSize));
-  document.querySelectorAll('[data-accent]').forEach(b => b.classList.toggle('selected', b.dataset.accent === s.accent));
-  document.querySelectorAll('[data-theme]').forEach(b => b.classList.toggle('selected', b.dataset.theme === s.theme));
+  document.querySelectorAll('[data-size]').forEach(b    => b.classList.toggle('active',   b.dataset.size  === s.fontSize));
+  document.querySelectorAll('[data-accent]').forEach(b  => b.classList.toggle('selected', b.dataset.accent === s.accent));
+  document.querySelectorAll('[data-theme]').forEach(b   => b.classList.toggle('selected', b.dataset.theme  === s.theme));
 }
 
 function syncSettingsUI(s) {
-  // Mode toggles — only one checked at a time
   document.getElementById('modeStudyToggle').checked  = s.mode === 'study';
   document.getElementById('modeReviseToggle').checked = s.mode === 'revise';
   document.getElementById('modeMCQToggle').checked    = s.mode === 'mcq';
 
-  document.querySelectorAll('[data-step]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.step) === s.stepNumber));
-  document.querySelectorAll('[data-filter]').forEach(b => b.classList.toggle('active', b.dataset.filter === s.filter));
-  document.querySelectorAll('[data-taborder]').forEach(b => b.classList.toggle('active', b.dataset.taborder === s.tabOrder));
-  document.querySelectorAll('[data-correctpct]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.correctpct) === s.correctPercent));
-  document.querySelectorAll('[data-minopt]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.minopt) === s.minOptions));
-  document.querySelectorAll('[data-maxopt]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.maxopt) === s.maxOptions));
-  document.querySelectorAll('[data-fixedopt]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.fixedopt) === s.fixedOptions));
-  document.querySelectorAll('[data-mcqopt]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.mcqopt) === s.mcqOptions));
-  document.querySelectorAll('[data-mcqmaxcorrect]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.mcqmaxcorrect) === s.mcqMaxCorrect));
-  document.getElementById('loopToggle').checked           = s.loopMode;
-  document.getElementById('translationToggle').checked    = s.showTranslation;
-  document.getElementById('highlightToggle').checked      = s.wordHighlight;
-  document.getElementById('showSimilarToggle').checked    = s.showSimilar;
-  document.getElementById('showMeaningToggle').checked    = s.showMeaning;
-  document.getElementById('meaningOptionsToggle').checked = s.meaningOptions;
-  document.getElementById('randomOptToggle').checked      = s.randomOptionCount;
-  document.getElementById('revealCorrectToggle').checked  = s.revealCorrect;
+  document.querySelectorAll('[data-step]').forEach(b         => b.classList.toggle('active', parseInt(b.dataset.step)         === s.stepNumber));
+  document.querySelectorAll('[data-filter]').forEach(b       => b.classList.toggle('active', b.dataset.filter                 === s.filter));
+  document.querySelectorAll('[data-taborder]').forEach(b     => b.classList.toggle('active', b.dataset.taborder               === s.tabOrder));
+  document.querySelectorAll('[data-correctpct]').forEach(b   => b.classList.toggle('active', parseInt(b.dataset.correctpct)   === s.correctPercent));
+  document.querySelectorAll('[data-minopt]').forEach(b       => b.classList.toggle('active', parseInt(b.dataset.minopt)       === s.minOptions));
+  document.querySelectorAll('[data-maxopt]').forEach(b       => b.classList.toggle('active', parseInt(b.dataset.maxopt)       === s.maxOptions));
+  document.querySelectorAll('[data-fixedopt]').forEach(b     => b.classList.toggle('active', parseInt(b.dataset.fixedopt)     === s.fixedOptions));
+  document.querySelectorAll('[data-mcqopt]').forEach(b       => b.classList.toggle('active', parseInt(b.dataset.mcqopt)       === s.mcqOptions));
+  document.querySelectorAll('[data-mcqmaxcorrect]').forEach(b=> b.classList.toggle('active', parseInt(b.dataset.mcqmaxcorrect)=== s.mcqMaxCorrect));
+
+  document.getElementById('loopToggle').checked             = s.loopMode;
+  document.getElementById('translationToggle').checked      = s.showTranslation;
+  document.getElementById('highlightToggle').checked        = s.wordHighlight;
+  document.getElementById('showSimilarToggle').checked      = s.showSimilar;
+  document.getElementById('showMeaningToggle').checked      = s.showMeaning;
+  document.getElementById('meaningOptionsToggle').checked   = s.meaningOptions;
+  document.getElementById('randomOptToggle').checked        = s.randomOptionCount;
+  document.getElementById('revealCorrectToggle').checked    = s.revealCorrect;
   document.getElementById('reviseWordActionToggle').checked = s.reviseWordAction;
-  document.getElementById('mcqRandomizeToggle').checked   = s.mcqRandomize;
-  document.getElementById('showClockToggle').checked      = s.showClock;
-  document.getElementById('mcqWordActionToggle').checked  = s.mcqWordAction;
-  // Conditional rows
+  document.getElementById('mcqRandomizeToggle').checked     = s.mcqRandomize;
+  document.getElementById('showClockToggle').checked        = s.showClock;
+  document.getElementById('mcqWordActionToggle').checked    = s.mcqWordAction;
+
   document.querySelector('.meaning-options-row').classList.toggle('hidden', !s.showMeaning);
   document.querySelectorAll('.random-opts-row').forEach(r => r.classList.toggle('hidden', !s.randomOptionCount));
   document.querySelector('.fixed-opts-row').classList.toggle('hidden', s.randomOptionCount);
 }
 
 function bindSettingsEvents() {
-  // Mode toggles — mutual exclusion
   const modeToggles = [
     { id: 'modeStudyToggle',  mode: 'study'  },
     { id: 'modeReviseToggle', mode: 'revise' },
@@ -1121,14 +1051,10 @@ function bindSettingsEvents() {
     document.getElementById(id).addEventListener('change', e => {
       if (!pendingSettings) return;
       if (e.target.checked) {
-        // Turn this one on, others off
         pendingSettings.mode = mode;
-        modeToggles.forEach(t => {
-          document.getElementById(t.id).checked = t.mode === mode;
-        });
+        modeToggles.forEach(t => { document.getElementById(t.id).checked = t.mode === mode; });
         updateSettingsConditional(mode);
       } else {
-        // Prevent unchecking — keep at least one always on
         e.target.checked = true;
       }
     });
@@ -1144,21 +1070,20 @@ function bindSettingsEvents() {
     }));
   }
 
-  bindGroup('data-step',         'stepNumber',    parseInt);
-  bindGroup('data-filter',       'filter',        null);
-  bindGroup('data-taborder',     'tabOrder',      null);
-  bindGroup('data-correctpct',   'correctPercent',parseInt);
-  bindGroup('data-minopt',       'minOptions',    parseInt);
-  bindGroup('data-maxopt',       'maxOptions',    parseInt);
-  bindGroup('data-fixedopt',     'fixedOptions',  parseInt);
-  bindGroup('data-mcqopt',       'mcqOptions',    parseInt);
-  bindGroup('data-mcqmaxcorrect','mcqMaxCorrect', parseInt);
+  bindGroup('data-step',          'stepNumber',    parseInt);
+  bindGroup('data-filter',        'filter',        null);
+  bindGroup('data-taborder',      'tabOrder',      null);
+  bindGroup('data-correctpct',    'correctPercent',parseInt);
+  bindGroup('data-minopt',        'minOptions',    parseInt);
+  bindGroup('data-maxopt',        'maxOptions',    parseInt);
+  bindGroup('data-fixedopt',      'fixedOptions',  parseInt);
+  bindGroup('data-mcqopt',        'mcqOptions',    parseInt);
+  bindGroup('data-mcqmaxcorrect', 'mcqMaxCorrect', parseInt);
 
   function bindToggle(id, key) {
     document.getElementById(id).addEventListener('change', e => {
       if (!pendingSettings) return;
       pendingSettings[key] = e.target.checked;
-      // Handle conditional row visibility live
       if (id === 'showMeaningToggle') {
         document.querySelector('.meaning-options-row').classList.toggle('hidden', !e.target.checked);
       }
@@ -1249,15 +1174,15 @@ function bindCustomiseEvents() {
   });
 }
 
-function saveSettings()  { localStorage.setItem('dictSettings', JSON.stringify(settings)); }
-function loadSettings()  {
+function saveSettings() { localStorage.setItem('dictSettings', JSON.stringify(settings)); }
+function loadSettings() {
   const saved = localStorage.getItem('dictSettings');
   if (saved) { try { Object.assign(settings, JSON.parse(saved)); } catch(e) {} }
   const accent = localStorage.getItem('dictAccent');
   if (accent) settings.accent = accent;
 }
 function applySettings() { applyAccent(); applyTheme(); applyFontSize(); }
-function applyAccent()   {
+function applyAccent() {
   document.body.className = document.body.className.replace(/accent-\w+/g, '').trim();
   document.body.classList.add(`accent-${settings.accent}`);
   localStorage.setItem('dictAccent', settings.accent);
@@ -1342,7 +1267,7 @@ function bindEvents() {
   // Panel save
   document.getElementById('panelSaveBtn').addEventListener('click', savePanelList);
 
-  // Panel search (Change 5)
+  // Panel search
   document.getElementById('panelSearchInput').addEventListener('input', e => {
     panelFilter = e.target.value.trim();
     updateWordListPanel();
@@ -1357,11 +1282,12 @@ function bindEvents() {
   document.getElementById('infoQuit').addEventListener('click', quitSession);
   document.getElementById('infoOverlay').addEventListener('click', e => closeOnOverlay('infoOverlay', e));
 
-  // Word detail — Change 1: View Word
+  // Word detail
   document.getElementById('wordDetailClose').addEventListener('click', () => closeModal('wordDetailOverlay'));
   document.getElementById('wordDetailView').addEventListener('click', viewDetailWord);
   document.getElementById('wordDetailOverlay').addEventListener('click', e => closeOnOverlay('wordDetailOverlay', e));
 
+  // Settings overlay click-outside
   document.getElementById('settingsOverlay').addEventListener('click', e => {
     if (e.target.id === 'settingsOverlay') { pendingSettings = null; closeModal('settingsOverlay'); syncSettingsUI(settings); }
   });
