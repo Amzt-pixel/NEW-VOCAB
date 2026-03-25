@@ -2,7 +2,7 @@
    DICTIONARY — app.js
    ══════════════════════════════════════ */
 
-const PASSWORD     = 'transister';
+const PASSWORD     = 'dicktionary';
 const CSV_URL      = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/dictionary1.csv';
 const HOLD_MS      = 700;
 
@@ -344,7 +344,7 @@ function show() {
   else if (S.mode === 'revise') showRevise(word, entry);
   // MCQ: future
 
-  updatePanel();
+  if (!document.getElementById('wordListOverlay').classList.contains('hidden')) updatePanel();
 }
 
 function tabOrder() {
@@ -677,7 +677,6 @@ function openPanel() {
 }
 
 function updatePanel() {
-  if (document.getElementById('wordListOverlay').classList.contains('hidden')) return;
   const el  = document.getElementById('wordListContent');
   const f   = panelFilter.toLowerCase();
   panelScroll[panelTab] = el.scrollTop;
