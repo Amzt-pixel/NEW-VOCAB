@@ -264,11 +264,77 @@
           <label class="toggle"><input type="checkbox" id="loopToggle"/><span class="toggle-slider"></span></label>
         </div>
         <div class="setting-row">
-          <div class="setting-label">Word List Filter</div>
-          <div class="size-btns">
-            <button class="size-btn active" data-filter="all">All</button>
-            <button class="size-btn" data-filter="root">Root</button>
-            <button class="size-btn" data-filter="synant">Syn/Ant</button>
+          <div class="setting-label">Step Action (Each)</div>
+          <label class="toggle"><input type="checkbox" id="stepActionToggle"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Navigation Filter</div>
+          <label class="toggle"><input type="checkbox" id="navFilterToggle"/><span class="toggle-slider"></span></label>
+        </div>
+
+        <!-- Nav filter options — shown when navFilter ON -->
+        <div class="nav-filter-options hidden" id="navFilterOptions">
+          <div class="setting-row setting-row-indent">
+            <label class="check-label">
+              <input type="checkbox" id="navSynAntChk" checked/>
+              <span>Syn / Ant</span>
+            </label>
+          </div>
+          <div class="setting-row setting-row-indent">
+            <label class="check-label">
+              <input type="checkbox" id="navDefinedChk"/>
+              <span>Defined</span>
+            </label>
+          </div>
+          <div class="setting-row setting-row-indent">
+            <label class="check-label">
+              <input type="checkbox" id="navRootwiseChk"/>
+              <span>Rootwise</span>
+            </label>
+          </div>
+          <!-- Rootwise sub-options — shown when Rootwise checked -->
+          <div class="nav-rootwise-options hidden" id="navRootwiseOptions">
+            <div class="setting-row setting-row-indent2">
+              <div class="setting-label">Next: Exclusive</div>
+              <label class="toggle"><input type="checkbox" id="nxtBehaviorToggle" checked/><span class="toggle-slider"></span></label>
+            </div>
+            <div class="setting-row setting-row-indent2">
+              <div class="setting-label">Prev: Variation</div>
+              <label class="toggle"><input type="checkbox" id="prevBehaviorToggle"/><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Random Navigation — shown in A→Z / Z→A modes only -->
+        <div class="nav-random-section hidden" id="navRandomSection">
+          <div class="setting-row">
+            <div class="setting-label">Random Navigation</div>
+            <label class="toggle"><input type="checkbox" id="randomNavToggle"/><span class="toggle-slider"></span></label>
+          </div>
+          <!-- Neighborhood + Suggest Marked — shown when randomNav ON -->
+          <div class="nav-random-options hidden" id="navRandomOptions">
+            <div class="setting-row setting-row-indent">
+              <div class="setting-label">Neighborhood (Δ)</div>
+              <div class="size-btns">
+                <button class="size-btn active" data-delta="2">2</button>
+                <button class="size-btn" data-delta="4">4</button>
+                <button class="size-btn" data-delta="6">6</button>
+                <button class="size-btn" data-delta="8">8</button>
+                <button class="size-btn" data-delta="10">10</button>
+              </div>
+            </div>
+            <div class="setting-row setting-row-indent">
+              <div class="setting-label">Suggest Marked</div>
+              <label class="toggle"><input type="checkbox" id="suggestMarkedToggle"/><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Suggest Marked for Random order — always shown when orderMode is random -->
+        <div class="nav-random-order-section hidden" id="navRandomOrderSection">
+          <div class="setting-row">
+            <div class="setting-label">Suggest Marked</div>
+            <label class="toggle"><input type="checkbox" id="suggestMarkedRandomToggle"/><span class="toggle-slider"></span></label>
           </div>
         </div>
       </div>
@@ -478,6 +544,19 @@
     </div>
   </div>
 
-  <script src="app3.js"></script>
+  <!-- ══════════════ QUICK NAV POPUP ══════════════ -->
+  <div class="modal-overlay hidden" id="quickNavOverlay">
+    <div class="modal modal-small">
+      <div class="modal-title">Navigation</div>
+      <div class="quick-nav-marks">
+        <button class="quick-mark-btn" id="quickLikeBtn">🥰 Like</button>
+        <button class="quick-mark-btn" id="quickDislikeBtn">😤 Dislike</button>
+      </div>
+      <div class="quick-nav-word" id="quickNavWord"></div>
+      <button class="modal-close-btn" id="quickNavClose">Done</button>
+    </div>
+  </div>
+
+  <script src="app4.js"></script>
 </body>
 </html>
