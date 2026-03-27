@@ -2,7 +2,7 @@
    DICTIONARY — app.js
    ══════════════════════════════════════ */
 
-const PASSWORD     = 'dicktionary';
+const PASSWORD     = '999+1=1000';
 const CSV_URL      = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/dictionary1.csv';
 const HOLD_MS      = 700;
 
