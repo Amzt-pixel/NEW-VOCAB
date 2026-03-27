@@ -15,16 +15,15 @@ const seenNumIds   = new Set(); // |NumId| values seen this session
 // ══════════════════════════════════════
 
 // Returns the filtered list of navigable words
-function navEffective() {
+// dir: 'next' or 'prev' — Rootwise filter only applies going forward
+function navEffective(dir) {
   return studyList.filter(w => {
-    // Always skip hidden
     if (hiddenWords.has(w)) return false;
-    // If nav filter is OFF — all words pass
     if (!S.navFilter) return true;
-    // Apply active filter conditions — word must pass ALL checked filters
-    if (S.navSynAnt   && !passSynAnt(w))   return false;
-    if (S.navDefined  && !passDefined(w))   return false;
-    if (S.navRootwise && !passRootwise(w))  return false;
+    if (S.navSynAnt  && !passSynAnt(w))  return false;
+    if (S.navDefined && !passDefined(w)) return false;
+    // Rootwise only applies to Next direction
+    if (dir === 'next' && S.navRootwise && !passRootwise(w)) return false;
     return true;
   });
 }
@@ -110,13 +109,11 @@ function scanBackward(eff, startIdx, step) {
   }
 }
 
-// A word passes all active filters (used during scanning)
+// A word passes non-rootwise filters (used during scanning after effective queue is built)
 function passesAllFilters(word) {
   if (!S.navFilter) return true;
   if (S.navSynAnt  && !passSynAnt(word))  return false;
   if (S.navDefined && !passDefined(word)) return false;
-  // Note: Rootwise is evaluated based on seenNumIds at scan time
-  if (S.navRootwise && !passRootwise(word)) return false;
   return true;
 }
 
@@ -124,7 +121,7 @@ function passesAllFilters(word) {
 // NEXT
 // ══════════════════════════════════════
 function navNext() {
-  const eff = navEffective();
+  const eff = navEffective('next');
   if (!eff.length) return;
 
   const step    = resolveStep();
@@ -134,9 +131,7 @@ function navNext() {
   let targetEff = scanForward(eff, currEff, step);
 
   if (targetEff < 0) {
-    // Hit the end
     if (!S.loopMode) { alert("You've reached the end of the list."); return; }
-    // Loop: scan from beginning
     targetEff = scanForward(eff, -1, step);
     if (targetEff < 0) { alert("No matching words found."); return; }
   }
@@ -148,11 +143,8 @@ function navNext() {
   show();
 }
 
-// ══════════════════════════════════════
-// PREV
-// ══════════════════════════════════════
 function navPrev() {
-  const eff = navEffective();
+  const eff = navEffective('prev');
   if (!eff.length) return;
 
   const step    = resolveStep();
@@ -162,16 +154,13 @@ function navPrev() {
   let targetEff;
 
   if (S.navRootwise && S.prevBehavior) {
-    // Variation mode — find word with same |NumId| as current, but not current word
     targetEff = findVariationPrev(eff, currEff);
   } else {
-    // Default — scan backward
     targetEff = scanBackward(eff, currEff, step);
   }
 
   if (targetEff < 0) {
     if (!S.loopMode) { alert("You've reached the beginning of the list."); return; }
-    // Loop: scan from end
     targetEff = scanBackward(eff, eff.length, step);
     if (targetEff < 0) { alert("No matching words found."); return; }
   }
