@@ -7,9 +7,9 @@
    ══════════════════════════════════════ */
 
 // ── Session state ──
-const seenNumIds  = new Set(); // |NumId| values seen this session
-const visitedWords = new Set(); // words visited this session (for Prev Exact/Variation)
-const sessionMarks = {};        // word → 'like' | 'dislike'
+const seenNumIds   = new Set();
+const visitedWords = new Set();
+const sessionMarks = {};
 
 // ══════════════════════════════════════
 // SESSION TRACKING
@@ -28,62 +28,66 @@ function navSessionStart() {
 }
 
 // ══════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════
+function hasSynAnt(word) {
+  const e = csvData.find(r => r.word === word);
+  if (!e?.id) return false;
+  const absId = Math.abs(e.id);
+  return csvData.some(r => r.word !== word && Math.abs(r.id) === absId);
+}
+
+function hasDef(word) {
+  const e = csvData.find(r => r.word === word);
+  return !!(e?.definition);
+}
+
+function getAbsId(word) {
+  const e = csvData.find(r => r.word === word);
+  return e?.id ? Math.abs(e.id) : 0;
+}
+
+// ══════════════════════════════════════
 // SKIP CONDITIONS
 // ══════════════════════════════════════
 
-// Returns true if word should be skipped going NEXT
 function skipNext(word) {
-  // Base: hidden
   if (hiddenWords.has(word)) return true;
-  // Nav filter OFF — no further conditions
   if (!S.navFilter) return false;
-  // Syn/Ant
-  if (S.navSynAnt && getSyns(word).length === 0 && getAnts(word).length === 0) return true;
-  // Defined
-  if (S.navDefined) {
-    const e = csvData.find(r => r.word === word);
-    if (!e?.definition) return true;
-  }
-  // Rootwise
+  if (S.navSynAnt  && !hasSynAnt(word)) return true;
+  if (S.navDefined && !hasDef(word))    return true;
   if (S.navRootwise) {
-    const e = csvData.find(r => r.word === word);
-    const absId = e?.id ? Math.abs(e.id) : 0;
+    const absId = getAbsId(word);
     if (S.nxtBehavior) {
-      // Exclusive: skip if |NumId| already seen
-      if (seenNumIds.has(absId)) return true;
+      if (seenNumIds.has(absId))  return true; // Exclusive: skip seen
     } else {
-      // Inclusive: skip if |NumId| not yet seen
-      if (!seenNumIds.has(absId)) return true;
+      if (!seenNumIds.has(absId)) return true; // Inclusive: skip unseen
     }
   }
   return false;
 }
 
-// Returns true if word should be skipped going PREV
-function skipPrev(word) {
-  // Base: hidden
+// Base conditions shared by all Prev modes
+function skipPrevBase(word) {
   if (hiddenWords.has(word)) return true;
-  // Nav filter OFF — no further conditions
   if (!S.navFilter) return false;
-  // Syn/Ant
-  if (S.navSynAnt && getSyns(word).length === 0 && getAnts(word).length === 0) return true;
-  // Defined
-  if (S.navDefined) {
-    const e = csvData.find(r => r.word === word);
-    if (!e?.definition) return true;
-  }
-  // Rootwise Prev modes
-  if (S.navRootwise) {
-    if (!S.prevBehavior) {
-      // Exact: skip if word was NOT visited
-      if (!visitedWords.has(word)) return true;
-    } else {
-      // Variation: skip if |NumId| NOT in seenNumIds AND word WAS visited
-      const e = csvData.find(r => r.word === word);
-      const absId = e?.id ? Math.abs(e.id) : 0;
-      if (!seenNumIds.has(absId) && visitedWords.has(word)) return true;
-    }
-  }
+  if (S.navSynAnt  && !hasSynAnt(word)) return true;
+  if (S.navDefined && !hasDef(word))    return true;
+  return false;
+}
+
+// Exact: skip if word was never visited
+function skipPrevExact(word) {
+  if (skipPrevBase(word)) return true;
+  if (!visitedWords.has(word)) return true;
+  return false;
+}
+
+// Variation Phase 1: skip if |NumId| ∉ S OR word already visited
+function skipPrevVariation1(word) {
+  if (skipPrevBase(word)) return true;
+  if (!seenNumIds.has(getAbsId(word))) return true; // |NumId| not seen
+  if (visitedWords.has(word))          return true; // already visited
   return false;
 }
 
@@ -100,71 +104,72 @@ function resolveStep() {
 }
 
 // ══════════════════════════════════════
+// SCAN HELPERS
+// ══════════════════════════════════════
+
+// All mode: jump step non-hidden positions, then scan for passing word
+function scanAll(start, step, dir, skipFn) {
+  const n   = studyList.length;
+  const inc = dir === 'next' ? 1 : -1;
+  let jumped = 0;
+  let i = start + inc;
+
+  // Jump step non-hidden positions
+  while (dir === 'next' ? i < n : i >= 0) {
+    if (!hiddenWords.has(studyList[i])) {
+      jumped++;
+      if (jumped >= step) break;
+    }
+    i += inc;
+  }
+
+  // Scan from landing for first passing word
+  while (dir === 'next' ? i < n : i >= 0) {
+    if (!skipFn(studyList[i])) return i;
+    i += inc;
+  }
+  return -1;
+}
+
+// Each mode: count step passing words
+function scanEach(start, step, dir, skipFn) {
+  const n   = studyList.length;
+  const inc = dir === 'next' ? 1 : -1;
+  let count = 0;
+  let i = start + inc;
+  while (dir === 'next' ? i < n : i >= 0) {
+    if (!skipFn(studyList[i])) {
+      count++;
+      if (count >= step) return i;
+    }
+    i += inc;
+  }
+  return -1;
+}
+
+function doScan(start, step, dir, skipFn) {
+  return S.stepAction
+    ? scanEach(start, step, dir, skipFn)
+    : scanAll(start, step, dir, skipFn);
+}
+
+// ══════════════════════════════════════
 // NEXT
 // ══════════════════════════════════════
 function navNext() {
   if (!studyList.length) return;
 
-  // Suggest Marked weighted random (random order mode)
   if (S.orderMode === 'random' && S.suggestMarked) {
-    weightedRandomNext();
-    return;
+    weightedRandomNext(); return;
   }
 
   const step = resolveStep();
-  const n    = studyList.length;
-  let   pos  = currentIndex;
+  let   pos  = doScan(currentIndex, step, 'next', skipNext);
 
-  if (!S.stepAction) {
-    // ── All mode (pre-count) ──
-    // Jump step positions forward (skipping hidden), then scan for passing word
-    let jumped = 0;
-    let i = pos + 1;
-    while (i < n && jumped < step) {
-      if (!hiddenWords.has(studyList[i])) jumped++;
-      if (jumped < step) i++;
-      else break;
-    }
-    // i is now at the jump landing — scan forward from here for passing word
-    while (i < n) {
-      if (!skipNext(studyList[i])) { pos = i; break; }
-      i++;
-    }
-    if (i >= n) {
-      if (!S.loopMode) { alert("You've reached the end of the list."); return; }
-      // Loop: scan from beginning
-      i = 0;
-      while (i < currentIndex) {
-        if (!skipNext(studyList[i])) { pos = i; break; }
-        i++;
-      }
-      if (i >= currentIndex) { alert("No matching words found."); return; }
-    }
-
-  } else {
-    // ── Each mode (post-count) ──
-    // Count step passing words from current position
-    let count = 0;
-    let i = pos + 1;
-    while (i < n) {
-      if (!skipNext(studyList[i])) {
-        count++;
-        if (count >= step) { pos = i; break; }
-      }
-      i++;
-    }
-    if (i >= n) {
-      if (!S.loopMode) { alert("You've reached the end of the list."); return; }
-      i = 0;
-      while (i < currentIndex) {
-        if (!skipNext(studyList[i])) {
-          count++;
-          if (count >= step) { pos = i; break; }
-        }
-        i++;
-      }
-      if (pos === currentIndex) { alert("No matching words found."); return; }
-    }
+  if (pos === -1) {
+    if (!S.loopMode) { alert("You've reached the end of the list."); return; }
+    pos = doScan(-1, step, 'next', skipNext);
+    if (pos === -1 || pos >= currentIndex) { alert("No matching words found."); return; }
   }
 
   currentIndex = pos;
@@ -178,57 +183,26 @@ function navNext() {
 function navPrev() {
   if (!studyList.length) return;
 
-  const step = resolveStep();
-  const n    = studyList.length;
-  let   pos  = currentIndex;
+  const step   = resolveStep();
+  const useVar = S.navFilter && S.navRootwise && S.prevBehavior;
+  let   pos    = -1;
 
-  if (!S.stepAction) {
-    // ── All mode (pre-count) ──
-    let jumped = 0;
-    let i = pos - 1;
-    while (i >= 0 && jumped < step) {
-      if (!hiddenWords.has(studyList[i])) jumped++;
-      if (jumped < step) i--;
-      else break;
-    }
-    // Scan backward from landing for passing word
-    while (i >= 0) {
-      if (!skipPrev(studyList[i])) { pos = i; break; }
-      i--;
-    }
-    if (i < 0) {
-      if (!S.loopMode) { alert("You've reached the beginning of the list."); return; }
-      i = n - 1;
-      while (i > currentIndex) {
-        if (!skipPrev(studyList[i])) { pos = i; break; }
-        i--;
-      }
-      if (i <= currentIndex) { alert("No matching words found."); return; }
-    }
-
+  if (useVar) {
+    // Phase 1 — Variation
+    pos = doScan(currentIndex, step, 'prev', skipPrevVariation1);
+    // Phase 2 — Fallback to Exact if Phase 1 found nothing
+    if (pos === -1)
+      pos = doScan(currentIndex, step, 'prev', skipPrevExact);
   } else {
-    // ── Each mode (post-count) ──
-    let count = 0;
-    let i = pos - 1;
-    while (i >= 0) {
-      if (!skipPrev(studyList[i])) {
-        count++;
-        if (count >= step) { pos = i; break; }
-      }
-      i--;
-    }
-    if (i < 0) {
-      if (!S.loopMode) { alert("You've reached the beginning of the list."); return; }
-      i = n - 1;
-      while (i > currentIndex) {
-        if (!skipPrev(studyList[i])) {
-          count++;
-          if (count >= step) { pos = i; break; }
-        }
-        i--;
-      }
-      if (pos === currentIndex) { alert("No matching words found."); return; }
-    }
+    // Exact
+    pos = doScan(currentIndex, step, 'prev', skipPrevExact);
+  }
+
+  if (pos === -1) {
+    if (!S.loopMode) { alert("You've reached the beginning of the list."); return; }
+    const skipFn = useVar ? skipPrevVariation1 : skipPrevExact;
+    pos = doScan(studyList.length, step, 'prev', skipFn);
+    if (pos === -1 || pos <= currentIndex) { alert("No matching words found."); return; }
   }
 
   currentIndex = pos;
@@ -237,17 +211,11 @@ function navPrev() {
 }
 
 // ══════════════════════════════════════
-// WEIGHTED RANDOM (Suggest Marked)
+// WEIGHTED RANDOM
 // ══════════════════════════════════════
 function getWeight(word) {
   let w = 1;
-  // Persistent flags — Phase 9 placeholders
-  // if (importantWords.has(word)) w *= 1.5;
-  // if (favoriteWords.has(word))  w *= 1;
-  // if (bookmarkWords.has(word))  w *= 1;
-  // if (learnedWords.has(word))   w *= 1;
-
-  // Session mark overrides (applied last — higher priority)
+  // Persistent flags — Phase 9
   const mark = sessionMarks[word];
   if (mark === 'like')    w *= 1/3;
   if (mark === 'dislike') w *= 3;
@@ -255,27 +223,17 @@ function getWeight(word) {
 }
 
 function weightedRandomNext() {
-  // Build eligible pool (hidden words excluded)
   const pool = studyList.filter(w => !hiddenWords.has(w) && w !== studyList[currentIndex]);
   if (!pool.length) { alert("No words available."); return; }
-
   const weights = pool.map(w => getWeight(w));
   const total   = weights.reduce((a, b) => a + b, 0);
   let   rand    = Math.random() * total;
-
   for (let i = 0; i < pool.length; i++) {
     rand -= weights[i];
-    if (rand <= 0) {
-      currentIndex = studyList.indexOf(pool[i]);
-      wordsSeen++;
-      show();
-      return;
-    }
+    if (rand <= 0) { currentIndex = studyList.indexOf(pool[i]); wordsSeen++; show(); return; }
   }
-  // Fallback
   currentIndex = studyList.indexOf(pool[pool.length - 1]);
-  wordsSeen++;
-  show();
+  wordsSeen++; show();
 }
 
 // ══════════════════════════════════════
@@ -300,7 +258,6 @@ function navBindQuickNav() {
     document.getElementById('quickLikeBtn').classList.toggle('active', sessionMarks[word] === 'like');
     document.getElementById('quickDislikeBtn').classList.remove('active');
   });
-
   document.getElementById('quickDislikeBtn').addEventListener('click', () => {
     const word = studyList[currentIndex];
     if (!word) return;
