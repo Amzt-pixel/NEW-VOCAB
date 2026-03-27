@@ -2,7 +2,7 @@
    DICTIONARY — app.js
    ══════════════════════════════════════ */
 
-const PASSWORD     = 'littleperfect';
+const PASSWORD     = 'littlething';
 const CSV_URL      = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/dictionary1.csv';
 const HOLD_MS      = 700;
 
@@ -516,7 +516,7 @@ function switchTab(tab) {
 // ══════════════════════════════════════
 // NAVIGATION — delegated to navigation.js
 // ══════════════════════════════════════
-function effective() { return navEffective(); }
+function effective(dir) { return navEffective(dir || 'next'); }
 function nextWord()  { navNext(); }
 function prevWord()  { navPrev(); }
 function prevDown()  { prevTimer = setTimeout(() => { prevTimer = null; navOpenQuickPopup(); }, HOLD_MS); }
