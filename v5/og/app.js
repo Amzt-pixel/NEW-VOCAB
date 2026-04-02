@@ -41,9 +41,14 @@ let S = {
   // Navigation filters
   navFilter: false,
   navSynAnt: true, navDefined: false, navRootwise: false,
-  nxtBehavior: true,   // true = exclusive, false = inclusive
-  prevBehavior: false, // false = default, true = variation
-  stepAction: false,   // false = all (pre), true = each (post)
+  // Rootwise options
+  necessary: true,
+  exclusive: true,
+  avoidOpposites: false,
+  prevExact: true,
+  prevVariation: false,
+  variationFallback: false,
+  stepAction: false,
   randomNav: false,
   navDelta: 2,
   suggestMarked: false,
@@ -335,7 +340,6 @@ function startAt(word) {
 function updateBar() {
   document.getElementById('sessionStep').textContent = S.stepNumber;
   document.getElementById('sessionLoopIcon').textContent = S.loopMode ? '🔁' : '';
-  // Filter abbreviations
   const filterEl = document.getElementById('sessionFilterChip');
   if (S.navFilter) {
     const parts = [];
@@ -357,10 +361,8 @@ function show() {
   const word  = studyList[currentIndex];
   const entry = csvData.find(r => r.word === word);
 
-  // Track history and session state
   trackVisit(word);
 
-  // Hero card
   document.getElementById('progressPill').textContent = (currentIndex + 1) + ' / ' + studyList.length;
   document.getElementById('sessionNumId').textContent = entry?.id ? '#' + entry.id : '—';
   document.getElementById('currentWord').textContent  = word;
@@ -374,7 +376,6 @@ function show() {
 
   if      (S.mode === 'study')  showStudy(word, entry);
   else if (S.mode === 'revise') showRevise(word, entry);
-  // MCQ: future
 
   if (!document.getElementById('wordListOverlay').classList.contains('hidden')) updatePanel();
 }
@@ -538,10 +539,8 @@ function nextUp()    { if (nextTimer) { clearTimeout(nextTimer); nextTimer = nul
 // CHIP HOLD
 // ══════════════════════════════════════
 function chipDown(e, word) {
-  // Check mode-specific toggle at interaction time
   if (S.mode === 'revise' && !S.reviseWordAction) return;
   if (S.mode === 'mcq'    && !S.mcqWordAction)    return;
-  // Study mode — always allowed
 
   if (chipTimer) clearTimeout(chipTimer);
   chipHeld  = false;
@@ -955,17 +954,22 @@ function syncSettingsUI() {
   tog('navFilterToggle',     'navFilter');
   tog('allowMultipleToggle', 'allowMultiple');
   tog('joinConditionToggle', 'joinCondition');
-  tog('nxtBehaviorToggle',   'nxtBehavior');
-  tog('prevBehaviorToggle',  'prevBehavior');
   tog('randomNavToggle',     'randomNav');
   tog('suggestMarkedToggle', 'suggestMarked');
+
+  // Rootwise sub-options
+  tog('necessaryToggle',        'necessary');
+  tog('nxtBehaviorToggle',      'exclusive');
+  tog('avoidOppositesToggle',   'avoidOpposites');
+  document.getElementById('prevExactChk').checked     = !!p.prevExact;
+  document.getElementById('prevVariationChk').checked = !!p.prevVariation;
+  tog('variationFallbackToggle','variationFallback');
 
   // Nav filter checkboxes
   document.getElementById('navSynAntChk').checked   = !!p.navSynAnt;
   document.getElementById('navDefinedChk').checked  = !!p.navDefined;
   document.getElementById('navRootwiseChk').checked = !!p.navRootwise;
 
-  // Suggest Marked for random order mode
   if (document.getElementById('suggestMarkedRandomToggle'))
     document.getElementById('suggestMarkedRandomToggle').checked = !!p.suggestMarked;
 
@@ -975,6 +979,7 @@ function syncSettingsUI() {
   document.querySelector('.fixed-opts-row').classList.toggle('hidden', !!p.randomOptionCount);
   document.getElementById('navFilterOptions').classList.toggle('hidden', !p.navFilter);
   document.getElementById('navRootwiseOptions').classList.toggle('hidden', !p.navRootwise);
+  document.getElementById('navVariationFallbackRow').classList.toggle('hidden', !p.prevVariation);
   document.querySelectorAll('.allow-multiple-row').forEach(r => r.classList.toggle('hidden', !p.allowMultiple));
   syncNavRandomUI(p);
 }
@@ -1068,7 +1073,6 @@ function bindSettingsEvents() {
   bindTog('allowMultipleToggle','allowMultiple', v => {
     document.querySelectorAll('.allow-multiple-row').forEach(r => r.classList.toggle('hidden', !v));
     if (!v && pending) {
-      // Force single selection — keep first checked, uncheck others
       const chks = ['navSynAntChk','navDefinedChk','navRootwiseChk'];
       let kept = false;
       chks.forEach(id => {
@@ -1082,13 +1086,29 @@ function bindSettingsEvents() {
     }
   });
   bindTog('joinConditionToggle','joinCondition');
-  bindTog('nxtBehaviorToggle',  'nxtBehavior');
-  bindTog('prevBehaviorToggle', 'prevBehavior');
+
+  // Rootwise sub-option toggles
+  bindTog('necessaryToggle',       'necessary');
+  bindTog('nxtBehaviorToggle',     'exclusive');
+  bindTog('avoidOppositesToggle',  'avoidOpposites');
+  bindTog('variationFallbackToggle','variationFallback');
+
+  // Prev behavior checkboxes
+  ['prevExactChk','prevVariationChk'].forEach(id => {
+    document.getElementById(id).addEventListener('change', e => {
+      if (!pending) return;
+      const key = id === 'prevExactChk' ? 'prevExact' : 'prevVariation';
+      pending[key] = e.target.checked;
+      if (key === 'prevVariation')
+        document.getElementById('navVariationFallbackRow').classList.toggle('hidden', !e.target.checked);
+    });
+  });
+
   bindTog('randomNavToggle',    'randomNav',   v => document.getElementById('navRandomOptions').classList.toggle('hidden', !v));
   bindTog('suggestMarkedToggle','suggestMarked');
   bindTog('suggestMarkedRandomToggle', 'suggestMarked');
 
-  // Nav filter checkboxes — at least one mandatory; single-select when allowMultiple OFF
+  // Nav filter checkboxes
   ['navSynAntChk','navDefinedChk','navRootwiseChk'].forEach(id => {
     document.getElementById(id).addEventListener('change', e => {
       if (!pending) return;
@@ -1100,7 +1120,6 @@ function bindSettingsEvents() {
         if (!othersChecked) { e.target.checked = true; return; }
       }
       pending[key] = e.target.checked;
-      // If Allow Multiple is OFF, uncheck others
       if (e.target.checked && !pending.allowMultiple) {
         ['navSynAntChk','navDefinedChk','navRootwiseChk'].forEach(oid => {
           if (oid !== id) {
@@ -1162,53 +1181,66 @@ function bindSettingsEvents() {
 // ── Quick Nav settings sync ──
 function syncQuickNavUI() {
   const p = pendingNav;
-  // Step buttons
   document.querySelectorAll('[data-qstep]').forEach(b =>
     b.classList.toggle('active', parseInt(b.dataset.qstep) === p.stepNumber));
-  // Delta buttons
   document.querySelectorAll('[data-qdelta]').forEach(b =>
     b.classList.toggle('active', parseInt(b.dataset.qdelta) === p.navDelta));
-  // Toggles
+
   document.getElementById('qLoopToggle').checked         = !!p.loopMode;
   document.getElementById('qStepActionToggle').checked   = !!p.stepAction;
   document.getElementById('qNavFilterToggle').checked    = !!p.navFilter;
   document.getElementById('qAllowMultipleToggle').checked = !!p.allowMultiple;
   document.getElementById('qJoinConditionToggle').checked = !!p.joinCondition;
-  document.getElementById('qNxtBehaviorToggle').checked  = !!p.nxtBehavior;
-  document.getElementById('qPrevBehaviorToggle').checked = !!p.prevBehavior;
   document.getElementById('qRandomNavToggle').checked    = !!p.randomNav;
-  document.getElementById('qSuggestMarkedToggle').checked       = !!p.suggestMarked;
-  document.getElementById('qSuggestMarkedRandomToggle').checked = !!p.suggestMarked;
+
+  // Rootwise sub-options
+  document.getElementById('qNecessaryToggle').checked        = !!p.necessary;
+  document.getElementById('qNxtBehaviorToggle').checked      = !!p.exclusive;
+  document.getElementById('qAvoidOppositesToggle').checked   = !!p.avoidOpposites;
+  document.getElementById('qPrevExactChk').checked           = !!p.prevExact;
+  document.getElementById('qPrevVariationChk').checked       = !!p.prevVariation;
+  document.getElementById('qVariationFallbackToggle').checked = !!p.variationFallback;
+  document.getElementById('qNavVariationFallbackRow').classList.toggle('hidden', !p.prevVariation);
+
   // Checkboxes
   document.getElementById('qNavSynAntChk').checked   = !!p.navSynAnt;
   document.getElementById('qNavDefinedChk').checked  = !!p.navDefined;
   document.getElementById('qNavRootwiseChk').checked = !!p.navRootwise;
+
+  const qSM  = document.getElementById('qSuggestMarkedToggle');
+  const qSMR = document.getElementById('qSuggestMarkedRandomToggle');
+  if (qSM)  qSM.checked  = !!p.suggestMarked;
+  if (qSMR) qSMR.checked = !!p.suggestMarked;
+
   // Conditional visibility
   document.getElementById('qNavFilterOptions').classList.toggle('hidden', !p.navFilter);
   document.getElementById('qNavRootwiseOptions').classList.toggle('hidden', !p.navRootwise);
   document.querySelectorAll('.allow-multiple-row').forEach(r => r.classList.toggle('hidden', !p.allowMultiple));
+  syncQuickNavRandomUI(p);
+}
+
+function syncQuickNavRandomUI(p) {
   const isRandom = p.orderMode === 'random';
   document.getElementById('qNavRandomSection').classList.toggle('hidden', isRandom);
   document.getElementById('qNavRandomOrderSection').classList.toggle('hidden', !isRandom);
-  if (!isRandom) document.getElementById('qNavRandomOptions').classList.toggle('hidden', !p.randomNav);
+  if (!isRandom)
+    document.getElementById('qNavRandomOptions').classList.toggle('hidden', !p.randomNav);
 }
 
 function bindQuickNavSettings() {
-  // Step buttons
   document.querySelectorAll('[data-qstep]').forEach(b => b.addEventListener('click', () => {
     if (!pendingNav) return;
     document.querySelectorAll('[data-qstep]').forEach(x => x.classList.remove('active'));
     b.classList.add('active');
     pendingNav.stepNumber = parseInt(b.dataset.qstep);
   }));
-  // Delta buttons
   document.querySelectorAll('[data-qdelta]').forEach(b => b.addEventListener('click', () => {
     if (!pendingNav) return;
     document.querySelectorAll('[data-qdelta]').forEach(x => x.classList.remove('active'));
     b.classList.add('active');
     pendingNav.navDelta = parseInt(b.dataset.qdelta);
   }));
-  // Toggles
+
   function qTog(id, key, onchange) {
     document.getElementById(id).addEventListener('change', e => {
       if (!pendingNav) return;
@@ -1216,6 +1248,7 @@ function bindQuickNavSettings() {
       if (onchange) onchange(e.target.checked);
     });
   }
+
   qTog('qLoopToggle',        'loopMode');
   qTog('qStepActionToggle',  'stepAction');
   qTog('qNavFilterToggle',   'navFilter',  v => document.getElementById('qNavFilterOptions').classList.toggle('hidden', !v));
@@ -1235,12 +1268,29 @@ function bindQuickNavSettings() {
     }
   });
   qTog('qJoinConditionToggle','joinCondition');
-  qTog('qNxtBehaviorToggle', 'nxtBehavior');
-  qTog('qPrevBehaviorToggle','prevBehavior');
+
+  // Rootwise sub-option toggles
+  qTog('qNecessaryToggle',        'necessary');
+  qTog('qNxtBehaviorToggle',      'exclusive');
+  qTog('qAvoidOppositesToggle',   'avoidOpposites');
+  qTog('qVariationFallbackToggle','variationFallback');
+
+  // Prev behavior checkboxes
+  ['qPrevExactChk','qPrevVariationChk'].forEach(id => {
+    document.getElementById(id).addEventListener('change', e => {
+      if (!pendingNav) return;
+      const key = id === 'qPrevExactChk' ? 'prevExact' : 'prevVariation';
+      pendingNav[key] = e.target.checked;
+      if (key === 'prevVariation')
+        document.getElementById('qNavVariationFallbackRow').classList.toggle('hidden', !e.target.checked);
+    });
+  });
+
   qTog('qRandomNavToggle',   'randomNav',  v => document.getElementById('qNavRandomOptions').classList.toggle('hidden', !v));
   qTog('qSuggestMarkedToggle',       'suggestMarked');
   qTog('qSuggestMarkedRandomToggle', 'suggestMarked');
-  // Checkboxes
+
+  // Nav filter checkboxes
   ['qNavSynAntChk','qNavDefinedChk','qNavRootwiseChk'].forEach(id => {
     document.getElementById(id).addEventListener('change', e => {
       if (!pendingNav) return;
@@ -1321,48 +1371,12 @@ function applyAppearance() {
 }
 
 // ══════════════════════════════════════
-// QUICK NAV — open with pending + sync
+// QUICK NAV
 // ══════════════════════════════════════
 function openQuickNav() {
-  pending = Object.assign({}, S);
+  pendingNav = Object.assign({}, S);
   syncQuickNavUI();
-  navOpenQuickPopup(); // sets word label + like/dislike state
-}
-
-function syncQuickNavUI() {
-  const p = pending;
-  // Step
-  document.querySelectorAll('[data-qstep]').forEach(b =>
-    b.classList.toggle('active', parseInt(b.dataset.qstep) === p.stepNumber));
-  // Toggles
-  document.getElementById('qLoopToggle').checked       = !!p.loopMode;
-  document.getElementById('qStepActionToggle').checked = !!p.stepAction;
-  document.getElementById('qNavFilterToggle').checked  = !!p.navFilter;
-  document.getElementById('qNxtBehaviorToggle').checked  = !!p.nxtBehavior;
-  document.getElementById('qPrevBehaviorToggle').checked = !!p.prevBehavior;
-  document.getElementById('qNavSynAntChk').checked   = !!p.navSynAnt;
-  document.getElementById('qNavDefinedChk').checked  = !!p.navDefined;
-  document.getElementById('qNavRootwiseChk').checked  = !!p.navRootwise;
-  // Delta
-  document.querySelectorAll('[data-qdelta]').forEach(b =>
-    b.classList.toggle('active', parseInt(b.dataset.qdelta) === p.navDelta));
-  // Suggest Marked
-  const qSM  = document.getElementById('qSuggestMarkedToggle');
-  const qSMR = document.getElementById('qSuggestMarkedRandomToggle');
-  if (qSM)  qSM.checked  = !!p.suggestMarked;
-  if (qSMR) qSMR.checked = !!p.suggestMarked;
-  // Conditional visibility
-  document.getElementById('qNavFilterOptions').classList.toggle('hidden', !p.navFilter);
-  document.getElementById('qNavRootwiseOptions').classList.toggle('hidden', !p.navRootwise);
-  syncQuickNavRandomUI(p);
-}
-
-function syncQuickNavRandomUI(p) {
-  const isRandom = p.orderMode === 'random';
-  document.getElementById('qNavRandomSection').classList.toggle('hidden', isRandom);
-  document.getElementById('qNavRandomOrderSection').classList.toggle('hidden', !isRandom);
-  if (!isRandom)
-    document.getElementById('qNavRandomOptions').classList.toggle('hidden', !p.randomNav);
+  navOpenQuickPopup();
 }
 
 // ══════════════════════════════════════
@@ -1398,7 +1412,7 @@ function bindAll() {
   document.getElementById('settingsBtn').addEventListener('click', openSettings);
   document.getElementById('wordListBtn').addEventListener('click', openPanel);
 
-  // Prev / Next — click navigates, hold opens word detail
+  // Prev / Next
   const pb = document.getElementById('prevBtn');
   const nb = document.getElementById('nextBtn');
   pb.addEventListener('click', prevWord);
@@ -1447,7 +1461,7 @@ function bindAll() {
       Object.assign(S, pendingNav);
       saveSettings();
       updateBar();
-      syncSettingsUI(); // keep main Settings modal in sync
+      syncSettingsUI();
     }
     pendingNav = null;
     closeModal('quickNavOverlay');
@@ -1456,7 +1470,7 @@ function bindAll() {
   bindQuickNavSettings();
   navBindQuickNav();
 
-  // Keyboard shortcuts (study screen only)
+  // Keyboard shortcuts
   document.addEventListener('keydown', e => {
     if (document.querySelector('.screen.active')?.id !== 'studyScreen') return;
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') nextWord();
