@@ -307,14 +307,36 @@
           </div>
           <!-- Rootwise sub-options — shown when Rootwise checked -->
           <div class="nav-rootwise-options hidden" id="navRootwiseOptions">
-            <div class="setting-row setting-row-indent2">
-              <div class="setting-label">Next: Exclusive</div>
-              <label class="toggle"><input type="checkbox" id="nxtBehaviorToggle" checked/><span class="toggle-slider"></span></label>
-            </div>
-            <div class="setting-row setting-row-indent2">
-              <div class="setting-label">Prev: Variation</div>
-              <label class="toggle"><input type="checkbox" id="prevBehaviorToggle"/><span class="toggle-slider"></span></label>
-            </div>
+             <div class="setting-row setting-row-indent">
+  <div class="setting-label">Necessary</div>
+  <label class="toggle"><input type="checkbox" id="necessaryToggle" checked/><span class="toggle-slider"></span></label>
+</div>
+<div class="setting-subsection-title">Next Behavior</div>
+<div class="setting-row setting-row-indent2">
+  <div class="setting-label">Exclusive</div>
+  <label class="toggle"><input type="checkbox" id="nxtBehaviorToggle" checked/><span class="toggle-slider"></span></label>
+</div>
+<div class="setting-row setting-row-indent2">
+  <div class="setting-label">Avoid Opposites</div>
+  <label class="toggle"><input type="checkbox" id="avoidOppositesToggle"/><span class="toggle-slider"></span></label>
+</div>
+<div class="setting-subsection-title">Prev Behavior</div>
+<div class="setting-row setting-row-indent2">
+  <label class="check-label">
+    <input type="checkbox" id="prevExactChk" checked/>
+    <span>Exact</span>
+  </label>
+</div>
+<div class="setting-row setting-row-indent2">
+  <label class="check-label">
+    <input type="checkbox" id="prevVariationChk"/>
+    <span>Variation</span>
+  </label>
+</div>
+<div class="setting-row setting-row-indent2 nav-variation-fallback-row hidden" id="navVariationFallbackRow">
+  <div class="setting-label">Variation Fallback</div>
+  <label class="toggle"><input type="checkbox" id="variationFallbackToggle"/><span class="toggle-slider"></span></label>
+</div>
           </div>
         </div>
 
@@ -614,14 +636,36 @@
             <label class="check-label"><input type="checkbox" id="qNavRootwiseChk"/><span>Rootwise</span></label>
           </div>
           <div class="nav-rootwise-options hidden" id="qNavRootwiseOptions">
-            <div class="setting-row setting-row-indent2">
-              <div class="setting-label">Next: Exclusive</div>
-              <label class="toggle"><input type="checkbox" id="qNxtBehaviorToggle" checked/><span class="toggle-slider"></span></label>
-            </div>
-            <div class="setting-row setting-row-indent2">
-              <div class="setting-label">Prev: Variation</div>
-              <label class="toggle"><input type="checkbox" id="qPrevBehaviorToggle"/><span class="toggle-slider"></span></label>
-            </div>
+            <div class="setting-row setting-row-indent">
+  <div class="setting-label">Necessary</div>
+  <label class="toggle"><input type="checkbox" id="qNecessaryToggle" checked/><span class="toggle-slider"></span></label>
+</div>
+<div class="setting-subsection-title">Next Behavior</div>
+<div class="setting-row setting-row-indent2">
+  <div class="setting-label">Exclusive</div>
+  <label class="toggle"><input type="checkbox" id="qNxtBehaviorToggle" checked/><span class="toggle-slider"></span></label>
+</div>
+<div class="setting-row setting-row-indent2">
+  <div class="setting-label">Avoid Opposites</div>
+  <label class="toggle"><input type="checkbox" id="qAvoidOppositesToggle"/><span class="toggle-slider"></span></label>
+</div>
+<div class="setting-subsection-title">Prev Behavior</div>
+<div class="setting-row setting-row-indent2">
+  <label class="check-label">
+    <input type="checkbox" id="qPrevExactChk" checked/>
+    <span>Exact</span>
+  </label>
+</div>
+<div class="setting-row setting-row-indent2">
+  <label class="check-label">
+    <input type="checkbox" id="qPrevVariationChk"/>
+    <span>Variation</span>
+  </label>
+</div>
+<div class="setting-row setting-row-indent2 nav-variation-fallback-row hidden" id="qNavVariationFallbackRow">
+  <div class="setting-label">Variation Fallback</div>
+  <label class="toggle"><input type="checkbox" id="qVariationFallbackToggle"/><span class="toggle-slider"></span></label>
+</div>
           </div>
         </div>
         <div class="nav-random-section hidden" id="qNavRandomSection">
