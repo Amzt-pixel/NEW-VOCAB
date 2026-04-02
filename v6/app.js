@@ -2,7 +2,7 @@
    DICTIONARY — app.js
    ══════════════════════════════════════ */
 
-const PASSWORD     = 'BlondeButter++';
+const PASSWORD     = 'MotherFather++';
 const CSV_URL      = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/dict_demo.csv';
 const HOLD_MS      = 700;
 
