@@ -357,7 +357,8 @@ input  { font-family: 'DM Sans', sans-serif; }
 .nav-random-section, .nav-random-order-section { margin-top: 2px; }
 .nav-filter-options.hidden, .nav-rootwise-options.hidden,
 .nav-random-options.hidden, .nav-random-section.hidden,
-.nav-random-order-section.hidden, .allow-multiple-row.hidden { display: none; }
+.nav-random-order-section.hidden, .allow-multiple-row.hidden,
+.nav-allow-multiple-row.hidden { display: none; }
 .check-label { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; color: var(--text); cursor: pointer; }
 .check-label input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
 
