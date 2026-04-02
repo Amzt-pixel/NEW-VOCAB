@@ -1,0 +1,620 @@
+NumId,Word,Category,Role,Definition1,Definition2,Example1,Example2,Example3,Example4,Example5,BengaliDef,BengaliEx1,BengaliEx2,BengaliEx3,RefWord,Level
+1,Proclivity,1,Common Noun,A natural tendency or inclination towards something.,,His proclivity for exaggeration made it hard to trust him.,,,,,কিছু করার/হওয়ার/ঘটার সাধারণ প্রবনতা,,,,,0
+1,Tendency,1,Common Noun,An inclination towards a particular kind of thought or action.,,She had a tendency to overthink every decision.,,,,,ঝোঁক; কোনো নির্দিষ্ট দিকে স্বাভাবিকভাবে ঝুঁকে পড়ার প্রবণতা।,,,,,0
+1,Inclination,1,Common Noun,,,,,,,,,,,,,0
+1,Propensity,1,Common Noun,A natural tendency to behave in a particular way.,"Propensity is more commonly used for event/situations, in cases of referring to a certain bias in probability of outcomes.",Her propensity for kindness was evident to all who knew her.,"The propensity of an accident will surge immediately if the authorities remove the 5th, seemingly superfluous pillar.",,,,,,,,,1
+1,Predilection,1,Common Noun,,,,,,,,,,,,,1
+2,Relegation,1,Common Noun,The action of assigning an inferior rank or position to someone.,,,,,,,,,,,,2
+2,Demotion,1,Common Noun,A reduction in rank or status.,,The demotion came as a shock to everyone in the department.,,,,,,,,,,0
+2,Degradation,1,Common Noun,The process of reducing something to a lower or worse state.,,The degradation of the environment was visible even from a distance.,,,,,,,,,,0
+-2,Promotion,1,Common Noun,The act of raising someone to a higher position or rank.,,,,,,,,,,,,0
+-2,Elevation,1,Common Noun,The raising of something to a higher position or status.,,The elevation of local talent was central to the festival's mission.,,,,,,,,,,0
+3,Tamper,1,Transitive Verb,"To interfere with something without authorisation, often causing damage.",,,,,,,,,,,,0
+3,Tinker,1,Transitive Verb,"To make small adjustments to something, often without clear purpose.",,He tinkered with the engine for hours but fixed nothing.,,,,,,,,,,3
+3,Meddle,1,Intransitive Verb,To interfere in someone else's concerns without being asked.,,She had a habit of meddling in affairs that were not hers.,,,,,,,,,,0
+3,Fiddle,1,Intransitive Verb,To touch or adjust something restlessly or without purpose.,,Stop fiddling with the settings are you are making it worse.,,,,,,,,,,3
+3.1,Fondle,1,Transitive Verb,"To touch, toy and explore something clumsily with hands",,Did you expect a 5yr old to not fondle the cheeks of her baby brother???,,,,,"অলস, উদ্দেশ্যহীনভাবে হাত দিয়ে কিছু ঘাটা",,,,,
+4,Strengthen,1,Transitive Verb,To make something stronger or more secure.,,Regular exercise will strengthen both your body and your resolve.,,,,,,,,,,0
+4,Fortify,1,Transitive Verb,To make a place or structure stronger and more resistant.,,They worked through the night to fortify the defences.,,,,,,,,,,1
+4,Reinforce,1,Transitive Verb,"To support and strengthen something, especially a structure or argument.",,New evidence only reinforced his original theory.,,,,,,,,,,0
+4,Bolster,1,Transitive Verb,To support or strengthen something that needs it.,,The new investment bolstered confidence in the company.,,,,,,,,,,0
+-4,Weaken,1,Transitive Verb,To make something less strong or less powerful.,,,,,,,,,,,,0
+-4,Undermine,1,Transitive Verb,To erode or damage something gradually and often covertly.,,,,,,,,,,,,0
+-4,Debilitate,1,Transitive Verb,To make someone so weak that they are unable to function normally.,,The illness debilitated him for weeks after the initial diagnosis.,The monsoon storms debilitated the early-stage port infrastructure that the British managed to setup.,,,,দুর্বল ও অকেজো করে দেওয়া।,,,,,1
+-4,Enfeeble,1,Transitive Verb,To make weak or feeble; to deprive of strength.,,Years of neglect had enfeebled the once proud institution.,,,,,,,,,,1
+5,Hubris,1,Common Noun,"Excessive pride or self-confidence, often leading to downfall.",,"It was hubris, not incompetence, that destroyed his political career.",,,,,"অতিরিক্ত আত্মবিশ্বাস বা অহংকার, যা শেষ পর্যন্ত পতন ডেকে আনে।",,,,,1
+5,Arrogance,1,Common Noun,An exaggerated sense of one's own importance or abilities.,,His arrogance in the meeting left the clients visibly annoyed.,,,,,ঔদ্ধত্য; নিজেকে অন্যের চেয়ে অনেক বড় মনে করার স্বভাব।,তার ঔদ্ধত্যপূর্ণ আচরণ সবাইকে বিরক্ত করেছিল।,,,,0
+5,Conceit,1,Common Noun,Excessively high opinion of one's own merit or abilities.,,Her conceit blinded her to the obvious flaws in her plan.,,,,,আত্মম্ভরিতা; নিজের গুণ বা মেধা সম্পর্কে অতিরিক্ত উচ্চ ধারণা।,তার আত্মম্ভরিতা তাকে নিজের ভুল দেখতে দেয়নি।,,,,0
+5,Vanity,1,Common Noun,Excessive pride in one's appearance or achievements.,,His vanity was most evident in the way he reacted to criticism.,Her vanity is all that there is about herself.,,,,"Vanity বলতে মূলত এমন এক প্রকার আত্মাভিমান ও অহমকে বোঝায়, যাহা মূলত একজন নারীর মধ্যে তার রূপ, যৌবন, ঐশ্বর্য এবং প্রতিপত্তিকে কেন্দ্র করে গড়ে ওঠে, এবং স্বভাবগতভাবে সাধারণ অহংকার রূপে প্রকাশ পায়।",,,,,0
+-5,Humility,1,Common Noun,A modest and respectful view of one's own importance.,,True humility is rare among those who have tasted great success.,,,,,বিনয়; নিজের সম্পর্কে অতিরিক্ত গর্ব না করার স্বভাব।,,,,,0
+-5,Modesty,1,Common Noun,The quality of not boasting about one's abilities or achievements.,,,,,,,,,,,,0
+6,Squander,1,Transitive Verb,To waste something valuable in a reckless or foolish manner.,,He squandered his inheritance on ventures that never paid off.,,,,,"অপচয় করা; অর্থ, সময় বা সুযোগ বেহিসাবিভাবে নষ্ট করা।",সে পুরো সম্পত্তি এমন ব্যবসায় অপচয় করল যেগুলো কখনো কাজে আসেনি।,প্রতিভা থাকলেই হবে না — সেটা অপচয় না করে সঠিকভাবে ব্যবহার করতে হবে।,সুযোগ একবার অপচয় হলে আর ফিরে আসে না।,,0
+6,Fritter,1,Transitive Verb,,,,,,,,,,,,,3
+6,Dissipate,1,Transitive Verb,"To waste energy, resources, or attention on worthless things.",,His talent was dissipated by years of poor choices.,,,,,,,,,,1
+-6,Conserve,1,Transitive Verb,To use resources carefully to avoid waste.,,We must conserve water during periods of drought.,,,,,,,,,,0
+-6,Preserve,1,Transitive Verb,To maintain something in its original state or in good condition.,,Efforts to preserve the old library were finally bearing fruit.,,,,,,,,,,0
+7,Pugnacious,1,Adjective,"Eager and ready to argue, fight or quarrel.",Characterized by an aggressive or quarrelsome nature.,His pugnacious attitude had cost him several friendships.,,,,,"সাধারণ ""খিটখিটে""-ভাব নয়; Pugnacious বলতে এমন একটা স্বভাব (আচরণ নয়) বোঝায়, যেন উক্ত ব্যক্তি অল্প কিছুতেই পুরোপুরি মারামারি করতে প্রস্তুত, এমন একটা মেজাজে থাকেন।",,,,,1
+7,Belligerent,1,Adjective,"Hostile and aggressive, especially in manner or attitude.",,The belligerent tone of his reply surprised even his allies.,,,,,"মানুষকে রাগীয়ে দেওয়ার মতো তিক্ত, গাঁ-জ্বালানো আক্রমনাত্মক স্বর/স্বভাব।",,,,,0
+7.1,Combative,1,Adjective,Ready and willing to fight or argue.,,,,,,,,,,,,0
+7.1,Defensive,1,Adjective,An attitude trying to actively defend your vulnerabilities.,,She went defensive immediately when I probed in her precise whereabouts.,,,,,,,,,,
+7,Contentious,1,Adjective,,,,,,,,,,,,,1
+-7,Placid,1,Adjective,Not easily upset or excited; calm and peaceful.,,,,,,,,,,,,0
+-7,Conciliatory,1,Adjective,Intended to make peace or reduce hostility.,,He adopted a conciliatory tone in his follow-up message.,,,,,,,,,,1
+8,Enrapture,1,Transitive Verb,,,,,,,,,,,,,1
+8,Captivate,1,Transitive Verb,,,,,,,,,,,,,0
+8,Enthrall,1,Transitive Verb,To hold the fascination of someone completely.,,The documentary enthralled viewers with its stunning visuals.,,,,,একেবারে মোহিত করে দেওয়া। ,,,,,0
+8,Mesmerise,1,Transitive Verb,To hold someone spellbound; to fascinate irresistibly.,,,,,,,,,,,,0
+-8,Repel,1,Transitive Verb,To cause someone to feel strong disgust or dislike.,,The graphic images repelled even the most seasoned observers.,,,,,,,,,,0
+-8,Repulse,1,Transitive Verb,,,,,,,,,,,,,0
+9,Fulminate,1,Intransitive Verb,"To express vehement protest or condemnation, especially in writing.",,The columnist fulminated against the new policy in his weekly piece.,,,,,,,,,,1
+9,Fume,1,Intransitive Verb,,,,,,,,,,,,,3
+9,Inveigh,1,Intransitive Verb,,,,,,,,,,,,,1
+9,Vituperate,1,Transitive Verb,To blame or criticise someone in harsh language.,,She vituperated the committee for its indifference to the crisis.,,,,,,,,,,1
+-9,Commend,1,Transitive Verb,To formally praise or recommend someone.,,,,,,,,,,,,0
+-9,Extol,1,Transitive Verb,To praise enthusiastically and at length.,,Critics extolled the novel as the finest of the decade.,,,,,,,,,,1
+10,Contrive,1,Transitive Verb,,,,,,,,,,,,,0
+10,Machinate,1,Intransitive Verb,"To plan or plot secretly, especially with intent to deceive.",,He was suspected of machinating behind the scenes for months.,,,,,,,,,,1
+10,Manoeuvre,1,Transitive Verb,To move or guide someone skillfully and carefully.,,She manoeuvred the conversation towards a more comfortable topic.,,,,,,,,,,0
+-10,Bungle,1,Transitive Verb,To carry out badly or clumsily; to mismanage.,,He completely bungled the introduction and set the wrong tone.,,,,,,,,,,3
+-10,Fumble,1,Transitive Verb,,,,,,,,,,,,,3
+11,Ascetic,1,Adjective,,,,,,,,,,,,,1
+11,Austere,1,Adjective,,,,,,,,,,,,,0
+11,Spartan,1,Adjective,,,,,,,,,,,,,2
+11,Frugal,1,Adjective,Careful with money or resources; avoiding waste or luxury.,,He was so frugal that he repaired his shoes three times before buying new ones.,,,,,মিতব্যয়ী; অপচয় না করে সাবধানে খরচ করেন এমন।,তিনি এতটাই মিতব্যয়ী ছিলেন যে নতুন কিছু কেনার আগে তিনবার ভাবতেন।,,,,0
+-11,Debauched,1,Adjective,"Indulging excessively in pleasure, especially of a sensual kind.",,The debauched lifestyle of the elite was an open secret.,,,,,,,,,,1
+-11,Indulgent,1,Adjective,Willing to allow or tolerate excessive pleasure or desire.,,Indulgent parents often struggle when their children reach adolescence.,,,,,,,,,,0
+-11,Dissolute,1,Adjective,Lacking moral restraint; given to immoral or vicious habits.,,His dissolute years were a stark contrast to his later reputation.,,,,,"চরিত্রহীন। রীতিমতো অনৈতিক, অভব্য ও অসৎ কাজ করতে যার বিবেকে বাঁধে না।",,,,,1
+12,Impetuous,1,Adjective,Acting or done quickly and without thought; impulsive.,,His impetuous decision to resign left everyone scrambling.,,,,,"বিবেচনা না করেই, খামখেয়ালি কাজ করে ফেলা।",,,,,0
+12,Impulsive,1,Adjective,,,,,,,,,,,,,0
+12,Rash,1,Adjective,,,,,,,,,,,,,0
+12,Precipitous,1,Adjective,Done without deliberation; dangerously hasty.,,A precipitous decision could unravel everything they had built.,,,,,,,,,,1
+-12,Prudent,1,Adjective,,,,,,,,,,,,,0
+-12,Circumspect,1,Adjective,Wary and unwilling to take risks; careful about all circumstances.,,She was circumspect in her dealings with the new client.,,,,,সতর্ক ও সুচিন্তিত; যেকোনো পদক্ষেপ নেওয়ার আগে সব দিক ভেবে দেখেন এমন।,"তিনি সতর্কভাবে প্রতিটি সিদ্ধান্ত নিতেন, কোনো কিছু তাড়াহুড়ো করে করতেন না।",এই পরিস্থিতিতে সতর্ক থাকাটাই বুদ্ধিমানের কাজ।,,,1
+-12,Deliberate,1,Adjective,Done consciously and intentionally; carefully considered.,,Every word in his speech was deliberate and precisely chosen.,,,,,,,,,,0
+13,Intrepid,1,Adjective,,,,,,,,,,,,,1
+13,Dauntless,1,Adjective,Showing fearlessness and determination.,,,,,,,,,,,,1
+13,Valiant,1,Adjective,Possessing great courage; heroic.,,"A valiant effort was made, even though victory slipped away.",,,,,শৌর্যবান,,,,,1
+13,Audacious,1,Adjective,Showing a willingness to take bold risks.,,"It was an audacious plan, but it worked.",,,,,,,,,,0
+-13,Timid,1,Adjective,,,,,,,,,,,,,0
+-13,Cowardly,1,Adjective,Lacking courage and showing shameful fear.,,The cowardly act of fleeing responsibility shocked everyone.,,,,,,,,,,0
+14,Benevolent,1,Adjective,,,,,,,,,,,,,0
+14,Magnanimous,1,Adjective,,,,,,,,,,,,,1
+14,Munificent,1,Adjective,More generous than is usual or expected.,,,,,,,,,,,,1
+14,Philanthropic,1,Adjective,"Concerned with the welfare of others, especially through charitable giving.",,His philanthropic activities grew after he sold the business.,,,,,,,,,,2
+-14,Miserly,1,Adjective,Unwilling to spend money; extremely mean with money.,,,,,,,,,,,,0
+-14,Parsimonious,1,Adjective,Extremely unwilling to spend money or use resources.,,Her parsimonious nature became a source of friction at home.,,,,,,,,,,1
+-14,Niggardly,1,Adjective,"Ungenerous with money, time, or resources; grudgingly stingy.",,He was niggardly with praise even when it was clearly deserved.,,,,,,,,,,1
+15,Loquacious,1,Adjective,Tending to talk a great deal; talkative.,,The loquacious host made sure no awkward silences could form.,,,,,বাচাল; সীমাহীন কথা বলার স্বভাব।,সে এতটাই বাচাল যে পাঁচ মিনিটের মিটিং তার কারণে এক ঘণ্টায় পরিণত হয়।,বাচাল মানুষের পাশে বসলে নিজে কথা বলার সুযোগ পাওয়া কঠিন।,,,1
+15,Garrulous,1,Adjective,"Excessively talkative, especially on trivial matters.",,His garrulous aunt could talk for hours about nothing.,,,,,,,,,,1
+15,Voluble,1,Adjective,Talking fluently and at length.,,,,,,,,,,,,1
+-15,Taciturn,1,Adjective,Reserved or uncommunicative in speech; saying little.,,He was so taciturn that a two-word reply was considered generous.,,,,,স্বভাবতই কম কথা বলেন এমন।,,,,,1
+-15,Reticent,1,Adjective,Not revealing one's thoughts or feelings readily.,,"She was reticent about her past, and no one pressed her on it.",,,,,,,,,,0
+-15,Laconic,1,Adjective,Using very few words; brief and concise in expression.,,His laconic response â just 'no' â closed the discussion entirely.,,,,,,,,,,1
+16,Mundane,1,Adjective,Lacking interest or excitement; dull and ordinary.,,He found the mundane aspects of the job increasingly hard to bear.,,,,,,,,,,0
+16,Banal,1,Adjective,,,,,,,,,,,,,1
+16,Prosaic,1,Adjective,Having the style of prose; lacking imaginativeness or creativity.,,His prosaic manner of speaking never matched the ambition of his ideas.,,,,,গদ্যময়,,,,,1
+16,Pedestrian,1,Adjective,Lacking inspiration or excitement; dull and ordinary.,,,,,,,,,,,,2
+-16,Riveting,1,Adjective,Completely engrossing; holding one's complete attention.,,The documentary was so riveting that no one moved for two hours.,,,,,,,,,,0
+-16,Captivating,1,Adjective,Capable of attracting and holding interest and attention.,,Her captivating personality lit up the room the moment she entered.,,,,,,,,,,0
+17,Lament,1,Transitive Verb,"To express grief, sorrow or regret about something.",,She lamented the passing of a more courteous age.,,,,,বিলাপ করা বা গভীর দুঃখ প্রকাশ করা।,"সে হারানো সুযোগের জন্য মনে মনে বিলাপ করত, কিন্তু মুখে কিছু বলত না।",কবিতাটিতে একটি হারিয়ে যাওয়া যুগের জন্য গভীর বিলাপ ছিল।,বিলাপ করে সময় নষ্ট না করে এগিয়ে যাওয়াটাই ভালো।,,0
+17,Bemoan,1,Transitive Verb,To express discontent or sorrow over something.,,He bemoaned the lack of decent bookshops in the city.,,,,,,,,,,0
+17,Deplore,1,Transitive Verb,To feel or express strong disapproval or sadness about something.,,Every right-thinking person deplores such acts of cruelty.,,,,,তীব্র নিন্দা করা বা গভীর দুঃখ প্রকাশ করা।,তিনি ঘটনাটিকে তীব্রভাবে নিন্দা করলেন এবং তদন্তের দাবি জানালেন।,,,,0
+-17,Celebrate,1,Transitive Verb,,,,,,,,,,,,,0
+-17,Rejoice,1,Intransitive Verb,To feel or show great joy or delight.,,She rejoiced at the news of her brother's safe return.,,,,,,,,,,0
+18,Evasive,1,Adjective,Tending to avoid commitment or give direct answers.,,His evasive answers only deepened their suspicion.,,,,,এড়িয়ে চলার ভঙ্গি; সরাসরি উত্তর না দিয়ে ঘুরিয়ে-পেঁচিয়ে কথা বলেন এমন।,তার এড়িয়ে চলা উত্তরগুলো সন্দেহ আরও বাড়িয়ে দিল।,এড়িয়ে চলার ভঙ্গি অনেক সময় সরাসরি মিথ্যার চেয়ে বেশি ক্ষতিকর।,,,0
+18,Equivocal,1,Adjective,,,,,,,,,,,,,1
+18,Ambiguous,1,Adjective,Open to more than one interpretation; unclear in meaning.,,The contract contained several ambiguous clauses.,,,,,"দ্ব্যর্থবোধক; একাধিক অর্থ বহন করে এমন, ফলে বিভ্রান্তি তৈরি হয়।",চুক্তির শর্তগুলো এতটাই দ্ব্যর্থবোধক ছিল যে উভয় পক্ষ নিজের মতো ব্যাখ্যা করেছিল।,অস্পষ্ট নির্দেশ দিলে কাজ ঠিকভাবে হওয়া কঠিন।,,,0
+-18,Candid,1,Adjective,Truthful and straightforward; not hiding one's opinions.,,"She appreciated his candid assessment, even if it was hard to hear.",,,,,খোলামেলা ও সৎ; মনের কথা সরাসরি বলতে পারেন এমন।,,,,,0
+-18,Forthright,1,Adjective,,,,,,,,,,,,,0
+-18,Unequivocal,1,Adjective,Leaving no doubt; clear and unambiguous.,,The unequivocal verdict put the matter to rest.,,,,,,,,,,1
+19,Recalcitrant,1,Adjective,Obstinately refusing to obey or cooperate with authority.,,The recalcitrant student refused every attempt at engagement.,,,,,বেয়াড়া; কর্তৃপক্ষের নির্দেশ মানতে একগুঁয়েভাবে অস্বীকার করেন এমন।,বেয়াড়া ছাত্রটিকে সামলানো শিক্ষকের জন্য সত্যিই কঠিন হয়ে উঠেছিল।,,,,1
+19,Obstinate,1,Adjective,Stubbornly refusing to change opinion or course of action.,,He remained obstinate in his refusal despite overwhelming evidence.,,,,,একগুঁয়ে; যুক্তিতর্ক বা প্রমাণ দিয়েও যাকে মত পরিবর্তন করানো যায় না।,এত প্রমাণ দেখার পরও সে একগুঁয়ের মতো নিজের অবস্থানে অটল রইল।,একগুঁয়ে মানুষের সাথে তর্ক করা সময় নষ্ট।,তার একগুঁয়েমি দলের সামনে এগিয়ে যাওয়ার পথ বন্ধ করে দিয়েছিল।,,0
+19,Intractable,1,Adjective,Hard to control or deal with; stubbornly persistent.,,,,,,,,,,,,1
+19,Obdurate,1,Adjective,,,,,,,,,,,,,1
+-19,Amenable,1,Adjective,,,,,,,,,,,,,1
+-19,Compliant,1,Adjective,Meeting or acting in accordance with rules or wishes.,,The compliant attitude of the new team made collaboration easy.,,,,,,,,,,0
+-19,Acquiescent,1,Adjective,Ready to accept something without protest or resistance.,,,,,,,,,,,,1
+20,Opulent,1,Adjective,Ostentatiously rich and luxurious or lavish.,,The opulent interiors of the palace left visitors speechless.,,,,,,,,,,1
+20,Lavish,1,Adjective,"Sumptuously rich, elaborate, or luxurious.",,She threw a lavish party to mark the occasion.,,,,,,,,,,0
+20,Sumptuous,1,Adjective,Splendid and expensive-looking; impressively grand.,,The sumptuous meal was a fitting end to the evening.,,,,,,,,,,1
+20,Extravagant,1,Adjective,Lacking restraint in spending; exceeding reasonable limits.,,His extravagant lifestyle was unsustainable on a teacher's salary.,,,,,,,,,,0
+-20,Austere,1,Adjective,,,,,,,,,,,,,0
+-20,Frugal,1,Adjective,Simple and plain; avoiding waste.,,She decorated the room in a frugal but tasteful style.,,,,,মিতব্যয়ী; অপচয় না করে সাবধানে খরচ করেন এমন।,তিনি এতটাই মিতব্যয়ী ছিলেন যে নতুন কিছু কেনার আগে তিনবার ভাবতেন।,,,,0
+21,Ostentatious,1,Adjective,Characterised by a vulgar display of wealth and a desire to impress.,,The ostentatious display of jewellery was in poor taste at the funeral.,,,,,,,,,,1
+21,Flamboyant,1,Adjective,"Attracting attention because of confidence, exuberance, and stylishness.",,His flamboyant entrance made the evening far more interesting.,,,,,,,,,,0
+21,Garish,1,Adjective,Obtrusively bright and showy; luridly colourful.,,The garish decor clashed with everything else in the building.,,,,,,,,,,3
+-21,Understated,1,Adjective,"Presented or expressed in a subtle, restrained style.",,Her understated elegance was more striking than any loud display.,,,,,,,,,,0
+-21,Unassuming,1,Adjective,,,,,,,,,,,,,0
+22,Tenacious,1,Adjective,Tending to hold firmly to something; persistent and determined.,,"She was tenacious in her pursuit of the story, refusing to give up.",,,,,লক্ষ্যে অবিচল; যত বাধাই আসুক হাল ছাড়েন না এমন।,এত প্রত্যাখ্যানের পরও সে অবিচলভাবে চেষ্টা করে গেল।,অবিচল থাকার গুণটাই তাকে বাকিদের থেকে আলাদা করেছিল।,সাফল্যের পেছনে প্রতিভার চেয়ে অবিচল পরিশ্রমের ভূমিকা বেশি।,,0
+22,Dogged,1,Adjective,,,,,,,,,,,,,0
+22,Indefatigable,1,Adjective,,,,,,,,,,,,,1
+22,Steadfast,1,Adjective,Resolutely firm and unwavering in purpose.,,She remained steadfast in her beliefs despite enormous pressure.,,,,,,,,,,0
+-22,Fickle,1,Adjective,,,,,,,,,,,,,0
+-22,Vacillate,1,Intransitive Verb,To waver between different opinions or actions; to be indecisive.,,,,,,,,,,,,1
+23,Alacrity,1,Common Noun,Brisk and cheerful readiness to do something.,,She accepted the assignment with such alacrity it surprised everyone.,,,,,"উৎসাহের সাথে, সানন্দে প্রস্তুত হওয়া।",,,,,1
+23,Zeal,1,Common Noun,Great energy or enthusiasm in pursuit of a cause or objective.,,His zeal for reform was evident in every speech he gave.,,,,,উদ্যম; কোনো লক্ষ্যের প্রতি তীব্র উৎসাহ ও নিষ্ঠা।,"সে যে উদ্যম নিয়ে কাজ শুরু করেছিল, তা দলের বাকিদেরও অনুপ্রাণিত করেছিল।",,,,0
+23,Ardour,1,Common Noun,Enthusiasm or passion.,,The ardour with which she pursued her research was infectious.,,,,,,,,,,1
+-23,Apathy,1,Common Noun,"Lack of interest, enthusiasm, or concern.",,Voter apathy reached a record high in the last election.,,,,,,,,,,0
+-23,Indolence,1,Common Noun,Laziness; aversion to activity or exertion.,,,,,,,,,,,,1
+-23,Lethargy,1,Common Noun,A lack of energy and enthusiasm; sluggishness.,,A sense of lethargy had settled over the office after the news.,,,,,,,,,,0
+24,Sycophant,1,Common Noun,A person who acts obsequiously to gain advantage; a flatterer.,,"The boardroom was full of sycophants, none willing to challenge him.",,,,,চাটুকার; নিজের সুবিধার জন্য যে ব্যক্তি অন্যের তোষামোদ করেন।,,,,,1
+24,Toady,1,Common Noun,A person who behaves obsequiously to someone influential.,,He surrounded himself with toadies who told him only what he wanted to hear.,,,,,,,,,,3
+24,Flatterer,1,Common Noun,,,,,,,,,,,,,0
+-24,Critic,1,Common Noun,,,,,,,,,,,,,0
+25,Repudiate,1,Transitive Verb,To refuse to accept or be associated with; to reject firmly.,,He publicly repudiated the values he had once championed.,,,,,সম্পূর্ণভাবে প্রত্যাখ্যান করা; কোনো কিছুর সাথে সম্পর্ক অস্বীকার করা।,তিনি প্রকাশ্যে দলের সিদ্ধান্ত প্রত্যাখ্যান করলেন।,,,,1
+25,Renounce,1,Transitive Verb,"To formally declare abandonment of a claim, right, or possession.",,She renounced her citizenship in protest against the new laws.,,,,,,,,,,0
+25,Disavow,1,Transitive Verb,,,,,,,,,,,,,1
+-25,Endorse,1,Transitive Verb,To declare public approval or support for something.,,The committee formally endorsed the proposal with only two abstentions.,,,,,,,,,,0
+-25,Ratify,1,Transitive Verb,To give formal consent or approval to; to make officially valid.,,All member states ratified the treaty within the year.,,,,,,,,,,2
+26,Prevaricate,1,Intransitive Verb,To speak or act evasively; to avoid stating the truth plainly.,,He prevaricated so skillfully that no one quite caught him in a lie.,,,,,,,,,,1
+26,Equivocate,1,Intransitive Verb,To use ambiguous language to avoid committing to one position.,,Politicians equivocate â it is practically a professional requirement.,,,,,,,,,,1
+26,Hedge,1,Intransitive Verb,,,,,,,,,,,,,3
+-26,Affirm,1,Transitive Verb,To state emphatically or publicly; to assert as a fact.,,He affirmed his commitment to the cause without any qualification.,,,,,,,,,,0
+-26,Avow,1,Transitive Verb,To assert or confess openly; to declare publicly.,,She avowed her support for the candidate without hesitation.,,,,,,,,,,1
+27,Pernicious,1,Adjective,"Having a harmful effect, especially in a gradual or subtle way.",,The pernicious effects of misinformation take years to undo.,,,,,ধীরে ধীরে এবং সূক্ষ্মভাবে ক্ষতি করে এমন।,,,,,1
+27,Detrimental,1,Adjective,Tending to cause harm; damaging.,,,,,,,,,,,,0
+27,Deleterious,1,Adjective,"Causing harm or damage, especially to health.",,,,,,,,,,,,1
+27,Injurious,1,Adjective,,,,,,,,,,,,,2
+-27,Salutary,1,Adjective,"Producing good effects; beneficial, especially after something unpleasant.",,The defeat had a salutary effect â the team trained harder than ever.,,,,,,,,,,1
+-27,Benign,1,Adjective,Gentle and kindly; not harmful in effect.,,The new policy had an unexpectedly benign impact on trade.,,,,,,,,,,0
+28,Egregious,1,Adjective,Outstandingly bad; shockingly obvious in a negative way.,,It was an egregious error â the kind that ends careers.,,,,,,,,,,1
+28,Flagrant,1,Adjective,,,,,,,,,,,,,0
+28,Blatant,1,Adjective,Done openly and unashamedly; obvious to all.,,His blatant lie was all the more surprising for how poorly it was told.,,,,,,,,,,0
+-28,Inconspicuous,1,Adjective,Not clearly visible or attracting attention; not prominent.,,,,,,,,,,,,0
+29,Languish,1,Intransitive Verb,To lose or lack vitality; to suffer from being in an unsatisfactory situation.,,The project languished for two years before anyone took it seriously.,,,,,নিস্তেজ হয়ে পড়া; প্রাণশক্তি হারিয়ে ধীরে ধীরে ক্ষয় পাওয়া।,,,,,0
+29,Stagnate,1,Intransitive Verb,"To become inactive, dull or stagnant through lack of activity or development.",,,,,,,,,,,,0
+29,Wither,1,Intransitive Verb,To become dry and shrunken; to fade through lack of nourishment.,,"Without support, even the strongest ambitions can wither.",,,,,,,,,,0
+-29,Flourish,1,Intransitive Verb,,,,,,,,,,,,,0
+-29,Thrive,1,Intransitive Verb,To prosper and grow; to do well.,,Children thrive when they feel seen and heard.,,,,,,,,,,0
+30,Truculent,1,Adjective,Eager or quick to argue or fight; aggressively defiant.,,The truculent official refused to answer even the simplest question.,,,,,ঝগড়াটে ও আক্রমণাত্মক; সামান্য কারণেই বিবাদে জড়িয়ে পড়ে এমন।,,,,,1
+30,Querulous,1,Adjective,,,,,,,,,,,,,1
+30,Cantankerous,1,Adjective,,,,,,,,,,,,,3
+-30,Affable,1,Adjective,"Friendly, good-natured, and easy to talk to.",,,,,,,,,,,,0
+-30,Amiable,1,Adjective,Having a friendly and pleasant manner.,,"She was amiable with everyone, never seeming to have a bad day.",,,,,,,,,,0
+31,Venerate,1,Transitive Verb,To regard with great respect and reverence.,,The community venerated the elder for her wisdom and patience.,,,,,গভীর শ্রদ্ধা করা।,,,,,1
+31,Revere,1,Transitive Verb,,,,,,,,,,,,,0
+31,Idolise,1,Transitive Verb,To admire or love someone to excess; to worship as an idol.,,She idolised her older sister until adulthood brought perspective.,,,,,,,,,,0
+-31,Despise,1,Transitive Verb,To feel contempt for; to regard as worthless or beneath one.,,She despised dishonesty above all other failings.,,,,,,,,,,0
+-31,Disdain,1,Transitive Verb,,,,,,,,,,,,,0
+32,Ameliorate,1,Transitive Verb,To make something bad or unsatisfactory better.,,Targeted investment can ameliorate the worst effects of poverty.,,,,,কোনো খারাপ পরিস্থিতি ভালো করা বা উন্নত করা।,সঠিক নীতি বাস্তবায়ন করলে দারিদ্র্যের ভয়াবহতা অনেকটাই কমানো সম্ভব।,,,,1
+32,Mitigate,1,Transitive Verb,"To make less severe, serious, or painful.",,,,,,,,,,,,0
+32,Alleviate,1,Transitive Verb,,,,,,,,,,,,,0
+-32,Exacerbate,1,Transitive Verb,To make an existing problem or bad situation worse.,,Rushing the decision would only exacerbate the underlying tension.,,,,,,,,,,0
+-32,Aggravate,1,Transitive Verb,To make a problem or offence worse or more serious.,,Scratching it will only aggravate the rash further.,,,,,,,,,,0
+33,Ephemeral,1,Adjective,Lasting for a very short time; transitory.,,Fame in the digital age is often ephemeral â a week and it is gone.,,,,,ক্ষণস্থায়ী; যা খুব অল্প সময়ের জন্য থাকে।,,,,,1
+33,Transient,1,Adjective,Lasting only for a short time; passing.,,"His happiness felt transient, like sunlight breaking through cloud.",,,,,ক্ষণিক; বেশিক্ষণ থাকে না এমন।,,,,,0
+33,Fleeting,1,Adjective,Lasting for a very short time.,,She caught only a fleeting glimpse of the figure before it vanished.,,,,,,,,,,0
+-33,Enduring,1,Adjective,,,,,,,,,,,,,0
+-33,Perpetual,1,Adjective,,,,,,,,,,,,,0
+34,Beat around the bush,2,Idiomatic Expression,To avoid coming to the main point of what one is saying.,,,,,,,,,,,,0
+34,Talk in circles,2,Idiomatic Expression,To keep discussing something without making progress or reaching a conclusion.,,,,,,,,,,,,3
+-34,Get straight to the point,2,Idiomatic Expression,To say exactly what one means without unnecessary preamble.,,"She got straight to the point, which everyone in the room appreciated.",,,,,,,,,,0
+-34,Cut to the chase,2,Idiomatic Expression,To get to the most important part of something without delay.,,Cut to the chase â do we have the funding or not?,,,,,,,,,,3
+35,Pull one's weight,2,Idiomatic Expression,,,,,,,,,,,,,0
+35,Give it one's all,2,Idiomatic Expression,,,,,,,,,,,,,0
+-35,Cut corners,2,Idiomatic Expression,,,,,,,,,,,,,3
+-35,Drag one's feet,2,Idiomatic Expression,To act slowly or reluctantly; to delay doing something.,,He had been dragging his feet on the application for months.,,,,,,,,,,3
+36,Come across,3,Phrasal Verb,,,,,,,,,,,,,0
+36,Run into,3,Phrasal Verb,To meet someone unexpectedly.,To encounter a problem or obstacle.,I ran into my old professor at the conference.,The project ran into serious funding issues in the third quarter.,,,,,,,,,0
+-36,Seek out,3,Phrasal Verb,,,,,,,,,,,,,0
+37,Look into,3,Phrasal Verb,To investigate or examine something.,,The committee agreed to look into the matter before the next session.,,,,,,,,,,0
+37,Look up,3,Phrasal Verb,To search for information in a reference source.,To visit someone after a period of absence.,Look up the word if you are unsure of its meaning.,She promised to look him up the next time she was in the city.,,,,,,,,,0
+37,Look down on,3,Phrasal Verb,,,,,,,,,,,,,0
+-37,Look up to,3,Phrasal Verb,To admire and respect someone.,,,,,,,,,,,,0
+38,Break down,3,Phrasal Verb,To stop functioning; to fail mechanically or emotionally.,To analyse or explain something in detail.,The car broke down just ten minutes into the journey.,We need to break down the costs before we can decide.,,,,,,,,,0
+38,Break out,3,Phrasal Verb,To escape from a place; to start suddenly.,,,,,,,,,,,,0
+-38,Build up,3,Phrasal Verb,,,,,,,,,,,,,0
+39,Obsessed with,3,Appropriate Preposition,,,,,,,,,,,,,0
+39,Preoccupied with,3,Appropriate Preposition,The correct preposition following 'preoccupied'.,,He seemed permanently preoccupied with what others thought of him.,,,,,,,,,,0
+39,Absorbed in,3,Appropriate Preposition,The correct preposition following 'absorbed'.,,,,,,,,,,,,0
+40,Asperity,1,Common Noun,Harshness of tone or manner.,,She replied with an asperity that silenced the room.,,,,,,,,,,1
+40,Acrimony,1,Common Noun,,,,,,,,,,,,,1
+40,Tartness,1,Common Noun,The quality of being sharp or cutting in manner or tone.,,There was a tartness in her reply that he had not expected.,,,,,,,,,,2
+-40,Cordiality,1,Common Noun,Warm and friendly quality; geniality.,,The cordiality of their welcome made us feel immediately at home.,,,,,,,,,,1
+-40,Warmth,1,Common Noun,,,,,,,,,,,,,0
+41,Diffident,1,Adjective,,,,,,,,,,,,,0
+41,Bashful,1,Adjective,Reluctant to draw attention to oneself; shy.,,He gave a bashful smile and looked away.,,,,,,,,,,3
+41,Meek,1,Adjective,"Quiet, gentle, and easily imposed on.",,,,,,,,,,,,0
+-41,Assertive,1,Adjective,Confident and direct in claiming rights or putting forward views.,,Learning to be assertive was the most valuable thing she did that year.,,,,,,,,,,0
+-41,Domineering,1,Adjective,,,,,,,,,,,,,0
+42,Reproach,1,Transitive Verb,To express disapproval or disappointment to someone.,,She reproached herself for not having said something sooner.,,,,,তিরস্কার করা বা কারো প্রতি হতাশা প্রকাশ করা।,নিজেকেই সে বারবার তিরস্কার করছিল কেন আগে কথা বলেনি।,"তিরস্কারের ভঙ্গিটা সহানুভূতিশীল ছিল, শাস্তিমূলক নয়।",,,0
+42,Rebuke,1,Transitive Verb,To express sharp disapproval or criticism of someone.,,The judge rebuked the lawyer for his unprofessional conduct.,,,,,তীব্রভাবে ভর্ৎসনা করা; কারো অন্যায় আচরণের বিরুদ্ধে কঠোর প্রতিক্রিয়া দেওয়া।,বিচারক আইনজীবীকে তার অপেশাদার আচরণের জন্য তীব্রভাবে ভর্ৎসনা করলেন।,প্রকাশ্যে ভর্ৎসিত হওয়া তার আত্মসম্মানে বড় আঘাত ছিল।,,,0
+42,Reprimand,1,Transitive Verb,To formally express disapproval of someone's conduct.,,He was reprimanded but kept his job â just barely.,,,,,,,,,,2
+42,Censure,1,Transitive Verb,,,,,,,,,,,,,2
+-42,Commend,1,Transitive Verb,,,,,,,,,,,,,0
+-42,Laud,1,Transitive Verb,"To praise highly, especially in a public context.",,,,,,,,,,,,1
+43,Credulous,1,Adjective,Having too great a readiness to believe things without evidence.,,He was so credulous that he believed every piece of gossip he heard.,,,,,সহজবিশ্বাসী; প্রমাণ ছাড়াই যেকোনো কথা বিশ্বাস করে ফেলেন এমন।,এত সহজবিশ্বাসী হলে চলে না — সবার কথায় আস্থা রাখলে ঠকতে হয়।,,,,1
+43,Gullible,1,Adjective,Easily persuaded to believe something; naively trusting.,,Only the most gullible reader would accept that explanation.,,,,,,,,,,0
+43,Naive,1,Adjective,"Showing a lack of experience, wisdom, or judgement.",,It was naive to think the contract would protect them.,,,,,,,,,,0
+-43,Sceptical,1,Adjective,Not easily convinced; having doubts or reservations.,,,,,,,,,,,,0
+-43,Cynical,1,Adjective,,,,,,,,,,,,,0
+-43,Wary,1,Adjective,Feeling or showing caution about possible dangers or problems.,,,,,,,,,,,,0
+44,Dilapidated,1,Adjective,In a state of disrepair or ruin as a result of age or neglect.,,The dilapidated building had been left untouched for thirty years.,,,,,,,,,,0
+44,Decrepit,1,Adjective,Worn out or ruined by age or neglect.,,The decrepit machinery was a liability rather than an asset.,,,,,,,,,,0
+44,Ramshackle,1,Adjective,In a state of severe disrepair; poorly constructed.,,They sheltered in a ramshackle shed while the storm passed.,,,,,,,,,,3
+-44,Pristine,1,Adjective,"In its original, unspoiled condition; perfectly clean.",,The documents were in pristine condition despite their age.,,,,,,,,,,0
+-44,Immaculate,1,Adjective,"Perfectly clean, neat, or tidy.",,"She arrived looking immaculate, as though the journey had not happened.",,,,,,,,,,0
+45,Nonchalant,1,Adjective,Feeling or appearing casually calm and relaxed; not displaying anxiety.,,"He was nonchalant about the whole affair, which irritated everyone.",,,,,"ভাবলেশহীন, নির্লিপ্ত; কিছু হলেও যেন কিছুই যায়-আসে না এমন ভাব।",,,,,1
+45,BlasÃ©,1,Adjective,Unimpressed by or indifferent to something because one has seen it all before.,,,,,,,,,,,,1
+45,Sanguine,1,Adjective,"Optimistic, especially in a difficult situation; positive about outcomes.",,,,,,,,,,,,1
+-45,Anxious,1,Adjective,,,,,,,,,,,,,0
+-45,Agitated,1,Adjective,,,,,,,,,,,,,0
+46,Peevish,1,Adjective,"Easily irritated, especially by trivial things; childishly sulky.",,She grew peevish when lunch was delayed even by a few minutes.,,,,,সামান্য কারণেই বিরক্ত হয়ে যান এমন; খিটখিটে মেজাজের।,সে সারাদিন এত খিটখিটে ছিল যে কেউ কাছে আসতে সাহস করেনি।,ক্লান্তি হলে মানুষ প্রায়ই খিটখিটে হয়ে পড়েন।,তার খিটখিটে মেজাজ সবাইকে এড়িয়ে চলতে বাধ্য করেছিল।,,3
+46,Petulant,1,Adjective,Childishly sulky or bad-tempered.,,His petulant refusal to cooperate held up the entire project.,,,,,,,,,,1
+46,Irascible,1,Adjective,Having or showing a tendency to become easily angered.,,The irascible professor was avoided by most first-year students.,,,,,,,,,,1
+-46,Equanimous,1,Adjective,"Calm and composed, especially in difficult situations.",,,,,,,,,,,,1
+-46,Stoic,1,Adjective,Enduring pain or hardship without complaining or showing emotion.,,,,,,,,,,,,0
+-46,Imperturbable,1,Adjective,Unable to be upset or excited; calm at all times.,,An imperturbable temperament is a considerable advantage in negotiations.,,,,,,,,,,1
+47,Prodigal,1,Adjective,,,,,,,,,,,,,1
+47,Profligate,1,Adjective,Recklessly extravagant or wasteful in the use of resources.,,The profligate spending of the previous administration left nothing in reserve.,,,,,,,,,,1
+47,Improvident,1,Adjective,Not providing for future needs; not thinking ahead financially.,,,,,,,,,,,,1
+-47,Thrifty,1,Adjective,,,,,,,,,,,,,0
+-47,Prudent,1,Adjective,Acting with care and thought for the future; not wasteful.,,,,,,,,,,,,0
+48,Verbose,1,Adjective,Using or expressed in more words than are needed.,,His verbose reports were famous for containing very little actual information.,,,,,প্রয়োজনের চেয়ে অনেক বেশি কথা বলা বা লেখার অভ্যাস।,,,,,1
+48,Prolix,1,Adjective,Using too many words; tediously lengthy.,,The prolix memo could have been a single sentence.,,,,,,,,,,1
+48,Rambling,1,Adjective,Lengthy and confused; straying from the main subject.,,His rambling speech tested the patience of even his supporters.,,,,,,,,,,3
+-48,Concise,1,Adjective,Giving a lot of information clearly and in a few words.,,Her concise summary saved the committee a great deal of time.,,,,,,,,,,0
+-48,Pithy,1,Adjective,,,,,,,,,,,,,1
+-48,Succinct,1,Adjective,Briefly and clearly expressed.,,He gave a succinct reply that answered the question without elaborating.,,,,,,,,,,0
+49,Magnify,1,Transitive Verb,To make something appear larger; to increase the apparent size of.,To exaggerate the importance of something.,A microscope magnifies objects too small to see with the naked eye.,The media tended to magnify every minor setback into a crisis.,,,,,,,,,0
+49,Amplify,1,Transitive Verb,,,,,,,,,,,,,0
+49,Exaggerate,1,Transitive Verb,"To represent something as being larger, better, or worse than it really is.",,She had a tendency to exaggerate difficulties to gain sympathy.,,,,,,,,,,0
+-49,Minimise,1,Transitive Verb,,,,,,,,,,,,,0
+-49,Understate,1,Transitive Verb,To express or describe something as being smaller or less significant than it is.,,To say the review was unkind would be to understate matters considerably.,,,,,,,,,,0
+50,Nefarious,1,Adjective,Wicked or criminal in nature; iniquitous.,,The nefarious plot was uncovered before it could cause real harm.,,,,,,,,,,1
+50,Villainous,1,Adjective,Wicked; evil; characteristic of a villain.,,The villainous deception was exposed in court.,,,,,,,,,,0
+50,Iniquitous,1,Adjective,,,,,,,,,,,,,1
+-50,Virtuous,1,Adjective,Having or showing high moral standards.,,"He was virtuous in his dealings, which was rare in that industry.",,,,,,,,,,0
+-50,Righteous,1,Adjective,,,,,,,,,,,,,0
+51,Impede,1,Transitive Verb,To delay or prevent progress by obstructing.,,Bureaucracy continues to impede the delivery of aid.,,,,,বাধা দেওয়া; অগ্রগতি থামিয়ে দেওয়া।,,,,,0
+51,Hinder,1,Transitive Verb,To make it difficult for someone to do something or for something to happen.,,Poor weather hindered their progress across the mountain.,,,,,,,,,,0
+51,Hamper,1,Transitive Verb,To hinder or impede the movement or progress of.,,The lack of funding hampered the research at every stage.,,,,,,,,,,0
+51,Encumber,1,Transitive Verb,,,,,,,,,,,,,1
+-51,Facilitate,1,Transitive Verb,To make an action or process easier.,,The new software facilitates the sharing of documents across teams.,,,,,,,,,,0
+-51,Expedite,1,Transitive Verb,To make something happen sooner or more quickly.,,The director intervened personally to expedite the approval.,,,,,,,,,,1
+52,Copious,1,Adjective,,,,,,,,,,,,,0
+52,Profuse,1,Adjective,,,,,,,,,,,,,0
+52,Plentiful,1,Adjective,Existing in or yielding great quantities; abundant.,,Food was plentiful at the harvest festival.,,,,,,,,,,0
+-52,Meagre,1,Adjective,Lacking in quantity or quality; insufficient.,,The meagre salary was barely enough to cover basic expenses.,,,,,,,,,,0
+-52,Scanty,1,Adjective,Small or insufficient in quantity or extent.,,Scanty evidence made a conviction almost impossible.,,,,,,,,,,1
+-52,Sparse,1,Adjective,,,,,,,,,,,,,0
+53,Throw oneself into,2,Idiomatic Expression,To begin doing something with great enthusiasm and energy.,,,,,,,,,,,,0
+53,Go the extra mile,2,Idiomatic Expression,To make more effort than is required.,,,,,,,,,,,,0
+-53,Go through the motions,2,Idiomatic Expression,To do something without real effort or interest; to perform mechanically.,,"By the third year, he was just going through the motions.",,,,,,,,,,3
+54,Bite the bullet,2,Idiomatic Expression,,,,,,,,,,,,,3
+54,Take the plunge,2,Idiomatic Expression,,,,,,,,,,,,,3
+-54,Play it safe,2,Idiomatic Expression,To act cautiously; to avoid unnecessary risk.,,,,,,,,,,,,0
+-54,Sit on the fence,2,Idiomatic Expression,,,,,,,,,,,,,3
+55,Turn down,3,Phrasal Verb,"To reject an offer, request, or person.","To reduce the volume, heat, or level of something.",She turned down two promotions before accepting the third.,Turn down the music â the neighbours are complaining.,,,,,,,,,0
+55,Turn over,3,Phrasal Verb,To hand something to someone in authority.,To start an engine.,,,,,,,,,,,0
+-55,Take up,3,Phrasal Verb,To begin a new hobby or activity.,To accept an offer or challenge.,She took up running after the doctor's advice.,He took up the challenge without hesitation.,,,,,,,,,0
+56,Give up,3,Phrasal Verb,,,,,,,,,,,,,0
+56,Give away,3,Phrasal Verb,,,,,,,,,,,,,0
+-56,Hold on,3,Phrasal Verb,,,,,,,,,,,,,3
+57,Set back,3,Phrasal Verb,To delay or obstruct the progress of something.,,,,,,,,,,,,0
+57,Set off,3,Phrasal Verb,,,,,,,,,,,,,0
+-57,Catch up,3,Phrasal Verb,,,,,,,,,,,,,0
+58,Accuse of,3,Appropriate Preposition,The correct preposition following 'accuse'.,,He was accused of negligence by the investigating board.,,,,,,,,,,0
+58,Charged with,3,Appropriate Preposition,The correct preposition following 'charged' in a legal context.,,She was charged with misappropriation of funds.,,,,,,,,,,2
+58,Guilty of,3,Appropriate Preposition,The correct preposition following 'guilty'.,,,,,,,,,,,,0
+58,Acquitted of,3,Appropriate Preposition,The correct preposition following 'acquitted'.,,She was acquitted of all charges and walked free.,,,,,,,,,,2
+59,Indifferent to,3,Appropriate Preposition,The correct preposition following 'indifferent'.,,"He was largely indifferent to criticism, which unnerved his detractors.",,,,,,,,,,0
+59,Averse to,3,Appropriate Preposition,,,,,,,,,,,,,1
+59,Immune to,3,Appropriate Preposition,,,,,,,,,,,,,0
+59,Prone to,3,Appropriate Preposition,The correct preposition following 'prone'.,,,,,,,,,,,,0
+60,Eloquent,1,Adjective,Fluent or persuasive in speaking or writing.,,Her eloquent plea moved even the most resistant members of the panel.,,,,,বাগ্মী; সুন্দর ও প্রভাবশালীভাবে কথা বলতে বা লিখতে পারেন এমন।,তার বাগ্মিতা শ্রোতাদের মনে গভীর ছাপ ফেলেছিল।,,,,0
+60,Articulate,1,Adjective,Having or showing the ability to speak fluently and coherently.,,He was the most articulate speaker the party had fielded in years.,,,,,,,,,,0
+60,Lucid,1,Adjective,,,,,,,,,,,,,0
+-60,Incoherent,1,Adjective,Expressed in a confusing way that is difficult to understand.,,The argument was incoherent â full of assertions with no evidence.,,,,,,,,,,0
+-60,Inarticulate,1,Adjective,,,,,,,,,,,,,0
+61,Placate,1,Transitive Verb,To make someone less angry or hostile; to appease.,,A brief apology was enough to placate the angry customer.,,,,,রাগ বা ক্ষোভ প্রশমিত করা।,,,,,0
+61,Appease,1,Transitive Verb,,,,,,,,,,,,,0
+61,Mollify,1,Transitive Verb,,,,,,,,,,,,,1
+-61,Antagonise,1,Transitive Verb,,,,,,,,,,,,,0
+-61,Provoke,1,Transitive Verb,"To stimulate a reaction, especially an angry one.",,,,,,,,,,,,0
+62,Revive,1,Transitive Verb,"To restore to life, consciousness, or vigour.",,The rain revived the withered garden almost immediately.,,,,,,,,,,0
+62,Resuscitate,1,Transitive Verb,To restore to consciousness or life.,To make active or vigorous again.,,,,,,,,,,,1
+62,Rejuvenate,1,Transitive Verb,To make someone or something look or feel younger or more vigorous.,,A change of leadership rejuvenated the entire organisation.,,,,,,,,,,0
+-62,Exhaust,1,Transitive Verb,To use up completely; to deplete entirely.,,Years of conflict had exhausted the country's reserves.,,,,,,,,,,0
+-62,Deplete,1,Transitive Verb,"To reduce severely in quantity, quality, or number.",,Overfishing had seriously depleted the coastal fish stocks.,,,,,,,,,,0
+63,Innocuous,1,Adjective,Not harmful or offensive; harmless.,,What seemed like an innocuous comment triggered an unexpected response.,,,,,নিরীহ; যা কোনো ক্ষতি করে না বা করার সম্ভাবনা নেই।,"মন্তব্যটা নিরীহ মনে হয়েছিল, কিন্তু সবাই তাতে লুকানো বিদ্রূপ খুঁজে পেল।",নিরীহ দেখতে মানুষটাই সবচেয়ে বেশি ক্ষতি করেছিল।,,,1
+63,Inoffensive,1,Adjective,,,,,,,,,,,,,0
+-63,Insidious,1,Adjective,,,,,,,,,,,,,1
+-63,Malicious,1,Adjective,Characterised by malice; intending or intended to do harm.,,The malicious gossip had caused her years of professional damage.,,,,,,,,,,0
+64,Wane,1,Intransitive Verb,"To decrease in vigour, power, or extent; to decline.",,Public enthusiasm for the project began to wane after the first year.,,,,,ক্রমশ কমতে থাকা; শক্তি বা প্রভাব হারানো।,,,,,0
+64,Ebb,1,Intransitive Verb,,,,,,,,,,,,,0
+64,Diminish,1,Transitive Verb,To make or become less; to lessen or reduce.,,Nothing could diminish her pride in what they had accomplished.,,,,,,,,,,0
+-64,Wax,1,Intransitive Verb,,,,,,,,,,,,,1
+-64,Surge,1,Intransitive Verb,To increase suddenly and powerfully.,,Support surged after the television interview.,,,,,,,,,,0
+65,Coerce,1,Transitive Verb,To persuade someone to do something by using force or threats.,,She felt coerced into signing the agreement under duress.,,,,,ভয় দেখিয়ে বা জোর করে কাউকে কিছু করতে বাধ্য করা।,সাক্ষীকে জোর করে সাক্ষ্য দিতে বাধ্য করা হয়েছিল বলে অভিযোগ উঠেছিল।,,,,0
+65,Compel,1,Transitive Verb,To force or oblige someone to do something.,,The new regulation compels all suppliers to disclose their sources.,,,,,,,,,,0
+65,Intimidate,1,Transitive Verb,"To frighten or overawe someone, especially to make them do what one wants.",,He tried to intimidate witnesses before the case went to court.,,,,,,,,,,0
+-65,Persuade,1,Transitive Verb,To induce someone to do something through reasoning or argument.,,She persuaded the reluctant committee with carefully marshalled facts.,,,,,,,,,,0
+-65,Coax,1,Transitive Verb,To persuade someone gradually or by flattery to do something.,,He coaxed a confession with patience rather than pressure.,,,,,,,,,,3
+66,Indolent,1,Adjective,Avoiding activity or exertion; lazy.,,His indolent approach to the first term nearly cost him the year.,,,,,অলস; কাজকর্মে অনীহা।,,,,,1
+66,Slothful,1,Adjective,Lazy; showing a disinclinaton to work or make an effort.,,She was not slothful â she was simply selective about her energy.,,,,,,,,,,1
+66,Idle,1,Adjective,Avoiding work; not active or in use.,,,,,,,,,,,,0
+-66,Industrious,1,Adjective,,,,,,,,,,,,,0
+-66,Assiduous,1,Adjective,,,,,,,,,,,,,1
+67,Sagacious,1,Adjective,Having or showing keen mental discernment and good judgement.,,His sagacious assessment of the situation was proven right within months.,,,,,বিচক্ষণ; গভীর প্রজ্ঞা ও সূক্ষ্ম বিচারবোধ সম্পন্ন।,,,,,1
+67,Astute,1,Adjective,Having an ability to assess accurately and cleverly.,,,,,,,,,,,,0
+67,Shrewd,1,Adjective,,,,,,,,,,,,,0
+67,Discerning,1,Adjective,Having or showing good judgement; perceptive.,,A discerning reader will notice the layers beneath the simple prose.,,,,,,,,,,0
+-67,Obtuse,1,Adjective,Annoyingly insensitive or slow to understand.,,"He was being deliberately obtuse, she was certain of it.",,,,,,,,,,1
+-67,Vacuous,1,Adjective,Having or showing a lack of thought or intelligence; mindless.,,The vacuous reply revealed he had not read the briefing at all.,,,,,,,,,,1
+68,Laborious,1,Adjective,,,,,,,,,,,,,0
+68,Arduous,1,Adjective,Involving or requiring strenuous effort; difficult and tiring.,,,,,,,,,,,,0
+68,Onerous,1,Adjective,Involving an amount of effort that is oppressively burdensome.,,The onerous terms of the contract effectively trapped the smaller party.,,,,,,,,,,1
+-68,Effortless,1,Adjective,Requiring no physical or mental exertion; achieved without difficulty.,,Her effortless performance made the most difficult passages look simple.,,,,,,,,,,0
+-68,Facile,1,Adjective,Appearing effortless; achieved without difficulty.,Ignoring the complexities of an issue; simplistic.,,,,,,,,,,,1
+69,Terse,1,Adjective,,,,,,,,,,,,,0
+69,Curt,1,Adjective,,,,,,,,,,,,,0
+69,Brusque,1,Adjective,Abrupt or offhand in manner; somewhat rude.,,His brusque manner was mistaken for arrogance by those who didn't know him.,,,,,,,,,,1
+-69,Expansive,1,Adjective,Covering a wide area; covering a wide range of subjects; open and communicative.,,"She was expansive in her reply, covering every angle of the question.",,,,,,,,,,0
+-69,Effusive,1,Adjective,"Expressing gratitude, pleasure, or approval in an unrestrained way.",,"He was effusive in his praise, perhaps excessively so.",,,,,,,,,,1
+70,Indiscriminate,1,Adjective,Done at random or without careful judgement.,,,,,,,,,,,,1
+70,Haphazard,1,Adjective,Lacking any obvious principle of organisation; random.,,,,,,,,,,,,0
+70,Arbitrary,1,Adjective,"Based on random choice or personal whim, not reason.",,The arbitrary decision to exclude certain applicants was never explained.,,,,,,,,,,0
+-70,Deliberate,1,Adjective,Done consciously and intentionally; carefully considered.,,Every step of the plan was deliberate and fully considered.,,,,,,,,,,0
+-70,Methodical,1,Adjective,Done according to a systematic or established procedure.,,,,,,,,,,,,0
+71,Perspicacious,1,Adjective,Having a ready insight into things; of keen understanding.,,A perspicacious analyst would have spotted the discrepancy immediately.,,,,,,,,,,1
+71,Perceptive,1,Adjective,Having or showing sensitive insight; astute.,,Her perceptive question cut straight to the heart of the matter.,,,,,,,,,,0
+71,Insightful,1,Adjective,Having or showing an accurate and deep understanding.,,,,,,,,,,,,0
+-71,Imperceptive,1,Adjective,Lacking the ability to perceive or understand; slow to notice.,,,,,,,,,,,,1
+-71,Dense,1,Adjective,Stupid; not quick to understand.,,,,,,,,,,,,3
+72,Take to task,2,Idiomatic Expression,To reprimand or criticise someone for a fault or shortcoming.,,The manager took him to task for missing the deadline without notice.,,,,,,,,,,0
+72,Read the riot act,2,Idiomatic Expression,To firmly warn someone that their behaviour is unacceptable.,,She read the riot act to the team after the third consecutive failure.,,,,,,,,,,3
+-72,Let off the hook,2,Idiomatic Expression,,,,,,,,,,,,,3
+-72,Turn a blind eye,2,Idiomatic Expression,To pretend not to notice something; to ignore intentionally.,,Management had been turning a blind eye to the misconduct for months.,,,,,,,,,,0
+73,Futile,1,Adjective,Incapable of producing any useful result; pointless.,,It was futile to argue with someone who had already made up their mind.,,,,,নিষ্ফল; কোনো ফল দেয় না এমন।,,,,,0
+73,Fruitless,1,Adjective,,,,,,,,,,,,,0
+73,Abortive,1,Adjective,Failing to produce the intended result; unsuccessful.,,An abortive attempt to mediate left relations worse than before.,,,,,,,,,,1
+-73,Productive,1,Adjective,Achieving a significant amount; having a useful result.,,It was the most productive meeting they had held in months.,,,,,,,,,,0
+-73,Fruitful,1,Adjective,Producing good or helpful results; productive.,,"The collaboration proved fruitful, yielding three published papers.",,,,,,,,,,0
+74,Capricious,1,Adjective,Given to sudden and unaccountable changes of mood or behaviour.,,Her capricious decisions made long-term planning almost impossible.,,,,,খামখেয়ালি; কোনো কারণ ছাড়াই মেজাজ ও সিদ্ধান্ত পরিবর্তন করেন এমন।,তার খামখেয়ালি স্বভাবের কারণে কেউ বুঝতে পারত না পরবর্তী পদক্ষেপ কী হবে।,,,,1
+74,Erratic,1,Adjective,Not even or regular in pattern; unpredictable.,,His erratic form made him a risk for any team seeking consistency.,,,,,,,,,,0
+74,Mercurial,1,Adjective,Subject to sudden or unpredictable changes in mood.,,His mercurial temperament was both his strength and his weakness.,,,,,,,,,,1
+-74,Consistent,1,Adjective,Acting or done in the same way over time; unchanging.,,"She was consistent in her approach, which earned her the team's trust.",,,,,,,,,,0
+-74,Steadfast,1,Adjective,Resolutely firm and unwavering.,,,,,,,,,,,,0
+75,Supercilious,1,Adjective,,,,,,,,,,,,,1
+75,Haughty,1,Adjective,Arrogantly superior and disdainful.,,She looked at us with a haughty contempt that made further conversation pointless.,,,,,উদ্ধত; নিজেকে অন্যদের চেয়ে উঁচু মনে করে অবজ্ঞার সাথে আচরণ করেন এমন।,তার উদ্ধত ভাব দেখে মনে হতো তিনি সবাইকে নিজের চেয়ে ছোট মনে করেন।,এত উদ্ধত হলে মানুষ কাছে আসতে চায় না।,,,0
+75,Imperious,1,Adjective,Assuming power or authority without justification; arrogantly domineering.,,,,,,,,,,,,1
+75,Disdainful,1,Adjective,Showing contempt or lack of respect; scornful.,,She was disdainful of any effort that fell short of perfection.,,,,,,,,,,0
+-75,Deferential,1,Adjective,Showing respect and submission to another's authority.,,He was deferential to senior colleagues without being obsequious.,,,,,,,,,,1
+-75,Respectful,1,Adjective,Feeling or showing deference and respect.,,The students were respectful of their teachers even outside the classroom.,,,,,,,,,,0
+76,Disparage,1,Transitive Verb,To regard or represent as being of little worth; to belittle.,,"He disparaged her early work, which she never entirely forgave.",,,,,,,,,,0
+76,Belittle,1,Transitive Verb,,,,,,,,,,,,,0
+76,Denigrate,1,Transitive Verb,,,,,,,,,,,,,1
+-76,Exalt,1,Transitive Verb,To hold someone or something in very high regard; to praise.,,The ceremony was designed to exalt the founders of the institution.,,,,,,,,,,0
+-76,Glorify,1,Transitive Verb,To praise and worship; to represent in an idealised way.,,The biography glorified its subject without acknowledging any flaws.,,,,,,,,,,0
+77,Catch red-handed,2,Idiomatic Expression,To catch someone in the very act of doing something wrong.,,,,,,,,,,,,3
+77,In broad daylight,2,Idiomatic Expression,"Done openly and without concealment, during the day.",,,,,,,,,,,,0
+-77,Under the radar,2,Idiomatic Expression,Without being noticed or detected by others.,,The initiative had been operating under the radar for almost a year.,,,,,,,,,,3
+78,Rancour,1,Common Noun,"Bitterness or resentfulness, especially when long-standing.",,There was a rancour in their correspondence that neither acknowledged openly.,,,,,দীর্ঘদিন ধরে পুষে রাখা তিক্ততা ও বিদ্বেষ।,,,,,1
+78,Resentment,1,Common Noun,Bitter indignation at having been treated unfairly.,,The resentment had built up quietly over years of perceived slights.,,,,,,,,,,0
+78,Animosity,1,Common Noun,Strong hostility; active dislike.,,The animosity between the two departments undermined every joint project.,,,,,,,,,,0
+78,Antipathy,1,Common Noun,A deep-seated feeling of aversion towards something.,,He had an instinctive antipathy towards anything that smelled of bureaucracy.,,,,,,,,,,1
+-78,Goodwill,1,Common Noun,,,,,,,,,,,,,0
+-78,Amity,1,Common Noun,A friendly relationship between people or countries.,,The treaty established lasting amity between the two neighbours.,,,,,,,,,,1
+79,Contemplate,1,Transitive Verb,,,,,,,,,,,,,0
+79,Ruminate,1,Intransitive Verb,To think deeply about something; to turn something over in one's mind.,,He tended to ruminate on failures far longer than was useful.,,,,,,,,,,1
+79,Ponder,1,Transitive Verb,To think about carefully; to weigh in the mind.,,,,,,,,,,,,0
+79,Deliberate,1,Intransitive Verb,To engage in long and careful consideration.,,The jury deliberated for two days before returning a verdict.,,,,,,,,,,0
+-79,Act impulsively,2,Idiomatic Expression,To do something without careful thought or planning.,,He acted impulsively and regretted it within hours.,,,,,,,,,,0
+80,Volatile,1,Adjective,,,,,,,,,,,,,0
+80,Explosive,1,Adjective,Likely to erupt in conflict or violence; potentially catastrophic.,,,,,,,,,,,,0
+80,Combustible,1,Adjective,,,,,,,,,,,,,1
+-80,Stable,1,Adjective,,,,,,,,,,,,,0
+-80,Temperate,1,Adjective,Showing moderation or self-restraint; mild.,,She responded in a temperate manner that defused the tension.,,,,,,,,,,1
+81,Knuckle down,3,Phrasal Verb,,,,,,,,,,,,,3
+81,Buckle down,3,Phrasal Verb,To start working hard on something.,,The team buckled down after the manager's firm warning.,,,,,,,,,,3
+-81,Slack off,3,Phrasal Verb,To reduce one's level of effort; to become lazier.,,He slacked off in the final weeks and it showed in the result.,,,,,,,,,,3
+82,Give in,3,Phrasal Verb,,,,,,,,,,,,,0
+82,Back down,3,Phrasal Verb,To withdraw a claim or position; to concede.,,,,,,,,,,,,3
+-82,Stand firm,2,Idiomatic Expression,To refuse to change one's position or be moved by pressure.,,,,,,,,,,,,0
+-82,Hold one's ground,2,Idiomatic Expression,,,,,,,,,,,,,0
+83,Sublime,1,Adjective,,,,,,,,,,,,,0
+83,Resplendent,1,Adjective,Attractive and impressive through being richly colourful or magnificent.,,She arrived resplendent in a crimson dress that silenced the room.,,,,,,,,,,1
+83,Exquisite,1,Adjective,,,,,,,,,,,,,0
+-83,Squalid,1,Adjective,Extremely dirty and unpleasant; showing a contemptible lack of moral standards.,,,,,,,,,,,,0
+-83,Grotesque,1,Adjective,Comically or repulsively ugly or distorted.,,The grotesque caricature was meant to shock and succeeded.,,,,,,,,,,0
+84,Duplicity,1,Common Noun,Deceitfulness; double-dealing.,,The level of duplicity uncovered in the investigation shocked everyone.,,,,,"দ্বিমুখী আচরণ; মুখে এক কথা, মনে আরেক কথা।",,,,,1
+84,Guile,1,Common Noun,Sly or cunning intelligence; craftiness.,,,,,,,,,,,,1
+84,Treachery,1,Common Noun,Betrayal of trust; deception.,,The treachery of his closest ally was the blow he never recovered from.,,,,,,,,,,0
+-84,Integrity,1,Common Noun,The quality of being honest and having strong moral principles.,,Her integrity in the matter was never once called into question.,,,,,সততা ও নৈতিক দৃঢ়তা।,,,,,0
+-84,Candour,1,Common Noun,The quality of being open and honest in expression; frankness.,,She spoke with a candour that was rare at that level of the organisation.,,,,,,,,,,1
+85,Eligible for,3,Appropriate Preposition,The correct preposition following 'eligible'.,,She was eligible for the scholarship based on her academic record.,,,,,,,,,,0
+85,Qualified for,3,Appropriate Preposition,The correct preposition following 'qualified'.,,He was fully qualified for the role but was passed over anyway.,,,,,,,,,,0
+85,Suited to,3,Appropriate Preposition,,,,,,,,,,,,,0
+85,Adept at,3,Appropriate Preposition,The correct preposition following 'adept'.,,She was adept at defusing tension with a well-timed remark.,,,,,,,,,,0
+85,Proficient in,3,Appropriate Preposition,The correct preposition following 'proficient'.,,"He was proficient in four languages, which opened many doors.",,,,,,,,,,0
+86,Compassionate,1,Adjective,Feeling or showing sympathy and concern for others.,,,,,,,,,,,,0
+86,Empathetic,1,Adjective,Showing empathy; able to understand and share the feelings of another.,,An empathetic doctor listens before they prescribe.,,,,,,,,,,0
+86,Sympathetic,1,Adjective,Feeling or showing sympathy; expressing compassion.,,She was sympathetic to the difficulty of the situation.,,,,,,,,,,0
+-86,Callous,1,Adjective,,,,,,,,,,,,,0
+-86,Indifferent,1,Adjective,Having no particular interest or sympathy; unconcerned.,,He was indifferent to the suffering his decisions caused.,,,,,,,,,,0
+87,Vitiate,1,Transitive Verb,,,,,,,,,,,,,1
+87,Corrupt,1,Transitive Verb,To cause to act dishonestly or make morally depraved.,,,,,,,,,,,,0
+87,Taint,1,Transitive Verb,To contaminate or pollute; to affect with a bad quality.,,The scandal tainted every aspect of the administration that followed.,,,,,,,,,,0
+-87,Purify,1,Transitive Verb,To remove contaminants from; to make clean and pure.,,The water needed to be purified before it was safe to drink.,,,,,,,,,,0
+-87,Rectify,1,Transitive Verb,To put something right; to correct.,,Steps were taken to rectify the errors before they caused further damage.,,,,,,,,,,0
+88,Reluctant,1,Adjective,,,,,,,,,,,,,0
+88,Loath,1,Adjective,Strongly unwilling; reluctant.,,,,,,,,,,,,1
+88,Disinclined,1,Adjective,Unwilling; lacking enthusiasm to do something.,,She was disinclined to discuss the matter at that point.,,,,,,,,,,1
+-88,Eager,1,Adjective,Keen and enthusiastic; wanting very much to do or have something.,,He was eager to demonstrate what he had learned.,,,,,,,,,,0
+-88,Avid,1,Adjective,,,,,,,,,,,,,0
+89,Tacit,1,Adjective,,,,,,,,,,,,,0
+89,Implicit,1,Adjective,Implied though not plainly expressed; inherent.,,There was an implicit threat in every polite exchange that followed.,,,,,,,,,,0
+-89,Explicit,1,Adjective,"Stated clearly and in detail, leaving no room for doubt.",,"The instructions were explicit â no exceptions, no substitutions.",,,,,,,,,,0
+-89,Overt,1,Adjective,Done openly; not secret.,,The overt hostility of the greeting surprised the visiting delegation.,,,,,,,,,,0
+90,Embellish,1,Transitive Verb,To make something more attractive; to add decorative details to a story.,,He had a habit of embellishing stories until they became unrecognisable.,,,,,,,,,,0
+90,Adorn,1,Transitive Verb,To make more attractive; to decorate or add beauty to.,,Photographs adorned every wall of the small apartment.,,,,,,,,,,0
+90,Ornament,1,Transitive Verb,To make more attractive by adding decorative items.,,The ceiling was ornamented with intricate plasterwork.,,,,,,,,,,1
+-90,Strip,1,Transitive Verb,,,,,,,,,,,,,0
+91,Insolent,1,Adjective,Showing a rude and arrogant lack of respect.,,His insolent response to the judge's question caused a stir in the gallery.,,,,,,,,,,0
+91,Impertinent,1,Adjective,,,,,,,,,,,,,0
+91,Impudent,1,Adjective,Not showing due respect; disrespectfully bold.,,His impudent grin suggested he was not remotely sorry.,,,,,,,,,,1
+-91,Courteous,1,Adjective,"Polite, respectful, and considerate in manner.",,"She was unfailingly courteous, even to those who were not.",,,,,,,,,,0
+-91,Deferential,1,Adjective,Showing great respect and submission to authority.,,The young aide was deferential without being servile.,,,,,,,,,,1
+92,Mundane preoccupations,2,Idiomatic Expression,Concerns and worries of ordinary everyday life.,,He longed to escape the mundane preoccupations of his daily routine.,,,,,,,,,,2
+92,Run-of-the-mill,2,Idiomatic Expression,Ordinary; lacking any special or distinctive quality.,,It was a run-of-the-mill performance â professional but uninspired.,,,,,,,,,,3
+-92,Out of the ordinary,2,Idiomatic Expression,Different from what is usual or expected; remarkable.,,,,,,,,,,,,0
+93,Circumvent,1,Transitive Verb,,,,,,,,,,,,,1
+93,Bypass,1,Transitive Verb,"To go around or avoid something, especially an obstacle.",,The proposal was designed to bypass the usual approval process.,,,,,,,,,,0
+-93,Comply,1,Intransitive Verb,To act in accordance with a wish or command.,,,,,,,,,,,,0
+-93,Conform,1,Intransitive Verb,"To comply with rules, standards, or conventions.",,,,,,,,,,,,0
+94,Serendipity,1,Common Noun,The occurrence of events by chance in a happy or beneficial way.,,The best discoveries in science often have an element of serendipity.,,,,,,,,,,1
+94,Fortuitous,1,Adjective,"Happening by chance rather than intention, especially beneficially.",,The fortuitous meeting at the airport led to their first collaboration.,,,,,,,,,,1
+-94,Deliberate,1,Adjective,,,,,,,,,,,,,0
+95,Procrastinate,1,Intransitive Verb,,,,,,,,,,,,,0
+95,Defer,1,Transitive Verb,To put off to a later time; to postpone.,,He deferred the decision until all the relevant data was available.,,,,,,,,,,0
+95,Stall,1,Intransitive Verb,,,,,,,,,,,,,3
+-95,Act promptly,2,Idiomatic Expression,,,,,,,,,,,,,0
+96,Lenient,1,Adjective,More merciful or tolerant than expected; not strict.,,The lenient sentence surprised legal commentators across the board.,,,,,,,,,,0
+96,Indulgent,1,Adjective,Ready to be generous or tolerant towards someone.,,An indulgent editor once let him write ten thousand words on a footnote.,,,,,,,,,,0
+96,Forbearing,1,Adjective,Patient and restrained under provocation.,,She was forbearing with difficult clients â a rare quality.,,,,,,,,,,1
+-96,Stringent,1,Adjective,,,,,,,,,,,,,1
+-96,Rigorous,1,Adjective,Extremely thorough and careful; not flexible.,,A rigorous peer review process is the foundation of good science.,,,,,,,,,,0
+97,Deplete,1,Transitive Verb,To use up the supply or resources of something.,,,,,,,,,,,,0
+97,Exhaust,1,Transitive Verb,,,,,,,,,,,,,0
+-97,Replenish,1,Transitive Verb,,,,,,,,,,,,,0
+-97,Augment,1,Transitive Verb,,,,,,,,,,,,,1
+98,Convoluted,1,Adjective,Extremely complex and difficult to follow.,,,,,,,,,,,,0
+98,Labyrinthine,1,Adjective,Resembling a labyrinth in complexity; intricate.,,The labyrinthine regulations made compliance almost impossible for small firms.,,,,,,,,,,1
+98,Tortuous,1,Adjective,,,,,,,,,,,,,1
+-98,Straightforward,1,Adjective,Easy to do or understand; uncomplicated.,,The process was more straightforward than any of them had expected.,,,,,,,,,,0
+-98,Transparent,1,Adjective,Easy to see through; open and without concealment.,,,,,,,,,,,,0
+99,Lax,1,Adjective,,,,,,,,,,,,,0
+99,Negligent,1,Adjective,Failing to take proper care or act with due diligence.,,The company was found negligent in its handling of the incident.,,,,,,,,,,2
+99,Remiss,1,Adjective,,,,,,,,,,,,,1
+-99,Diligent,1,Adjective,Having or showing care and conscientiousness in work.,,Her diligent record-keeping proved invaluable during the audit.,,,,,পরিশ্রমী ও যত্নশীল।,,,,,0
+-99,Vigilant,1,Adjective,Keeping careful watch for possible danger or difficulties.,,The security team remained vigilant throughout the summit.,,,,,,,,,,0
+100,Penchant,1,Common Noun,A strong or habitual liking for something; a tendency.,,,,,,,,,,,,1
+100,Predisposition,1,Common Noun,,,,,,,,,,,,,1
+-100,Aversion,1,Common Noun,A strong dislike or disinclination.,,,,,,,,,,,,0
+-100,Repugnance,1,Common Noun,Intense disgust; strong aversion.,,,,,,,,,,,,1
+101,Insipid,1,Adjective,Lacking flavour; dull and uninteresting.,,The insipid speech failed to excite even its author's supporters.,,,,,,,,,,0
+101,Vapid,1,Adjective,Offering nothing that is stimulating or challenging.,,The vapid conversation made the evening feel interminable.,,,,,,,,,,1
+-101,Piquant,1,Adjective,Having a pleasantly sharp taste; interestingly provocative.,,,,,,,,,,,,1
+-101,Stimulating,1,Adjective,Raising levels of interest and energy; thought-provoking.,,The stimulating debate attracted scholars from three countries.,,,,,,,,,,0
+102,Embolden,1,Transitive Verb,To give someone the courage or confidence to do something.,,,,,,,,,,,,1
+102,Galvanise,1,Transitive Verb,To shock or excite someone into taking action.,,The tragedy galvanised the community into organising change.,,,,,,,,,,1
+102,Spur,1,Transitive Verb,,,,,,,,,,,,,0
+-102,Deter,1,Transitive Verb,To discourage from acting by instilling fear or doubt.,,The harsh penalties were meant to deter future violations.,,,,,,,,,,0
+-102,Dissuade,1,Transitive Verb,To persuade someone not to take a particular course of action.,,He tried to dissuade her from resigning but she had made up her mind.,,,,,,,,,,0
+103,Insatiable,1,Adjective,,,,,,,,,,,,,0
+103,Voracious,1,Adjective,Wanting or devouring great quantities of something.,,She was a voracious reader who finished a novel every two days.,,,,,,,,,,0
+-103,Moderate,1,Adjective,"Average in amount, intensity, or degree; not extreme.",,He was a moderate eater who never indulged beyond what he needed.,,,,,,,,,,0
+-103,Abstemious,1,Adjective,,,,,,,,,,,,,1
+104,Placate,1,Transitive Verb,To reduce the anger or displeasure of someone; to appease.,,Small concessions were enough to placate the more moderate critics.,,,,,রাগ বা ক্ষোভ প্রশমিত করা।,,,,,0
+-104,Incense,1,Transitive Verb,To make someone extremely angry.,,The dismissive reply incensed the delegation and talks broke down.,,,,,,,,,,0
+-104,Enrage,1,Transitive Verb,,,,,,,,,,,,,0
+105,Condescending,1,Adjective,,,,,,,,,,,,,0
+105,Patronising,1,Adjective,,,,,,,,,,,,,3
+-105,Egalitarian,1,Adjective,Believing in and promoting equal rights for all.,,The new principal had a genuinely egalitarian approach to leadership.,,,,,,,,,,1
+106,Break new ground,2,Idiomatic Expression,To do something innovative or pioneering.,,,,,,,,,,,,0
+106,Ahead of the curve,2,Idiomatic Expression,More advanced than current trends; at the cutting edge.,,The company had been ahead of the curve on digital payments for years.,,,,,,,,,,3
+-106,Behind the times,2,Idiomatic Expression,Old-fashioned; not keeping up with modern ideas or developments.,,,,,,,,,,,,3
+107,Bring about,3,Phrasal Verb,,,,,,,,,,,,,0
+107,Carry out,3,Phrasal Verb,,,,,,,,,,,,,0
+-107,Call off,3,Phrasal Verb,To cancel an event or arrangement that had been planned.,,The match was called off due to the severity of the weather.,,,,,,,,,,0
+1.1,Disposition,1,Common Noun,A person's inherent qualities of mind and character; a tendency.,,Her disposition towards caution made her a reliable rather than a bold leader.,,,,,,,,,,0
+1.2,Bent,1,Common Noun,A natural talent or inclination towards something.,,He had a natural bent for mathematics from an early age.,,,,,,,,,,3
+4.1,Consolidate,1,Transitive Verb,,,,,,,,,,,,,0
+4.2,Cement,1,Transitive Verb,To settle or strengthen a relationship or situation firmly.,,,,,,,,,,,,0
+5.1,Pomposity,1,Common Noun,The quality of being excessively self-important in a way that is irritating.,,His pomposity made it difficult to take even his valid points seriously.,,,,,,,,,,1
+5.2,Self-importance,1,Common Noun,An exaggerated sense of one's own value or importance.,,"His self-importance was evident in every interaction, however small.",,,,,,,,,,0
+7.1,Argumentative,1,Adjective,,,,,,,,,,,,,0
+7.2,Antagonistic,1,Adjective,Showing or feeling active opposition; actively hostile.,,Her antagonistic attitude during the review made collaboration impossible.,,,,,,,,,,0
+9.1,Harangue,1,Transitive Verb,To lecture someone at length in an aggressive or forceful manner.,,,,,,,,,,,,1
+9.2,Rail,1,Intransitive Verb,To complain bitterly or loudly; to utter vehement criticism.,,She railed against the decision in every interview she gave that week.,,,,,,,,,,1
+11.1,Self-denying,1,Adjective,Choosing to go without things for moral or religious reasons.,,His self-denying approach to comfort was admired but rarely imitated.,,,,,,,,,,2
+11.2,Puritanical,1,Adjective,,,,,,,,,,,,,1
+12.1,Headstrong,1,Adjective,Energetically wilful and determined; difficult to restrain.,,,,,,,,,,,,3
+12.2,Hot-headed,1,Adjective,Quickly becoming angry; impulsive and rash.,,,,,,,,,,,,3
+15.1,Chatty,1,Adjective,Fond of chatting; notably talkative in a friendly way.,,,,,,,,,,,,3
+15.2,Effusive,1,Adjective,Expressing pleasure or gratitude in an unrestrained way; gushing.,,"His effusive greeting was genuine, if slightly overwhelming.",,,,,,,,,,1
+17.1,Grieve,1,Intransitive Verb,"To feel intense sorrow or sadness, especially after a loss.",,,,,,,,,,,,0
+17.2,Mourn,1,Transitive Verb,To feel or express sorrow or regret for something lost.,,He mourned the end of an era with more feeling than most expected.,,,,,,,,,,0
+19.1,Refractory,1,Adjective,Stubborn or unmanageable; resistant to control or treatment.,,The refractory material withstood conditions that destroyed everything else.,The refractory child exhausted three teachers in a single term.,,,,,,,,,1
+19.2,Bullheaded,1,Adjective,Unreasonably or stupidly obstinate; headstrong.,,His bullheaded refusal to reconsider cost the project three months.,,,,,,,,,,3
+22.1,Resolute,1,Adjective,"Admirably purposeful, determined, and unwavering.",,,,,,,,,,,,0
+22.2,Pertinacious,1,Adjective,,,,,,,,,,,,,1
+24.1,Yes-man,1,Common Noun,,,,,,,,,,,,,3
+24.2,Lackey,1,Common Noun,A person who is too eager to serve or obey; a servile follower.,,He had too much pride to act as anyone's lackey.,,,,,,,,,,3
+27.1,Toxic,1,Adjective,Very harmful in a pervasive or insidious way.,,The toxic culture of the organisation drove away its best people.,,,,,,,,,,0
+27.2,Corrosive,1,Adjective,Tending to destroy slowly; having a gradual destructive effect.,,The corrosive effect of rumour on morale was plain to see.,,,,,,,,,,1
+29.1,Deteriorate,1,Intransitive Verb,To become progressively worse; to decline in quality.,,,,,,,,,,,,0
+29.2,Moulder,1,Intransitive Verb,To slowly decay or decline through neglect.,,The once ambitious plan was left to moulder in a desk drawer.,,,,,,,,,,1
+32.1,Remedy,1,Transitive Verb,,,,,,,,,,,,,0
+32.2,Redress,1,Transitive Verb,To remedy or set right a situation that is wrong or unfair.,,The policy was designed to redress historical imbalances.,,,,,,,,,,1
+40.1,Acerbity,1,Common Noun,,,,,,,,,,,,,1
+40.2,Sharpness,1,Common Noun,,,,,,,,,,,,,0
+47.1,Spendthrift,1,Common Noun,A person who spends money freely and wastefully.,,His reputation as a spendthrift made the bank hesitant to lend.,,,,,,,,,,0
+47.2,Wastrel,1,Common Noun,A person who wastes their time or resources; an idler.,,He was dismissed by his family as a wastrel with no prospects.,,,,,,,,,,1
+50.1,Reprehensible,1,Adjective,Deserving censure or condemnation; morally wrong.,,The committee described the conduct as reprehensible and unacceptable.,,,,,,,,,,1
+50.2,Heinous,1,Adjective,Utterly odious or wicked; grossly evil.,,The heinous nature of the crime shocked even seasoned investigators.,,,,,,,,,,0
+64.1,Abate,1,Intransitive Verb,"To become less intense, widespread, or severe.",,,,,,,,,,,,1
+64.2,Subside,1,Intransitive Verb,"To become less intense, violent, or severe; to settle down.",,,,,,,,,,,,0
+67.1,Judicious,1,Adjective,"Having, showing, or done with good judgement; wise and sensible.",,A judicious use of silence can be more powerful than any argument.,,,,,,,,,,1
+67.2,Prudent,1,Adjective,Acting with care and thought for future consequences.,,,,,,,,,,,,0
+74.1,Whimsical,1,Adjective,Playfully quaint or fanciful; subject to whims.,,,,,,,,,,,,0
+74.2,Unpredictable,1,Adjective,Not able to be predicted; changeable.,,Her unpredictable moods made working closely with her a challenge.,,,,,,,,,,0
+78.1,Grudge,1,Common Noun,A persistent feeling of ill will or resentment from past grievance.,,,,,,,,,,,,0
+78.2,Bitterness,1,Common Noun,Anger and disappointment at being treated unfairly; resentfulness.,,The bitterness of the defeat lingered long after the tournament ended.,,,,,,,,,,0
+84.1,Chicanery,1,Common Noun,The use of trickery to achieve one's purpose.,,The deal was rife with chicanery that only became clear months later.,,,,,,,,,,1
+84.2,Subterfuge,1,Common Noun,Deceit used in order to achieve one's goal.,,He resorted to subterfuge when straightforward persuasion failed.,,,,,,,,,,1
+88.1,Grudging,1,Adjective,Given or allowed only reluctantly or resentfully.,,She offered a grudging apology that satisfied no one.,,,,,,,,,,0
+88.2,Half-hearted,1,Adjective,Without enthusiasm or commitment; lacking vigour.,,His half-hearted attempt to fix things only made matters worse.,,,,,,,,,,3
+100.1,Partiality,1,Common Noun,,,,,,,,,,,,,1
+100.2,Affinity,1,Common Noun,A natural liking for and understanding of someone or something.,,,,,,,,,,,,0
+-1.1,Aversion,1,Common Noun,,,,,,,,,,,,,0
+-1.2,Antipathy,1,Common Noun,,,,,,,,,,,,,1
+-4.1,Fragment,1,Transitive Verb,To break or cause to break into small or separate parts.,,Years of internal conflict had fragmented the once unified coalition.,,,,,,,,,,0
+-4.2,Dissolve,1,Transitive Verb,To bring to an end; to disintegrate or weaken.,,Prolonged disagreement dissolved the trust they had built together.,,,,,,,,,,0
+-5.1,Unpretentiousness,1,Common Noun,The quality of not attempting to impress others with wealth or status.,,His unpretentiousness was striking given how much he had accomplished.,,,,,,,,,,1
+-5.2,Self-effacement,1,Common Noun,The quality of not drawing attention to oneself; modesty.,,Her self-effacement made it easy to underestimate her until too late.,,,,,,,,,,1
+-7.1,Agreeable,1,Adjective,,,,,,,,,,,,,0
+-7.2,Cooperative,1,Adjective,,,,,,,,,,,,,0
+-9.1,Pacify,1,Transitive Verb,,,,,,,,,,,,,0
+-9.2,Mollify,1,Transitive Verb,,,,,,,,,,,,,1
+-11.1,Self-indulgent,1,Adjective,Characterised by doing or tending to do exactly what one wants.,,A self-indulgent approach to the work produced something impressive if undisciplined.,,,,,,,,,,0
+-11.2,Permissive,1,Adjective,,,,,,,,,,,,,0
+-12.1,Amenable,1,Adjective,Open and responsive to suggestion; willing to be guided.,,"She was amenable to feedback, which made her exceptionally fast to improve.",,,,,,,,,,1
+-12.2,Phlegmatic,1,Adjective,,,,,,,,,,,,,1
+-15.1,Reserved,1,Adjective,Slow to reveal emotion or opinions; restrained.,,,,,,,,,,,,0
+-15.2,Restrained,1,Adjective,,,,,,,,,,,,,0
+-17.1,Rejoice,1,Intransitive Verb,To feel or show great joy or delight.,,"She rejoiced quietly, unwilling to celebrate too loudly while others still struggled.",,,,,,,,,,0
+-17.2,Exult,1,Intransitive Verb,"To show or feel elation or jubilation, especially at someone else's defeat.",,He exulted in the victory with a warmth that swept the whole room.,,,,,,,,,,1
+-19.1,Tractable,1,Adjective,,,,,,,,,,,,,1
+-19.2,Pliable,1,Adjective,,,,,,,,,,,,,1
+-22.1,Irresolute,1,Adjective,Showing or feeling hesitancy; uncertain how to act.,,He was irresolute at the critical moment and the opportunity passed.,,,,,,,,,,1
+-22.2,Wavering,1,Adjective,Becoming weaker or less certain; hesitating between options.,,,,,,,,,,,,0
+-24.1,Maverick,1,Common Noun,An independent-minded person who refuses to follow group norms.,,Every organisation needs a maverick â someone who asks the uncomfortable questions.,,,,,,,,,,1
+-24.2,Dissenter,1,Common Noun,A person who opposes or disagrees with official policy.,,The lone dissenter turned out to have been right all along.,,,,,,,,,,1
+-27.1,Wholesome,1,Adjective,Conducive to or promoting good health or well-being; morally sound.,,The wholesome atmosphere of the school was widely noted by visiting parents.,,,,,,,,,,0
+-27.2,Nourishing,1,Adjective,Providing sustenance; promoting health and growth.,,A nourishing culture retains talent far better than a demanding one.,,,,,,,,,,0
+-29.1,Recuperate,1,Intransitive Verb,To recover from illness or exertion; to regain health or strength.,,She needed several weeks to recuperate properly after the surgery.,,,,,,,,,,0
+-29.2,Revitalise,1,Transitive Verb,To give new life and vitality to something.,,,,,,,,,,,,0
+-32.1,Aggravate,1,Transitive Verb,To make a problem or bad situation worse.,,Every attempt to help only seemed to aggravate the situation further.,,,,,,,,,,0
+-32.2,Worsen,1,Transitive Verb,To make or become worse.,,The delay worsened an already critical shortage.,,,,,,,,,,0
+-40.1,Mildness,1,Common Noun,,,,,,,,,,,,,0
+-40.2,Gentleness,1,Common Noun,The quality of being kind and careful; a mild manner.,,She delivered the difficult news with gentleness and precision.,,,,,,,,,,0
+-47.1,Miser,1,Common Noun,A person who hoards wealth and spends as little as possible.,,"He was no miser, but he believed in spending money only where it mattered.",,,,,,,,,,0
+-47.2,Steward,1,Common Noun,,,,,,,,,,,,,2
+-50.1,Laudable,1,Adjective,,,,,,,,,,,,,1
+-50.2,Exemplary,1,Adjective,,,,,,,,,,,,,0
+-64.1,Intensify,1,Transitive Verb,To become or make more intense; to increase in strength.,,The pressure intensified as the deadline drew closer.,,,,,,,,,,0
+-64.2,Escalate,1,Intransitive Verb,To increase rapidly; to become more serious.,,The dispute escalated before anyone had time to intervene.,,,,,,,,,,0
+-67.1,Reckless,1,Adjective,,,,,,,,,,,,,0
+-67.2,Imprudent,1,Adjective,,,,,,,,,,,,,1
+-74.1,Predictable,1,Adjective,Behaving or occurring in a way that is expected; unsurprising.,,His predictable reactions made him easy to manage but hard to inspire.,,,,,,,,,,0
+-74.2,Steady,1,Adjective,,,,,,,,,,,,,0
+-78.1,Magnanimity,1,Common Noun,"The quality of being generous and forgiving, especially towards a rival.",,His magnanimity in defeat earned him more respect than victory would have.,,,,,,,,,,1
+-78.2,Equanimity,1,Common Noun,,,,,,,,,,,,,1
+-84.1,Probity,1,Common Noun,The quality of having strong moral principles; complete honesty.,,His probity in financial matters was never once questioned in thirty years.,,,,,,,,,,1
+-84.2,Transparency,1,Common Noun,,,,,,,,,,,,,0
+-88.1,Wholehearted,1,Adjective,,,,,,,,,,,,,0
+-88.2,Enthusiastic,1,Adjective,Having or showing intense and eager enjoyment or interest.,,,,,,,,,,,,0
+-100.1,Impartiality,1,Common Noun,Treatment of all rivals or disputants equally; fairness.,,,,,,,,,,,,1
+-100.2,Indifference,1,Common Noun,"Lack of interest, concern, or sympathy towards something.",,,,,,,,,,,,0
