@@ -270,9 +270,6 @@ function navOpenQuickPopup() {
   const mark = sessionMarks[word];
   document.getElementById('quickLikeBtn').classList.toggle('active', mark === 'like');
   document.getElementById('quickDislikeBtn').classList.toggle('active', mark === 'dislike');
-  // Init pending state and sync UI
-  pendingNav = Object.assign({}, S);
-  syncQuickNavUI();
   document.getElementById('quickNavOverlay').classList.remove('hidden');
 }
 
