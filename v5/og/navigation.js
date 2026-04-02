@@ -7,9 +7,10 @@
    ══════════════════════════════════════ */
 
 // ── Session state ──
-const seenNumIds   = new Set();
-const visitedWords = new Set();
-const sessionMarks = {};
+const seenNumIds    = new Set(); // |NumId| values seen
+const seenSignedIds = new Set(); // signed NumId values seen (for Avoid Opposites)
+const visitedWords  = new Set();
+const sessionMarks  = {};
 
 // ══════════════════════════════════════
 // SESSION TRACKING
@@ -18,11 +19,15 @@ function trackVisit(word) {
   readHistory.push({ word, index: currentIndex, time: new Date().toLocaleTimeString() });
   visitedWords.add(word);
   const e = csvData.find(r => r.word === word);
-  if (e?.id) seenNumIds.add(Math.abs(e.id));
+  if (e?.id) {
+    seenNumIds.add(Math.abs(e.id));
+    seenSignedIds.add(e.id);
+  }
 }
 
 function navSessionStart() {
   seenNumIds.clear();
+  seenSignedIds.clear();
   visitedWords.clear();
   Object.keys(sessionMarks).forEach(k => delete sessionMarks[k]);
 }
@@ -47,71 +52,131 @@ function getAbsId(word) {
   return e?.id ? Math.abs(e.id) : 0;
 }
 
-// ══════════════════════════════════════
-// SKIP CONDITIONS
-// ══════════════════════════════════════
+function getSignedId(word) {
+  const e = csvData.find(r => r.word === word);
+  return e?.id || 0;
+}
 
+// ══════════════════════════════════════
+// ROOTWISE CHECK — shared by Next and Prev
+// Returns true if the word PASSES the rootwise condition
+// ══════════════════════════════════════
+function rootwisePassNext(word) {
+  const signedId = getSignedId(word);
+  const absId    = Math.abs(signedId);
+  if (!absId) return false;
+
+  // Avoid Opposites: skip if this word's NumId is the negative of any seen ID
+  if (S.avoidOpposites) {
+    if (seenSignedIds.has(-signedId)) return false;
+  }
+
+  // Exclusive (default ON): pass if |NumId| NOT yet seen
+  // Inclusive (exclusive OFF): pass if |NumId| HAS been seen
+  return S.exclusive ? !seenNumIds.has(absId) : seenNumIds.has(absId);
+}
+
+// ══════════════════════════════════════
+// SYNANT + DEFINED BASE CHECK
+// Returns true if word should be SKIPPED by base filters
+// ══════════════════════════════════════
+function skipBase(word) {
+  if (!S.navFilter) return false;
+  if (!S.navSynAnt && !S.navDefined) return false;
+
+  const synAntOk  = !S.navSynAnt  || hasSynAnt(word);
+  const definedOk = !S.navDefined || hasDef(word);
+
+  // OR logic between SynAnt and Defined
+  const basePass = synAntOk || definedOk;
+  return !basePass;
+}
+
+// ══════════════════════════════════════
+// SKIP — NEXT
+// ══════════════════════════════════════
 function skipNext(word) {
   if (hiddenWords.has(word)) return true;
   if (!S.navFilter) return false;
 
-  if (S.joinCondition) {
-    // OR logic — pass if ANY filter passes
-    const synAntOk  = !S.navSynAnt  || hasSynAnt(word);
-    const definedOk = !S.navDefined || hasDef(word);
-    const rootOk    = !S.navRootwise || (() => {
-      const absId = getAbsId(word);
-      return S.nxtBehavior ? !seenNumIds.has(absId) : seenNumIds.has(absId);
-    })();
-    // Skip only if ALL fail
-    const anyActive = S.navSynAnt || S.navDefined || S.navRootwise;
-    if (!anyActive) return false;
-    return !(synAntOk || definedOk || rootOk);
-  }
+  const anyBaseActive = S.navSynAnt || S.navDefined;
+  const basePass      = anyBaseActive ? !skipBase(word) : true;
 
-  // AND logic (default)
-  if (S.navSynAnt  && !hasSynAnt(word)) return true;
-  if (S.navDefined && !hasDef(word))    return true;
-  if (S.navRootwise) {
-    const absId = getAbsId(word);
-    if (S.nxtBehavior  && seenNumIds.has(absId))  return true;
-    if (!S.nxtBehavior && !seenNumIds.has(absId)) return true;
+  if (!S.navRootwise) return !basePass;
+
+  const rootPass = rootwisePassNext(word);
+
+  // Necessary ON → (SynAnt OR Def) AND Root
+  // Necessary OFF → (SynAnt OR Def) OR Root
+  if (S.necessary) {
+    return !(basePass && rootPass);
+  } else {
+    return !(basePass || rootPass);
   }
-  return false;
 }
 
-// Base conditions shared by all Prev modes (Syn/Ant + Defined with join logic)
-function skipPrevBase(word) {
+// ══════════════════════════════════════
+// SKIP — PREV
+// Evaluates base + rootwise, then applies Prev mode conditions
+// ══════════════════════════════════════
+
+// Pass condition: word was visited (Exact)
+function prevExactPass(word) {
+  return visitedWords.has(word);
+}
+
+// Pass condition: |NumId| seen AND word not yet visited (Variation)
+function prevVariationPass(word) {
+  return seenNumIds.has(getAbsId(word)) && !visitedWords.has(word);
+}
+
+// Pass condition: |NumId| NOT seen (Neither-checked Exclusive mode)
+function prevExclusivePass(word) {
+  return !seenNumIds.has(getAbsId(word));
+}
+
+function skipPrev(word) {
   if (hiddenWords.has(word)) return true;
-  if (!S.navFilter) return false;
-
-  if (S.joinCondition) {
-    // OR logic — only skip if ALL active base filters fail
-    const synAntOk  = !S.navSynAnt  || hasSynAnt(word);
-    const definedOk = !S.navDefined || hasDef(word);
-    const anyActive = S.navSynAnt || S.navDefined;
-    if (!anyActive) return false;
-    return !(synAntOk || definedOk);
+  if (!S.navFilter) {
+    // No filter — just apply Prev mode
+    return !applyPrevMode(word);
   }
 
-  // AND logic
-  if (S.navSynAnt  && !hasSynAnt(word)) return true;
-  if (S.navDefined && !hasDef(word))    return true;
-  return false;
+  const anyBaseActive = S.navSynAnt || S.navDefined;
+  const basePass      = anyBaseActive ? !skipBase(word) : true;
+
+  if (!S.navRootwise) {
+    return !(basePass && applyPrevMode(word));
+  }
+
+  const rootPass = rootwisePassNext(word); // same root condition logic
+
+  let filterPass;
+  if (S.necessary) {
+    filterPass = basePass && rootPass;
+  } else {
+    filterPass = basePass || rootPass;
+  }
+
+  return !(filterPass && applyPrevMode(word));
 }
 
-// Exact: skip if word was never visited
-function skipPrevExact(word) {
-  if (skipPrevBase(word)) return true;
-  if (!visitedWords.has(word)) return true;
-  return false;
-}
+function applyPrevMode(word) {
+  const useExact     = S.prevExact;
+  const useVariation = S.prevVariation;
 
-// Variation Phase 1: skip if |NumId| ∉ S OR word already visited
-function skipPrevVariation1(word) {
-  if (skipPrevBase(word)) return true;
-  if (!seenNumIds.has(getAbsId(word))) return true; // |NumId| not seen
-  if (visitedWords.has(word))          return true; // already visited
+  if (!useExact && !useVariation) {
+    // Neither checked → Exclusive mode
+    return prevExclusivePass(word);
+  }
+
+  if (useExact && useVariation) {
+    return prevExactPass(word) || prevVariationPass(word);
+  }
+
+  if (useExact)     return prevExactPass(word);
+  if (useVariation) return prevVariationPass(word);
+
   return false;
 }
 
@@ -121,7 +186,7 @@ function skipPrevVariation1(word) {
 function resolveStep() {
   if (S.orderMode !== 'random' && S.randomNav) {
     const delta = S.navDelta || 2;
-    const raw   = S.stepNumber + Math.floor(Math.random() * (2 * delta + 1)) - delta;
+    const raw   = S.stepNumber + Math.floor(Math.random() * (delta + 1));
     return Math.max(1, raw);
   }
   return S.stepNumber;
@@ -130,15 +195,12 @@ function resolveStep() {
 // ══════════════════════════════════════
 // SCAN HELPERS
 // ══════════════════════════════════════
-
-// All mode: jump step non-hidden positions, then scan for passing word
 function scanAll(start, step, dir, skipFn) {
   const n   = studyList.length;
   const inc = dir === 'next' ? 1 : -1;
   let jumped = 0;
   let i = start + inc;
 
-  // Jump step non-hidden positions
   while (dir === 'next' ? i < n : i >= 0) {
     if (!hiddenWords.has(studyList[i])) {
       jumped++;
@@ -147,7 +209,6 @@ function scanAll(start, step, dir, skipFn) {
     i += inc;
   }
 
-  // Scan from landing for first passing word
   while (dir === 'next' ? i < n : i >= 0) {
     if (!skipFn(studyList[i])) return i;
     i += inc;
@@ -155,7 +216,6 @@ function scanAll(start, step, dir, skipFn) {
   return -1;
 }
 
-// Each mode: count step passing words
 function scanEach(start, step, dir, skipFn) {
   const n   = studyList.length;
   const inc = dir === 'next' ? 1 : -1;
@@ -207,25 +267,28 @@ function navNext() {
 function navPrev() {
   if (!studyList.length) return;
 
-  const step   = resolveStep();
-  const useVar = S.navFilter && S.navRootwise && S.prevBehavior;
-  let   pos    = -1;
+  const step = resolveStep();
+  let   pos  = doScan(currentIndex, step, 'prev', skipPrev);
 
-  if (useVar) {
-    // Phase 1 — Variation
-    pos = doScan(currentIndex, step, 'prev', skipPrevVariation1);
-    // Phase 2 — Fallback to Exact if Phase 1 found nothing
-    if (pos === -1)
-      pos = doScan(currentIndex, step, 'prev', skipPrevExact);
-  } else {
-    // Exact
-    pos = doScan(currentIndex, step, 'prev', skipPrevExact);
+  // Variation Fallback: if Variation is ON, fallback selected, and scan failed
+  if (pos === -1 && S.prevVariation && S.variationFallback && !S.prevExact) {
+    // Retry using Exact only as fallback
+    const fallbackSkip = word => {
+      if (hiddenWords.has(word)) return true;
+      if (!S.navFilter) return !prevExactPass(word);
+      const anyBaseActive = S.navSynAnt || S.navDefined;
+      const basePass      = anyBaseActive ? !skipBase(word) : true;
+      if (!S.navRootwise) return !(basePass && prevExactPass(word));
+      const rootPass   = rootwisePassNext(word);
+      const filterPass = S.necessary ? (basePass && rootPass) : (basePass || rootPass);
+      return !(filterPass && prevExactPass(word));
+    };
+    pos = doScan(currentIndex, step, 'prev', fallbackSkip);
   }
 
   if (pos === -1) {
     if (!S.loopMode) { alert("You've reached the beginning of the list."); return; }
-    const skipFn = useVar ? skipPrevVariation1 : skipPrevExact;
-    pos = doScan(studyList.length, step, 'prev', skipFn);
+    pos = doScan(studyList.length, step, 'prev', skipPrev);
     if (pos === -1 || pos <= currentIndex) { alert("No matching words found."); return; }
   }
 
@@ -239,7 +302,6 @@ function navPrev() {
 // ══════════════════════════════════════
 function getWeight(word) {
   let w = 1;
-  // Persistent flags — Phase 9
   const mark = sessionMarks[word];
   if (mark === 'like')    w *= 1/3;
   if (mark === 'dislike') w *= 3;
@@ -270,7 +332,6 @@ function navOpenQuickPopup() {
   const mark = sessionMarks[word];
   document.getElementById('quickLikeBtn').classList.toggle('active', mark === 'like');
   document.getElementById('quickDislikeBtn').classList.toggle('active', mark === 'dislike');
-  // Init pending state and sync UI
   pendingNav = Object.assign({}, S);
   syncQuickNavUI();
   document.getElementById('quickNavOverlay').classList.remove('hidden');
