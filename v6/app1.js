@@ -2,7 +2,7 @@
    DICTIONARY — app.js
    ══════════════════════════════════════ */
 
-const PASSWORD     = 'starparadox';
+const PASSWORD     = 'abcd1234++';
 const CSV_URL      = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/dict_demo.csv';
 const HOLD_MS      = 700;
 
@@ -410,16 +410,15 @@ function setCards(syns, ants, showDef, simSyns, simAnts, hasBengali) {
   simAnts    = simAnts    || [];
   hasBengali = hasBengali || false;
 
-  document.getElementById('synCard').classList.toggle('hidden',  !syns.length);
-  document.getElementById('antCard').classList.toggle('hidden',  !ants.length);
-  document.getElementById('defCard').classList.toggle('hidden',  !showDef);
-  document.getElementById('emptyCard').classList.toggle('hidden', syns.length > 0 || ants.length > 0 || showDef);
-  document.getElementById('tabSyn').classList.toggle('hidden',   !syns.length);
-  document.getElementById('tabAnt').classList.toggle('hidden',   !ants.length);
-  document.getElementById('tabDef').classList.toggle('hidden',   !showDef);
+  document.getElementById('synCard').classList.toggle('hidden',    !syns.length);
+  document.getElementById('antCard').classList.toggle('hidden',    !ants.length);
+  document.getElementById('defCard').classList.toggle('hidden',    !showDef);
+  document.getElementById('emptyCard').classList.toggle('hidden',  syns.length > 0 || ants.length > 0 || showDef);
+  document.getElementById('tabSyn').classList.toggle('hidden',     !syns.length);
+  document.getElementById('tabAnt').classList.toggle('hidden',     !ants.length);
+  document.getElementById('tabDef').classList.toggle('hidden',     !showDef);
   document.getElementById('synCount').textContent = syns.length || '';
   document.getElementById('antCount').textContent = ants.length || '';
-  // Similar sections — visibility managed by switchTab; just set content availability
   document.getElementById('simSynSection').classList.toggle('hidden', !simSyns.length);
   document.getElementById('simAntSection').classList.toggle('hidden', !simAnts.length);
   document.getElementById('bengaliSection').classList.toggle('hidden', !hasBengali);
@@ -547,13 +546,6 @@ function switchTab(tab) {
     document.getElementById('tab' + T)?.classList.toggle('active', t === tab);
     document.getElementById(t + 'Card')?.classList.toggle('hidden', t !== tab);
   });
-  // Similar sections shown only when their parent tab is active and they have content
-  const simSynSection = document.getElementById('simSynSection');
-  const simAntSection = document.getElementById('simAntSection');
-  if (simSynSection && !simSynSection.classList.contains('hidden'))
-    simSynSection.closest('.content-card')?.classList.toggle('hidden', tab !== 'syn');
-  if (simAntSection && !simAntSection.classList.contains('hidden'))
-    simAntSection.closest('.content-card')?.classList.toggle('hidden', tab !== 'ant');
 }
 
 // ══════════════════════════════════════
@@ -1426,7 +1418,11 @@ function bindAll() {
       Object.assign(S, pendingNav);
       saveSettings();
       updateBar();
-      syncSettingsUI();
+      // Sync Settings modal nav visibility only if it's open
+      if (!document.getElementById('settingsOverlay').classList.contains('hidden')) {
+        pending = Object.assign({}, S);
+        syncSettingsUI();
+      }
     }
     pendingNav = null;
     closeModal('quickNavOverlay');
