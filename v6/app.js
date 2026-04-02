@@ -2,8 +2,8 @@
    DICTIONARY — app.js
    ══════════════════════════════════════ */
 
-const PASSWORD     = 'HazelHoney++';
-const CSV_URL      = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/dictionary1.csv';
+const PASSWORD     = 'BlondeButter++';
+const CSV_URL      = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/dict_demo.csv';
 const HOLD_MS      = 700;
 
 // ── Data ──
@@ -213,6 +213,25 @@ function getAnts(word) {
   return csvData.filter(r => r.id === -e.id).map(r => r.word);
 }
 
+function simGroup(id, N) {
+  // floor for positive N, ceil for negative N
+  if (N > 0) return Math.floor(id) === Math.floor(N);
+  if (N < 0) return Math.ceil(id)  === Math.ceil(N);
+  return false;
+}
+
+function getSimSyns(word) {
+  const e = csvData.find(r => r.word === word);
+  if (!e?.id) return [];
+  return csvData.filter(r => r.word !== word && simGroup(r.id, e.id) && r.id !== e.id).map(r => r.word);
+}
+
+function getSimAnts(word) {
+  const e = csvData.find(r => r.word === word);
+  if (!e?.id) return [];
+  return csvData.filter(r => r.word !== word && simGroup(r.id, -e.id) && r.id !== -e.id).map(r => r.word);
+}
+
 function buildRootList() {
   const seen = new Set();
   rootWordList = [];
@@ -229,7 +248,9 @@ function updateStats() {
 }
 
 function buildStudyList() {
+  const cat = document.getElementById('categorySelect').value;
   let words = [...new Set(csvData.map(r => r.word))];
+  if (cat) words = words.filter(w => csvData.find(r => r.word === w)?.category === parseInt(cat));
   if (S.filter === 'root') {
     const roots = new Set(rootWordList.map(r => r.word));
     words = words.filter(w => roots.has(w));
@@ -384,32 +405,44 @@ function activateFirstTab(syns, ants, hasDef, reviseDef) {
   switchTab('syn');
 }
 
-function setCards(syns, ants, showDef) {
-  document.getElementById('synCard').classList.toggle('hidden',   !syns.length);
-  document.getElementById('antCard').classList.toggle('hidden',   !ants.length);
-  document.getElementById('defCard').classList.toggle('hidden',   !showDef);
-  document.getElementById('emptyCard').classList.toggle('hidden', syns.length > 0 || ants.length > 0 || showDef);
-  document.getElementById('tabSyn').classList.toggle('hidden',    !syns.length);
-  document.getElementById('tabAnt').classList.toggle('hidden',    !ants.length);
-  document.getElementById('tabDef').classList.toggle('hidden',    !showDef);
+function setCards(syns, ants, showDef, simSyns, simAnts) {
+  simSyns = simSyns || [];
+  simAnts = simAnts || [];
+  const activetab = document.querySelector('.focus-tab.active')?.id;
+  const synActive = activetab === 'tabSyn';
+  const antActive = activetab === 'tabAnt';
+
+  document.getElementById('synCard').classList.toggle('hidden',    !syns.length);
+  document.getElementById('antCard').classList.toggle('hidden',    !ants.length);
+  document.getElementById('defCard').classList.toggle('hidden',    !showDef);
+  document.getElementById('simSynCard').classList.toggle('hidden', !simSyns.length || !synActive);
+  document.getElementById('simAntCard').classList.toggle('hidden', !simAnts.length || !antActive);
+  document.getElementById('emptyCard').classList.toggle('hidden',  syns.length > 0 || ants.length > 0 || showDef);
+  document.getElementById('tabSyn').classList.toggle('hidden',     !syns.length);
+  document.getElementById('tabAnt').classList.toggle('hidden',     !ants.length);
+  document.getElementById('tabDef').classList.toggle('hidden',     !showDef);
   document.getElementById('synCount').textContent = syns.length || '';
   document.getElementById('antCount').textContent = ants.length || '';
 }
 
 function showStudy(word, entry) {
-  const syns   = getSyns(word);
-  const ants   = getAnts(word);
-  const hasDef = !!entry?.definition;
+  const syns    = getSyns(word);
+  const ants    = getAnts(word);
+  const simSyns = S.showSimilar ? getSimSyns(word) : [];
+  const simAnts = S.showSimilar ? getSimAnts(word) : [];
+  const hasDef  = !!entry?.definition;
 
-  document.getElementById('synChips').innerHTML = syns.map(w => studyChip(w, 'syn')).join('');
-  document.getElementById('antChips').innerHTML = ants.map(w => studyChip(w, 'ant')).join('');
+  document.getElementById('synChips').innerHTML    = syns.map(w => studyChip(w, 'syn')).join('');
+  document.getElementById('antChips').innerHTML    = ants.map(w => studyChip(w, 'ant')).join('');
+  document.getElementById('simSynChips').innerHTML = simSyns.map(w => studyChip(w, 'sim-syn')).join('');
+  document.getElementById('simAntChips').innerHTML = simAnts.map(w => studyChip(w, 'sim-ant')).join('');
 
   document.getElementById('defContent').innerHTML = hasDef
     ? '<div class="def-text">' + esc(entry.definition) + '</div>'
       + (entry.example ? '<div class="def-example">"' + esc(entry.example) + '"</div>' : '')
     : '';
 
-  setCards(syns, ants, hasDef);
+  setCards(syns, ants, hasDef, simSyns, simAnts);
   reorderTabs();
   activateFirstTab(syns, ants, hasDef, false);
 }
@@ -504,6 +537,11 @@ function switchTab(tab) {
     document.getElementById('tab' + T)?.classList.toggle('active', t === tab);
     document.getElementById(t + 'Card')?.classList.toggle('hidden', t !== tab);
   });
+  // Similar cards follow their parent tab — only show if they have content
+  const simSynCard = document.getElementById('simSynCard');
+  const simAntCard = document.getElementById('simAntCard');
+  if (simSynCard) simSynCard.classList.toggle('hidden', tab !== 'syn' || !document.getElementById('simSynChips').children.length);
+  if (simAntCard) simAntCard.classList.toggle('hidden', tab !== 'ant' || !document.getElementById('simAntChips').children.length);
 }
 
 // ══════════════════════════════════════
