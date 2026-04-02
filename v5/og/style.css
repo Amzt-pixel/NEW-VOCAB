@@ -371,3 +371,15 @@ input  { font-family: 'DM Sans', sans-serif; }
 .quick-mark-btn:hover { border-color: var(--accent); background: var(--accent-bg); }
 .quick-mark-btn.active { border-color: var(--accent); background: var(--accent); color: #fff; }
 .quick-nav-word { font-size: 12px; color: var(--text-secondary); text-align: center; margin-bottom: 12px; }
+
+.setting-subsection-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  color: var(--accent);
+  margin: 8px 0 4px;
+  padding-left: 20px;
+}
+
+.nav-variation-fallback-row.hidden { display: none; }
