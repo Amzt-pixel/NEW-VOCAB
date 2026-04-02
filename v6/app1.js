@@ -2,7 +2,7 @@
    DICTIONARY — app.js
    ══════════════════════════════════════ */
 
-const PASSWORD     = 'LoveDose❤';
+const PASSWORD     = 'starparadox';
 const CSV_URL      = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/dict_demo.csv';
 const HOLD_MS      = 700;
 
@@ -945,7 +945,10 @@ function showConditional(mode) {
 
 // ── Nav conditional visibility — call with S or pending/pendingNav ──
 function syncNavCondVisibility(p, isQuickNav) {
-  const pre = isQuickNav ? 'q' : '';
+  const pre      = isQuickNav ? 'q' : '';
+  const modalId  = isQuickNav ? 'quickNavOverlay' : 'settingsOverlay';
+  const modal    = document.getElementById(modalId);
+  const scope    = el => modal ? modal.querySelectorAll(el) : document.querySelectorAll(el);
 
   const filterOpts    = document.getElementById(pre + 'NavFilterOptions');
   const rootwiseOpts  = document.getElementById(pre + 'NavRootwiseOptions');
@@ -953,13 +956,12 @@ function syncNavCondVisibility(p, isQuickNav) {
   const randomOrdSect = document.getElementById(pre + 'NavRandomOrderSection');
   const randomOpts    = document.getElementById(pre + 'NavRandomOptions');
 
-  if (filterOpts)    filterOpts.classList.toggle('hidden', !p.navFilter);
-  if (rootwiseOpts)  rootwiseOpts.classList.toggle('hidden', !p.navRootwise);
+  if (filterOpts)   filterOpts.classList.toggle('hidden', !p.navFilter);
+  if (rootwiseOpts) rootwiseOpts.classList.toggle('hidden', !p.navRootwise);
 
-  // Allow Multiple toggle row — shown only when navFilter ON
-  document.querySelectorAll('.nav-allow-multiple-row').forEach(r => r.classList.toggle('hidden', !p.navFilter));
-  // Join Condition row — shown only when navFilter ON AND allowMultiple ON
-  document.querySelectorAll('.allow-multiple-row').forEach(r => r.classList.toggle('hidden', !p.navFilter || !p.allowMultiple));
+  // Scoped to this modal only
+  scope('.nav-allow-multiple-row').forEach(r => r.classList.toggle('hidden', !p.navFilter));
+  scope('.allow-multiple-row').forEach(r => r.classList.toggle('hidden', !p.navFilter || !p.allowMultiple));
 
   const isRandom = p.orderMode === 'random';
   if (randomSection) randomSection.classList.toggle('hidden', isRandom);
@@ -1116,12 +1118,14 @@ function bindSettingsEvents() {
   bindTog('mcqWordActionToggle',    'mcqWordAction');
   bindTog('stepActionToggle',       'stepAction');
   bindTog('navFilterToggle',        'navFilter', v => {
+    const modal = document.getElementById('settingsOverlay');
     document.getElementById('navFilterOptions').classList.toggle('hidden', !v);
-    document.querySelectorAll('.nav-allow-multiple-row').forEach(r => r.classList.toggle('hidden', !v));
-    if (!v) document.querySelectorAll('.allow-multiple-row').forEach(r => r.classList.add('hidden'));
+    modal.querySelectorAll('.nav-allow-multiple-row').forEach(r => r.classList.toggle('hidden', !v));
+    if (!v) modal.querySelectorAll('.allow-multiple-row').forEach(r => r.classList.add('hidden'));
   });
   bindTog('allowMultipleToggle',    'allowMultiple', v => {
-    document.querySelectorAll('.allow-multiple-row').forEach(r => r.classList.toggle('hidden', !v));
+    const modal = document.getElementById('settingsOverlay');
+    modal.querySelectorAll('.allow-multiple-row').forEach(r => r.classList.toggle('hidden', !v));
     if (!v && pending) {
       const chks = ['navSynAntChk','navDefinedChk','navRootwiseChk'];
       let kept = false;
@@ -1237,12 +1241,14 @@ function bindQuickNavSettings() {
   qTog('qLoopToggle',        'loopMode');
   qTog('qStepActionToggle',  'stepAction');
   qTog('qNavFilterToggle',   'navFilter', v => {
+    const modal = document.getElementById('quickNavOverlay');
     document.getElementById('qNavFilterOptions').classList.toggle('hidden', !v);
-    document.querySelectorAll('.nav-allow-multiple-row').forEach(r => r.classList.toggle('hidden', !v));
-    if (!v) document.querySelectorAll('.allow-multiple-row').forEach(r => r.classList.add('hidden'));
+    modal.querySelectorAll('.nav-allow-multiple-row').forEach(r => r.classList.toggle('hidden', !v));
+    if (!v) modal.querySelectorAll('.allow-multiple-row').forEach(r => r.classList.add('hidden'));
   });
   qTog('qAllowMultipleToggle','allowMultiple', v => {
-    document.querySelectorAll('.allow-multiple-row').forEach(r => r.classList.toggle('hidden', !v));
+    const modal = document.getElementById('quickNavOverlay');
+    modal.querySelectorAll('.allow-multiple-row').forEach(r => r.classList.toggle('hidden', !v));
     if (!v && pendingNav) {
       const chks = ['qNavSynAntChk','qNavDefinedChk','qNavRootwiseChk'];
       let kept = false;
