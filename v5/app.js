@@ -2,7 +2,7 @@
    DICTIONARY — app.js
    ══════════════════════════════════════ */
 
-const PASSWORD     = 'BlondeButter++';
+const PASSWORD     = 'HazelHoney++';
 const CSV_URL      = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/dictionary1.csv';
 const HOLD_MS      = 700;
 
@@ -893,28 +893,28 @@ function showConditional(mode) {
   document.querySelectorAll('.mcq-only').forEach(el    => el.classList.toggle('hidden', mode !== 'mcq'));
 }
 
-// ── Single source of truth for nav conditional visibility ──
-function syncNavCondVisibility(p, prefix) {
-  const pre = prefix || '';
-  const get = id => document.getElementById(pre + id);
-  const qAll = sel => document.querySelectorAll(sel);
+// ── Nav conditional visibility — call with S or pending/pendingNav ──
+function syncNavCondVisibility(p, isQuickNav) {
+  const pre = isQuickNav ? 'q' : '';
 
-  get('NavFilterOptions').classList.toggle('hidden', !p.navFilter);
-  get('NavRootwiseOptions').classList.toggle('hidden', !p.navRootwise);
-  // Allow Multiple only shown when navFilter is ON
-  qAll('.allow-multiple-row').forEach(r => r.classList.toggle('hidden', !p.navFilter || !p.allowMultiple ? true : false));
-  // Actually: show allow-multiple-row only when navFilter ON
-  // joinCondition row shown when navFilter ON AND allowMultiple ON
-  // (handled by .allow-multiple-row class in HTML — it wraps joinCondition)
-  // Show the allow-multiple toggle row when navFilter is ON
-  qAll('.nav-allow-multiple-row').forEach(r => r.classList.toggle('hidden', !p.navFilter));
-  qAll('.allow-multiple-row').forEach(r => r.classList.toggle('hidden', !p.navFilter || !p.allowMultiple));
+  const filterOpts    = document.getElementById(pre + 'NavFilterOptions');
+  const rootwiseOpts  = document.getElementById(pre + 'NavRootwiseOptions');
+  const randomSection = document.getElementById(pre + 'NavRandomSection');
+  const randomOrdSect = document.getElementById(pre + 'NavRandomOrderSection');
+  const randomOpts    = document.getElementById(pre + 'NavRandomOptions');
 
-  // Random nav section
+  if (filterOpts)    filterOpts.classList.toggle('hidden', !p.navFilter);
+  if (rootwiseOpts)  rootwiseOpts.classList.toggle('hidden', !p.navRootwise);
+
+  // Allow Multiple toggle row — shown only when navFilter ON
+  document.querySelectorAll('.nav-allow-multiple-row').forEach(r => r.classList.toggle('hidden', !p.navFilter));
+  // Join Condition row — shown only when navFilter ON AND allowMultiple ON
+  document.querySelectorAll('.allow-multiple-row').forEach(r => r.classList.toggle('hidden', !p.navFilter || !p.allowMultiple));
+
   const isRandom = p.orderMode === 'random';
-  get('NavRandomSection').classList.toggle('hidden', isRandom);
-  get('NavRandomOrderSection').classList.toggle('hidden', !isRandom);
-  if (!isRandom) get('NavRandomOptions').classList.toggle('hidden', !p.randomNav);
+  if (randomSection) randomSection.classList.toggle('hidden', isRandom);
+  if (randomOrdSect) randomOrdSect.classList.toggle('hidden', !isRandom);
+  if (!isRandom && randomOpts) randomOpts.classList.toggle('hidden', !p.randomNav);
 }
 
 function syncSettingsUI() {
@@ -963,7 +963,7 @@ function syncSettingsUI() {
   document.querySelectorAll('.random-opts-row').forEach(r => r.classList.toggle('hidden', !p.randomOptionCount));
   document.querySelector('.fixed-opts-row').classList.toggle('hidden', !!p.randomOptionCount);
 
-  syncNavCondVisibility(p, '');
+  syncNavCondVisibility(p, false);
 }
 
 function syncQuickNavUI() {
@@ -989,7 +989,7 @@ function syncQuickNavUI() {
   document.getElementById('qNavDefinedChk').checked  = !!p.navDefined;
   document.getElementById('qNavRootwiseChk').checked = !!p.navRootwise;
 
-  syncNavCondVisibility(p, 'q');
+  syncNavCondVisibility(p, true);
 }
 
 function btn(attr, key, p) {
