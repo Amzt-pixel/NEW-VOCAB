@@ -20,39 +20,28 @@ let sessionLive  = false;
 
 // ── Settings ──
 let S = {
-  // Appearance (Customise modal)
   accent: 'gold', fontSize: 'normal', theme: 'navy',
-  // Navigation (Settings modal — always)
   stepNumber: 1, loopMode: false, filter: 'all',
-  // Display (Settings modal — always)
   tabOrder: 'san',
-  // Mode
   mode: 'study',
-  // Study mode
   showTranslation: false, wordHighlight: false, showSimilar: false,
-  // Revise mode
   showMeaning: false, meaningOptions: false,
   correctPercent: 50, randomOptionCount: false,
   minOptions: 4, maxOptions: 8, fixedOptions: 6,
   revealCorrect: false, reviseWordAction: false,
-  // MCQ mode
   mcqOptions: 4, mcqMaxCorrect: 1, mcqRandomize: false,
   showClock: false, mcqWordAction: false,
-  // Navigation filters
   navFilter: false,
   navSynAnt: true, navDefined: false, navRootwise: false,
-  nxtBehavior: true,   // true = exclusive, false = inclusive
-  prevBehavior: false, // false = default, true = variation
-  stepAction: false,   // false = all (pre), true = each (post)
-  randomNav: false,
-  navDelta: 2,
+  nxtBehavior: true, prevBehavior: false,
+  stepAction: false,
+  randomNav: false, navDelta: 2,
   suggestMarked: false,
   allowMultiple: true, joinCondition: false,
-  // Internal
   orderMode: 'az',
 };
-let pending    = null; // pending settings copy while modal is open
-let pendingNav = null; // pending copy for Quick Nav popup
+let pending    = null;
+let pendingNav = null;
 
 // ── Panel state ──
 let panelTab    = 'list';
@@ -247,7 +236,7 @@ function buildStudyList() {
   } else if (S.filter === 'synant') {
     words = words.filter(w => getSyns(w).length > 0 || getAnts(w).length > 0);
   }
-  if (S.orderMode === 'az')     words.sort((a,b) => a.localeCompare(b));
+  if (S.orderMode === 'az')      words.sort((a,b) => a.localeCompare(b));
   else if (S.orderMode === 'za') words.sort((a,b) => b.localeCompare(a));
   else                           words.sort(() => Math.random() - 0.5);
   return words;
@@ -335,12 +324,11 @@ function startAt(word) {
 function updateBar() {
   document.getElementById('sessionStep').textContent = S.stepNumber;
   document.getElementById('sessionLoopIcon').textContent = S.loopMode ? '🔁' : '';
-  // Filter abbreviations
   const filterEl = document.getElementById('sessionFilterChip');
   if (S.navFilter) {
     const parts = [];
-    if (S.navSynAnt)  parts.push('Sy/An');
-    if (S.navDefined) parts.push('Dfn');
+    if (S.navSynAnt)   parts.push('Sy/An');
+    if (S.navDefined)  parts.push('Dfn');
     if (S.navRootwise) parts.push('Root');
     filterEl.textContent = 'Filter: ' + parts.join('·');
   } else {
@@ -357,10 +345,8 @@ function show() {
   const word  = studyList[currentIndex];
   const entry = csvData.find(r => r.word === word);
 
-  // Track history and session state
   trackVisit(word);
 
-  // Hero card
   document.getElementById('progressPill').textContent = (currentIndex + 1) + ' / ' + studyList.length;
   document.getElementById('sessionNumId').textContent = entry?.id ? '#' + entry.id : '—';
   document.getElementById('currentWord').textContent  = word;
@@ -374,7 +360,6 @@ function show() {
 
   if      (S.mode === 'study')  showStudy(word, entry);
   else if (S.mode === 'revise') showRevise(word, entry);
-  // MCQ: future
 
   if (!document.getElementById('wordListOverlay').classList.contains('hidden')) updatePanel();
 }
@@ -411,7 +396,6 @@ function setCards(syns, ants, showDef) {
   document.getElementById('antCount').textContent = ants.length || '';
 }
 
-// ── Study mode ──
 function showStudy(word, entry) {
   const syns   = getSyns(word);
   const ants   = getAnts(word);
@@ -443,7 +427,6 @@ function studyChip(word, type) {
     + '>' + esc(word) + '</button>';
 }
 
-// ── Revise mode ──
 function showRevise(word, entry) {
   const syns   = getSyns(word);
   const ants   = getAnts(word);
@@ -496,9 +479,8 @@ function buildReviseChips(opts, type) {
 }
 
 function reviseClick(btn) {
-  if (chipHeld)                              { chipHeld = false; return; }
-  if (btn.classList.contains('revise-correct') ||
-      btn.classList.contains('revise-incorrect')) return;
+  if (chipHeld) { chipHeld = false; return; }
+  if (btn.classList.contains('revise-correct') || btn.classList.contains('revise-incorrect')) return;
 
   const ok   = btn.dataset.correct === 'true';
   const card = btn.closest('.content-card');
@@ -538,10 +520,8 @@ function nextUp()    { if (nextTimer) { clearTimeout(nextTimer); nextTimer = nul
 // CHIP HOLD
 // ══════════════════════════════════════
 function chipDown(e, word) {
-  // Check mode-specific toggle at interaction time
   if (S.mode === 'revise' && !S.reviseWordAction) return;
   if (S.mode === 'mcq'    && !S.mcqWordAction)    return;
-  // Study mode — always allowed
 
   if (chipTimer) clearTimeout(chipTimer);
   chipHeld  = false;
@@ -568,10 +548,10 @@ function openDetail(word) {
 
   document.getElementById('detailWord').textContent = word;
 
-  const lvMap  = { 0:'Common', 1:'Unique', 2:'Specific', 3:'Colloquial' };
-  const lvCls  = { 0:'badge-common', 1:'badge-unique', 2:'badge-specific', 3:'badge-colloquial' };
-  const lv     = e?.level ?? 0;
-  let meta     = '<span class="detail-badge ' + lvCls[lv] + '">' + lvMap[lv] + '</span>';
+  const lvMap = { 0:'Common', 1:'Unique', 2:'Specific', 3:'Colloquial' };
+  const lvCls = { 0:'badge-common', 1:'badge-unique', 2:'badge-specific', 3:'badge-colloquial' };
+  const lv    = e?.level ?? 0;
+  let meta    = '<span class="detail-badge ' + lvCls[lv] + '">' + lvMap[lv] + '</span>';
   if (e?.role) meta += '<span class="detail-badge badge-role">' + esc(e.role) + '</span>';
   document.getElementById('detailMeta').innerHTML = meta;
 
@@ -728,14 +708,11 @@ function updatePanel() {
   el.scrollTop = panelScroll[panelTab];
 }
 
-// Panel hold/tap
 function panelDown(e, el) {
   if (panelTimer) clearTimeout(panelTimer);
-  panelHeld     = false;
-  panelScrolled = false;
-  panelTimer    = setTimeout(() => {
-    panelTimer = null;
-    panelHeld  = true;
+  panelHeld = false; panelScrolled = false;
+  panelTimer = setTimeout(() => {
+    panelTimer = null; panelHeld = true;
     if (el.dataset.word) openAddTo(el.dataset.word);
   }, HOLD_MS);
 }
@@ -757,7 +734,6 @@ function panelUp(e, el) {
   if (!isNaN(idx)) { currentIndex = idx; show(); closeModal('wordListOverlay'); }
 }
 
-// Panel save bar
 function updateSaveBar() {
   const pfx = { list:'List1', queue:'CustomList', history:'CurrentSession' };
   document.getElementById('panelSaveName').value = listName(pfx[panelTab] || 'List');
@@ -787,7 +763,6 @@ function listName(prefix) {
 
 function pad(n) { return String(n).padStart(2,'0'); }
 
-// Hidden words
 function saveHiddenWords() { localStorage.setItem('dictHidden', JSON.stringify([...hiddenWords])); }
 function loadHiddenWords()  { try { hiddenWords = new Set(JSON.parse(localStorage.getItem('dictHidden') || '[]')); } catch(e) {} }
 
@@ -803,10 +778,7 @@ function removeFromQueue(word, e) {
 function openAddTo(word) {
   document.getElementById('addToWordTitle').textContent = '"' + word + '"';
   document.getElementById('addToOverlay').dataset.word  = word;
-  pendingAddTo = {
-    queue: !!customQueue.find(q => q.word === word),
-    hide:  hiddenWords.has(word),
-  };
+  pendingAddTo = { queue: !!customQueue.find(q => q.word === word), hide: hiddenWords.has(word) };
   syncAddTo();
   document.getElementById('addToOverlay').classList.remove('hidden');
 }
@@ -814,8 +786,8 @@ function openAddTo(word) {
 function syncAddTo() {
   document.querySelectorAll('.addto-btn').forEach(b => b.classList.remove('active'));
   if (pendingAddTo.queue) document.querySelector('[data-flag="queue"]').classList.add('active');
-  const hBtn  = document.getElementById('addToHideBtn');
-  const hLbl  = document.getElementById('addToHideLabel');
+  const hBtn = document.getElementById('addToHideBtn');
+  const hLbl = document.getElementById('addToHideLabel');
   if (pendingAddTo.hide) {
     hBtn.classList.add('active');
     hBtn.firstChild.textContent = '👁️';
@@ -921,6 +893,30 @@ function showConditional(mode) {
   document.querySelectorAll('.mcq-only').forEach(el    => el.classList.toggle('hidden', mode !== 'mcq'));
 }
 
+// ── Single source of truth for nav conditional visibility ──
+function syncNavCondVisibility(p, prefix) {
+  const pre = prefix || '';
+  const get = id => document.getElementById(pre + id);
+  const qAll = sel => document.querySelectorAll(sel);
+
+  get('NavFilterOptions').classList.toggle('hidden', !p.navFilter);
+  get('NavRootwiseOptions').classList.toggle('hidden', !p.navRootwise);
+  // Allow Multiple only shown when navFilter is ON
+  qAll('.allow-multiple-row').forEach(r => r.classList.toggle('hidden', !p.navFilter || !p.allowMultiple ? true : false));
+  // Actually: show allow-multiple-row only when navFilter ON
+  // joinCondition row shown when navFilter ON AND allowMultiple ON
+  // (handled by .allow-multiple-row class in HTML — it wraps joinCondition)
+  // Show the allow-multiple toggle row when navFilter is ON
+  qAll('.nav-allow-multiple-row').forEach(r => r.classList.toggle('hidden', !p.navFilter));
+  qAll('.allow-multiple-row').forEach(r => r.classList.toggle('hidden', !p.navFilter || !p.allowMultiple));
+
+  // Random nav section
+  const isRandom = p.orderMode === 'random';
+  get('NavRandomSection').classList.toggle('hidden', isRandom);
+  get('NavRandomOrderSection').classList.toggle('hidden', !isRandom);
+  if (!isRandom) get('NavRandomOptions').classList.toggle('hidden', !p.randomNav);
+}
+
 function syncSettingsUI() {
   const p = pending;
   document.getElementById('modeStudyToggle').checked  = p.mode === 'study';
@@ -937,71 +933,78 @@ function syncSettingsUI() {
   btn('data-mcqmaxcorrect', 'mcqMaxCorrect', p);
   btn('data-delta',         'navDelta',      p);
 
-  tog('loopToggle',             'loopMode');
-  tog('translationToggle',      'showTranslation');
-  tog('highlightToggle',        'wordHighlight');
-  tog('showSimilarToggle',      'showSimilar');
-  tog('showMeaningToggle',      'showMeaning');
-  tog('meaningOptionsToggle',   'meaningOptions');
-  tog('randomOptToggle',        'randomOptionCount');
-  tog('revealCorrectToggle',    'revealCorrect');
-  tog('reviseWordActionToggle', 'reviseWordAction');
-  tog('mcqRandomizeToggle',     'mcqRandomize');
-  tog('showClockToggle',        'showClock');
-  tog('mcqWordActionToggle',    'mcqWordAction');
+  tog('loopToggle',             'loopMode',         p);
+  tog('translationToggle',      'showTranslation',  p);
+  tog('highlightToggle',        'wordHighlight',     p);
+  tog('showSimilarToggle',      'showSimilar',       p);
+  tog('showMeaningToggle',      'showMeaning',       p);
+  tog('meaningOptionsToggle',   'meaningOptions',    p);
+  tog('randomOptToggle',        'randomOptionCount', p);
+  tog('revealCorrectToggle',    'revealCorrect',     p);
+  tog('reviseWordActionToggle', 'reviseWordAction',  p);
+  tog('mcqRandomizeToggle',     'mcqRandomize',      p);
+  tog('showClockToggle',        'showClock',         p);
+  tog('mcqWordActionToggle',    'mcqWordAction',     p);
+  tog('stepActionToggle',       'stepAction',        p);
+  tog('navFilterToggle',        'navFilter',         p);
+  tog('allowMultipleToggle',    'allowMultiple',     p);
+  tog('joinConditionToggle',    'joinCondition',     p);
+  tog('nxtBehaviorToggle',      'nxtBehavior',       p);
+  tog('prevBehaviorToggle',     'prevBehavior',      p);
+  tog('randomNavToggle',        'randomNav',         p);
+  tog('suggestMarkedToggle',    'suggestMarked',     p);
+  tog('suggestMarkedRandomToggle', 'suggestMarked',  p);
 
-  // Navigation filter toggles
-  tog('stepActionToggle',    'stepAction');
-  tog('navFilterToggle',     'navFilter');
-  tog('allowMultipleToggle', 'allowMultiple');
-  tog('joinConditionToggle', 'joinCondition');
-  tog('nxtBehaviorToggle',   'nxtBehavior');
-  tog('prevBehaviorToggle',  'prevBehavior');
-  tog('randomNavToggle',     'randomNav');
-  tog('suggestMarkedToggle', 'suggestMarked');
-
-  // Nav filter checkboxes
   document.getElementById('navSynAntChk').checked   = !!p.navSynAnt;
   document.getElementById('navDefinedChk').checked  = !!p.navDefined;
   document.getElementById('navRootwiseChk').checked = !!p.navRootwise;
 
-  // Suggest Marked for random order mode
-  if (document.getElementById('suggestMarkedRandomToggle'))
-    document.getElementById('suggestMarkedRandomToggle').checked = !!p.suggestMarked;
-
-  // Conditional visibility
   document.querySelector('.meaning-options-row').classList.toggle('hidden', !p.showMeaning);
   document.querySelectorAll('.random-opts-row').forEach(r => r.classList.toggle('hidden', !p.randomOptionCount));
   document.querySelector('.fixed-opts-row').classList.toggle('hidden', !!p.randomOptionCount);
-  document.getElementById('navFilterOptions').classList.toggle('hidden', !p.navFilter);
-  document.getElementById('navRootwiseOptions').classList.toggle('hidden', !p.navRootwise);
-  document.querySelectorAll('.allow-multiple-row').forEach(r => r.classList.toggle('hidden', !p.allowMultiple));
-  syncNavRandomUI(p);
+
+  syncNavCondVisibility(p, '');
 }
 
-function syncNavRandomUI(p) {
-  const isRandom = p.orderMode === 'random';
-  document.getElementById('navRandomSection').classList.toggle('hidden', isRandom);
-  document.getElementById('navRandomOrderSection').classList.toggle('hidden', !isRandom);
-  if (!isRandom) {
-    document.getElementById('navRandomOptions').classList.toggle('hidden', !p.randomNav);
-  }
+function syncQuickNavUI() {
+  const p = pendingNav;
+
+  document.querySelectorAll('[data-qstep]').forEach(b =>
+    b.classList.toggle('active', parseInt(b.dataset.qstep) === p.stepNumber));
+  document.querySelectorAll('[data-qdelta]').forEach(b =>
+    b.classList.toggle('active', parseInt(b.dataset.qdelta) === p.navDelta));
+
+  tog('qLoopToggle',               'loopMode',   p);
+  tog('qStepActionToggle',         'stepAction', p);
+  tog('qNavFilterToggle',          'navFilter',  p);
+  tog('qAllowMultipleToggle',      'allowMultiple', p);
+  tog('qJoinConditionToggle',      'joinCondition', p);
+  tog('qNxtBehaviorToggle',        'nxtBehavior', p);
+  tog('qPrevBehaviorToggle',       'prevBehavior', p);
+  tog('qRandomNavToggle',          'randomNav',  p);
+  tog('qSuggestMarkedToggle',      'suggestMarked', p);
+  tog('qSuggestMarkedRandomToggle','suggestMarked', p);
+
+  document.getElementById('qNavSynAntChk').checked   = !!p.navSynAnt;
+  document.getElementById('qNavDefinedChk').checked  = !!p.navDefined;
+  document.getElementById('qNavRootwiseChk').checked = !!p.navRootwise;
+
+  syncNavCondVisibility(p, 'q');
 }
 
 function btn(attr, key, p) {
   const val = String(p[key]);
-  document.querySelectorAll('[' + attr + ']').forEach(b => {
-    b.classList.toggle('active', b.getAttribute(attr) === val);
-  });
+  document.querySelectorAll('[' + attr + ']').forEach(b =>
+    b.classList.toggle('active', b.getAttribute(attr) === val));
 }
 
-function tog(id, key) {
+function tog(id, key, p) {
   const el = document.getElementById(id);
-  if (el) el.checked = !!pending[key];
+  const src = p || pending;
+  if (el && src) el.checked = !!src[key];
 }
 
 function bindSettingsEvents() {
-  // Mode toggles
   ['modeStudyToggle','modeReviseToggle','modeMCQToggle'].forEach(id => {
     document.getElementById(id).addEventListener('change', e => {
       if (!pending) return;
@@ -1015,7 +1018,6 @@ function bindSettingsEvents() {
     });
   });
 
-  // Button groups
   function bindBtn(attr, key, parse) {
     document.querySelectorAll('[' + attr + ']').forEach(b => {
       b.addEventListener('click', () => {
@@ -1037,9 +1039,10 @@ function bindSettingsEvents() {
   bindBtn('data-mcqopt',        'mcqOptions',    parseInt);
   bindBtn('data-mcqmaxcorrect', 'mcqMaxCorrect', parseInt);
 
-  // Toggles
   function bindTog(id, key, onchange) {
-    document.getElementById(id).addEventListener('change', e => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('change', e => {
       if (!pending) return;
       pending[key] = e.target.checked;
       if (onchange) onchange(e.target.checked);
@@ -1050,7 +1053,7 @@ function bindSettingsEvents() {
   bindTog('translationToggle',      'showTranslation');
   bindTog('highlightToggle',        'wordHighlight');
   bindTog('showSimilarToggle',      'showSimilar');
-  bindTog('showMeaningToggle',      'showMeaning',    v => document.querySelector('.meaning-options-row').classList.toggle('hidden', !v));
+  bindTog('showMeaningToggle',      'showMeaning', v => document.querySelector('.meaning-options-row').classList.toggle('hidden', !v));
   bindTog('meaningOptionsToggle',   'meaningOptions');
   bindTog('randomOptToggle',        'randomOptionCount', v => {
     document.querySelectorAll('.random-opts-row').forEach(r => r.classList.toggle('hidden', !v));
@@ -1061,14 +1064,15 @@ function bindSettingsEvents() {
   bindTog('mcqRandomizeToggle',     'mcqRandomize');
   bindTog('showClockToggle',        'showClock');
   bindTog('mcqWordActionToggle',    'mcqWordAction');
-
-  // Navigation filter bindings
-  bindTog('stepActionToggle',   'stepAction');
-  bindTog('navFilterToggle',    'navFilter',   v => document.getElementById('navFilterOptions').classList.toggle('hidden', !v));
-  bindTog('allowMultipleToggle','allowMultiple', v => {
+  bindTog('stepActionToggle',       'stepAction');
+  bindTog('navFilterToggle',        'navFilter', v => {
+    document.getElementById('navFilterOptions').classList.toggle('hidden', !v);
+    document.querySelectorAll('.nav-allow-multiple-row').forEach(r => r.classList.toggle('hidden', !v));
+    if (!v) document.querySelectorAll('.allow-multiple-row').forEach(r => r.classList.add('hidden'));
+  });
+  bindTog('allowMultipleToggle',    'allowMultiple', v => {
     document.querySelectorAll('.allow-multiple-row').forEach(r => r.classList.toggle('hidden', !v));
     if (!v && pending) {
-      // Force single selection — keep first checked, uncheck others
       const chks = ['navSynAntChk','navDefinedChk','navRootwiseChk'];
       let kept = false;
       chks.forEach(id => {
@@ -1081,14 +1085,14 @@ function bindSettingsEvents() {
       document.getElementById('navRootwiseOptions').classList.add('hidden');
     }
   });
-  bindTog('joinConditionToggle','joinCondition');
-  bindTog('nxtBehaviorToggle',  'nxtBehavior');
-  bindTog('prevBehaviorToggle', 'prevBehavior');
-  bindTog('randomNavToggle',    'randomNav',   v => document.getElementById('navRandomOptions').classList.toggle('hidden', !v));
-  bindTog('suggestMarkedToggle','suggestMarked');
+  bindTog('joinConditionToggle',    'joinCondition');
+  bindTog('nxtBehaviorToggle',      'nxtBehavior');
+  bindTog('prevBehaviorToggle',     'prevBehavior');
+  bindTog('randomNavToggle',        'randomNav', v => document.getElementById('navRandomOptions').classList.toggle('hidden', !v));
+  bindTog('suggestMarkedToggle',    'suggestMarked');
   bindTog('suggestMarkedRandomToggle', 'suggestMarked');
 
-  // Nav filter checkboxes — at least one mandatory; single-select when allowMultiple OFF
+  // Nav filter checkboxes
   ['navSynAntChk','navDefinedChk','navRootwiseChk'].forEach(id => {
     document.getElementById(id).addEventListener('change', e => {
       if (!pending) return;
@@ -1100,7 +1104,6 @@ function bindSettingsEvents() {
         if (!othersChecked) { e.target.checked = true; return; }
       }
       pending[key] = e.target.checked;
-      // If Allow Multiple is OFF, uncheck others
       if (e.target.checked && !pending.allowMultiple) {
         ['navSynAntChk','navDefinedChk','navRootwiseChk'].forEach(oid => {
           if (oid !== id) {
@@ -1116,14 +1119,12 @@ function bindSettingsEvents() {
     });
   });
 
-  // Delta selector
   bindBtn('data-delta', 'navDelta', parseInt);
 
-  // Save
   document.getElementById('settingsSave').addEventListener('click', () => {
     if (pending) {
-      const modeChanged     = pending.mode     !== S.mode;
-      const tabOrderChanged = pending.tabOrder  !== S.tabOrder;
+      const modeChanged     = pending.mode    !== S.mode;
+      const tabOrderChanged = pending.tabOrder !== S.tabOrder;
       const reviseChanged   = S.mode === 'revise' && (
         pending.showMeaning       !== S.showMeaning       ||
         pending.meaningOptions    !== S.meaningOptions    ||
@@ -1133,92 +1134,63 @@ function bindSettingsEvents() {
         pending.maxOptions        !== S.maxOptions        ||
         pending.fixedOptions      !== S.fixedOptions
       );
-
       Object.assign(S, pending);
       saveSettings();
       applyAppearance();
       document.getElementById('sessionStep').textContent = S.stepNumber;
       updateBar();
-
-      if (studyList.length && (modeChanged || tabOrderChanged || reviseChanged))
-        show();
+      if (studyList.length && (modeChanged || tabOrderChanged || reviseChanged)) show();
     }
     pending = null;
     closeModal('settingsOverlay');
   });
 
-  // Close
-  document.getElementById('settingsClose').addEventListener('click', () => {
-    pending = null;
-    closeModal('settingsOverlay');
-  });
-
-  // Click outside
+  document.getElementById('settingsClose').addEventListener('click', () => { pending = null; closeModal('settingsOverlay'); });
   document.getElementById('settingsOverlay').addEventListener('click', e => {
     if (e.target.id === 'settingsOverlay') { pending = null; closeModal('settingsOverlay'); }
   });
 }
 
-// ── Quick Nav settings sync ──
-function syncQuickNavUI() {
-  const p = pendingNav;
-  // Step buttons
-  document.querySelectorAll('[data-qstep]').forEach(b =>
-    b.classList.toggle('active', parseInt(b.dataset.qstep) === p.stepNumber));
-  // Delta buttons
-  document.querySelectorAll('[data-qdelta]').forEach(b =>
-    b.classList.toggle('active', parseInt(b.dataset.qdelta) === p.navDelta));
-  // Toggles
-  document.getElementById('qLoopToggle').checked         = !!p.loopMode;
-  document.getElementById('qStepActionToggle').checked   = !!p.stepAction;
-  document.getElementById('qNavFilterToggle').checked    = !!p.navFilter;
-  document.getElementById('qAllowMultipleToggle').checked = !!p.allowMultiple;
-  document.getElementById('qJoinConditionToggle').checked = !!p.joinCondition;
-  document.getElementById('qNxtBehaviorToggle').checked  = !!p.nxtBehavior;
-  document.getElementById('qPrevBehaviorToggle').checked = !!p.prevBehavior;
-  document.getElementById('qRandomNavToggle').checked    = !!p.randomNav;
-  document.getElementById('qSuggestMarkedToggle').checked       = !!p.suggestMarked;
-  document.getElementById('qSuggestMarkedRandomToggle').checked = !!p.suggestMarked;
-  // Checkboxes
-  document.getElementById('qNavSynAntChk').checked   = !!p.navSynAnt;
-  document.getElementById('qNavDefinedChk').checked  = !!p.navDefined;
-  document.getElementById('qNavRootwiseChk').checked = !!p.navRootwise;
-  // Conditional visibility
-  document.getElementById('qNavFilterOptions').classList.toggle('hidden', !p.navFilter);
-  document.getElementById('qNavRootwiseOptions').classList.toggle('hidden', !p.navRootwise);
-  document.querySelectorAll('.allow-multiple-row').forEach(r => r.classList.toggle('hidden', !p.allowMultiple));
-  const isRandom = p.orderMode === 'random';
-  document.getElementById('qNavRandomSection').classList.toggle('hidden', isRandom);
-  document.getElementById('qNavRandomOrderSection').classList.toggle('hidden', !isRandom);
-  if (!isRandom) document.getElementById('qNavRandomOptions').classList.toggle('hidden', !p.randomNav);
+// ══════════════════════════════════════
+// QUICK NAV — single entry point
+// ══════════════════════════════════════
+function openQuickNav() {
+  pendingNav = Object.assign({}, S);
+  navOpenQuickPopup(); // sets word label + like/dislike + shows overlay
+  syncQuickNavUI();    // syncs all q* elements from pendingNav
 }
 
 function bindQuickNavSettings() {
-  // Step buttons
   document.querySelectorAll('[data-qstep]').forEach(b => b.addEventListener('click', () => {
     if (!pendingNav) return;
     document.querySelectorAll('[data-qstep]').forEach(x => x.classList.remove('active'));
     b.classList.add('active');
     pendingNav.stepNumber = parseInt(b.dataset.qstep);
   }));
-  // Delta buttons
   document.querySelectorAll('[data-qdelta]').forEach(b => b.addEventListener('click', () => {
     if (!pendingNav) return;
     document.querySelectorAll('[data-qdelta]').forEach(x => x.classList.remove('active'));
     b.classList.add('active');
     pendingNav.navDelta = parseInt(b.dataset.qdelta);
   }));
-  // Toggles
+
   function qTog(id, key, onchange) {
-    document.getElementById(id).addEventListener('change', e => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('change', e => {
       if (!pendingNav) return;
       pendingNav[key] = e.target.checked;
       if (onchange) onchange(e.target.checked);
     });
   }
+
   qTog('qLoopToggle',        'loopMode');
   qTog('qStepActionToggle',  'stepAction');
-  qTog('qNavFilterToggle',   'navFilter',  v => document.getElementById('qNavFilterOptions').classList.toggle('hidden', !v));
+  qTog('qNavFilterToggle',   'navFilter', v => {
+    document.getElementById('qNavFilterOptions').classList.toggle('hidden', !v);
+    document.querySelectorAll('.nav-allow-multiple-row').forEach(r => r.classList.toggle('hidden', !v));
+    if (!v) document.querySelectorAll('.allow-multiple-row').forEach(r => r.classList.add('hidden'));
+  });
   qTog('qAllowMultipleToggle','allowMultiple', v => {
     document.querySelectorAll('.allow-multiple-row').forEach(r => r.classList.toggle('hidden', !v));
     if (!v && pendingNav) {
@@ -1234,13 +1206,13 @@ function bindQuickNavSettings() {
       document.getElementById('qNavRootwiseOptions').classList.add('hidden');
     }
   });
-  qTog('qJoinConditionToggle','joinCondition');
-  qTog('qNxtBehaviorToggle', 'nxtBehavior');
-  qTog('qPrevBehaviorToggle','prevBehavior');
-  qTog('qRandomNavToggle',   'randomNav',  v => document.getElementById('qNavRandomOptions').classList.toggle('hidden', !v));
+  qTog('qJoinConditionToggle', 'joinCondition');
+  qTog('qNxtBehaviorToggle',   'nxtBehavior');
+  qTog('qPrevBehaviorToggle',  'prevBehavior');
+  qTog('qRandomNavToggle',     'randomNav', v => document.getElementById('qNavRandomOptions').classList.toggle('hidden', !v));
   qTog('qSuggestMarkedToggle',       'suggestMarked');
   qTog('qSuggestMarkedRandomToggle', 'suggestMarked');
-  // Checkboxes
+
   ['qNavSynAntChk','qNavDefinedChk','qNavRootwiseChk'].forEach(id => {
     document.getElementById(id).addEventListener('change', e => {
       if (!pendingNav) return;
@@ -1252,6 +1224,16 @@ function bindQuickNavSettings() {
         if (!others) { e.target.checked = true; return; }
       }
       pendingNav[key] = e.target.checked;
+      if (e.target.checked && !pendingNav.allowMultiple) {
+        ['qNavSynAntChk','qNavDefinedChk','qNavRootwiseChk'].forEach(oid => {
+          if (oid !== id) {
+            document.getElementById(oid).checked = false;
+            const okey = oid === 'qNavSynAntChk' ? 'navSynAnt' : oid === 'qNavDefinedChk' ? 'navDefined' : 'navRootwise';
+            pendingNav[okey] = false;
+          }
+        });
+        document.getElementById('qNavRootwiseOptions').classList.toggle('hidden', key !== 'navRootwise');
+      }
       if (key === 'navRootwise')
         document.getElementById('qNavRootwiseOptions').classList.toggle('hidden', !e.target.checked);
     });
@@ -1275,28 +1257,23 @@ function bindCustomiseEvents() {
   document.querySelectorAll('[data-size]').forEach(b => b.addEventListener('click', () => {
     if (!pending) return;
     document.querySelectorAll('[data-size]').forEach(x => x.classList.remove('active'));
-    b.classList.add('active');
-    pending.fontSize = b.dataset.size;
+    b.classList.add('active'); pending.fontSize = b.dataset.size;
   }));
   document.querySelectorAll('[data-accent]').forEach(b => b.addEventListener('click', () => {
     if (!pending) return;
     document.querySelectorAll('[data-accent]').forEach(x => x.classList.remove('selected'));
-    b.classList.add('selected');
-    pending.accent = b.dataset.accent;
+    b.classList.add('selected'); pending.accent = b.dataset.accent;
   }));
   document.querySelectorAll('[data-theme]').forEach(b => b.addEventListener('click', () => {
     if (!pending) return;
     document.querySelectorAll('[data-theme]').forEach(x => x.classList.remove('selected'));
-    b.classList.add('selected');
-    pending.theme = b.dataset.theme;
+    b.classList.add('selected'); pending.theme = b.dataset.theme;
   }));
   document.getElementById('customiseSave').addEventListener('click', () => {
     if (pending) { Object.assign(S, pending); saveSettings(); applyAppearance(); }
     pending = null; closeModal('customiseOverlay');
   });
-  document.getElementById('customiseClose').addEventListener('click', () => {
-    pending = null; closeModal('customiseOverlay');
-  });
+  document.getElementById('customiseClose').addEventListener('click', () => { pending = null; closeModal('customiseOverlay'); });
   document.getElementById('customiseOverlay').addEventListener('click', e => {
     if (e.target.id === 'customiseOverlay') { pending = null; closeModal('customiseOverlay'); }
   });
@@ -1321,51 +1298,6 @@ function applyAppearance() {
 }
 
 // ══════════════════════════════════════
-// QUICK NAV — open with pending + sync
-// ══════════════════════════════════════
-function openQuickNav() {
-  pending = Object.assign({}, S);
-  syncQuickNavUI();
-  navOpenQuickPopup(); // sets word label + like/dislike state
-}
-
-function syncQuickNavUI() {
-  const p = pending;
-  // Step
-  document.querySelectorAll('[data-qstep]').forEach(b =>
-    b.classList.toggle('active', parseInt(b.dataset.qstep) === p.stepNumber));
-  // Toggles
-  document.getElementById('qLoopToggle').checked       = !!p.loopMode;
-  document.getElementById('qStepActionToggle').checked = !!p.stepAction;
-  document.getElementById('qNavFilterToggle').checked  = !!p.navFilter;
-  document.getElementById('qNxtBehaviorToggle').checked  = !!p.nxtBehavior;
-  document.getElementById('qPrevBehaviorToggle').checked = !!p.prevBehavior;
-  document.getElementById('qNavSynAntChk').checked   = !!p.navSynAnt;
-  document.getElementById('qNavDefinedChk').checked  = !!p.navDefined;
-  document.getElementById('qNavRootwiseChk').checked  = !!p.navRootwise;
-  // Delta
-  document.querySelectorAll('[data-qdelta]').forEach(b =>
-    b.classList.toggle('active', parseInt(b.dataset.qdelta) === p.navDelta));
-  // Suggest Marked
-  const qSM  = document.getElementById('qSuggestMarkedToggle');
-  const qSMR = document.getElementById('qSuggestMarkedRandomToggle');
-  if (qSM)  qSM.checked  = !!p.suggestMarked;
-  if (qSMR) qSMR.checked = !!p.suggestMarked;
-  // Conditional visibility
-  document.getElementById('qNavFilterOptions').classList.toggle('hidden', !p.navFilter);
-  document.getElementById('qNavRootwiseOptions').classList.toggle('hidden', !p.navRootwise);
-  syncQuickNavRandomUI(p);
-}
-
-function syncQuickNavRandomUI(p) {
-  const isRandom = p.orderMode === 'random';
-  document.getElementById('qNavRandomSection').classList.toggle('hidden', isRandom);
-  document.getElementById('qNavRandomOrderSection').classList.toggle('hidden', !isRandom);
-  if (!isRandom)
-    document.getElementById('qNavRandomOptions').classList.toggle('hidden', !p.randomNav);
-}
-
-// ══════════════════════════════════════
 // MODALS
 // ══════════════════════════════════════
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
@@ -1381,7 +1313,6 @@ function bindAll() {
   bindAddTo();
   bindQuickNavSettings();
 
-  // Home
   document.getElementById('startBtn').addEventListener('click', startSession);
   document.getElementById('homeSearchBtn').addEventListener('click', () => showScreen('search'));
   document.getElementById('homeBookBtn').addEventListener('click', handleBook);
@@ -1392,30 +1323,26 @@ function bindAll() {
     showScreen('gate');
   });
 
-  // Study navbar
   document.getElementById('studyHomeBtn').addEventListener('click', goHome);
   document.getElementById('infoBtn').addEventListener('click', showInfo);
   document.getElementById('settingsBtn').addEventListener('click', openSettings);
   document.getElementById('wordListBtn').addEventListener('click', openPanel);
 
-  // Prev / Next — click navigates, hold opens word detail
   const pb = document.getElementById('prevBtn');
   const nb = document.getElementById('nextBtn');
   pb.addEventListener('click', prevWord);
   nb.addEventListener('click', nextWord);
-  pb.addEventListener('mousedown',   prevDown); pb.addEventListener('mouseup',     prevUp);
-  pb.addEventListener('mouseleave',  prevUp);
-  pb.addEventListener('touchstart',  prevDown, { passive: true });
-  pb.addEventListener('touchend',    prevUp); pb.addEventListener('touchcancel', prevUp);
-  nb.addEventListener('mousedown',   nextDown); nb.addEventListener('mouseup',     nextUp);
-  nb.addEventListener('mouseleave',  nextUp);
-  nb.addEventListener('touchstart',  nextDown, { passive: true });
-  nb.addEventListener('touchend',    nextUp); nb.addEventListener('touchcancel', nextUp);
+  pb.addEventListener('mousedown',  prevDown); pb.addEventListener('mouseup',    prevUp);
+  pb.addEventListener('mouseleave', prevUp);
+  pb.addEventListener('touchstart', prevDown, { passive: true });
+  pb.addEventListener('touchend',   prevUp);  pb.addEventListener('touchcancel', prevUp);
+  nb.addEventListener('mousedown',  nextDown); nb.addEventListener('mouseup',    nextUp);
+  nb.addEventListener('mouseleave', nextUp);
+  nb.addEventListener('touchstart', nextDown, { passive: true });
+  nb.addEventListener('touchend',   nextUp);  nb.addEventListener('touchcancel', nextUp);
 
-  // Search back
   document.getElementById('searchBackBtn').addEventListener('click', () => showScreen(sessionLive ? 'study' : 'home'));
 
-  // Panel tabs
   document.querySelectorAll('.panel-tab').forEach(t => t.addEventListener('click', () => {
     document.querySelectorAll('.panel-tab').forEach(x => x.classList.remove('active'));
     t.classList.add('active');
@@ -1427,36 +1354,32 @@ function bindAll() {
   document.getElementById('wordListClose').addEventListener('click', () => closeModal('wordListOverlay'));
   document.getElementById('wordListOverlay').addEventListener('click', e => { if (e.target.id === 'wordListOverlay') closeModal('wordListOverlay'); });
 
-  // Info
   document.getElementById('infoClose').addEventListener('click', () => closeModal('infoOverlay'));
   document.getElementById('infoQuit').addEventListener('click', quitSession);
   document.getElementById('infoOverlay').addEventListener('click', e => { if (e.target.id === 'infoOverlay') closeModal('infoOverlay'); });
 
-  // Word detail
   document.getElementById('wordDetailClose').addEventListener('click', () => closeModal('wordDetailOverlay'));
   document.getElementById('wordDetailView').addEventListener('click', viewDetailWord);
   document.getElementById('wordDetailOverlay').addEventListener('click', e => { if (e.target.id === 'wordDetailOverlay') closeModal('wordDetailOverlay'); });
 
-  // Add To overlay
   document.getElementById('addToOverlay').addEventListener('click', e => { if (e.target.id === 'addToOverlay') closeModal('addToOverlay'); });
 
-  // Quick Nav popup
   document.getElementById('quickNavClose').addEventListener('click', () => { pendingNav = null; closeModal('quickNavOverlay'); });
   document.getElementById('quickNavSave').addEventListener('click', () => {
     if (pendingNav) {
       Object.assign(S, pendingNav);
       saveSettings();
       updateBar();
-      syncSettingsUI(); // keep main Settings modal in sync
+      syncSettingsUI();
     }
     pendingNav = null;
     closeModal('quickNavOverlay');
   });
-  document.getElementById('quickNavOverlay').addEventListener('click', e => { if (e.target.id === 'quickNavOverlay') { pendingNav = null; closeModal('quickNavOverlay'); } });
-  bindQuickNavSettings();
+  document.getElementById('quickNavOverlay').addEventListener('click', e => {
+    if (e.target.id === 'quickNavOverlay') { pendingNav = null; closeModal('quickNavOverlay'); }
+  });
   navBindQuickNav();
 
-  // Keyboard shortcuts (study screen only)
   document.addEventListener('keydown', e => {
     if (document.querySelector('.screen.active')?.id !== 'studyScreen') return;
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') nextWord();
