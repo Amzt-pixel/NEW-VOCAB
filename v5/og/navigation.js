@@ -88,7 +88,10 @@ function skipBase(word) {
   const definedOk = !S.navDefined || hasDef(word);
 
   // OR logic between SynAnt and Defined
-  const basePass = synAntOk || definedOk;
+ // const basePass = synAntOk || definedOk;
+   const basePass = S.joinCondition
+    ? (synAntOk || definedOk)
+    : (synAntOk && definedOk);
   return !basePass;
 }
 
