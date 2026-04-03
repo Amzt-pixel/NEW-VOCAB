@@ -452,3 +452,4 @@ input  { font-family: 'DM Sans', sans-serif; }
 .card-subheader.ant-header .dot { background: var(--ant); }
 .card-subheader.def-header { color: var(--def); }
 .card-subheader.def-header .dot { background: var(--def); }
+.card-subheader .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
