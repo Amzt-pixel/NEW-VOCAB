@@ -524,12 +524,17 @@ function studyChip(word, type) {
 
 // ── Revise mode ──
 function showRevise(word, entry) {
-  const syns   = getSyns(word);
-  const ants   = getAnts(word);
-  const hasDef = !!entry?.definition;
+  const syns    = getSyns(word);
+  const ants    = getAnts(word);
+  const simSyms = getSimilarSyns(word);
+  const simAnts = getSimilarAnts(word);
+  const hasDef  = !!entry?.definition;
 
-  if (syns.length) document.getElementById('synChips').innerHTML = buildReviseChips(reviseOpts(syns, [word,...syns,...ants]), 'syn');
-  if (ants.length) document.getElementById('antChips').innerHTML = buildReviseChips(reviseOpts(ants, [word,...ants,...syns]), 'ant');
+  const synCorrect = [...syns, ...simSyms];
+  const antCorrect = [...ants, ...simAnts];
+
+  if (synCorrect.length) document.getElementById('synChips').innerHTML = buildReviseChips(reviseOpts(synCorrect, [word, ...synCorrect, ...antCorrect]), 'syn');
+  if (antCorrect.length) document.getElementById('antChips').innerHTML = buildReviseChips(reviseOpts(antCorrect, [word, ...antCorrect, ...synCorrect]), 'ant');
 
   const showDef = hasDef && S.showMeaning;
   const defEl   = document.getElementById('defContent');
@@ -549,9 +554,9 @@ function showRevise(word, entry) {
     defEl.innerHTML = '';
   }
 
-  setCards(syns, ants, showDef);
+  setCards(syns, ants, showDef, simSyms, simAnts);
   reorderTabs();
-  activateFirstTab(syns, ants, hasDef, showDef);
+  activateFirstTab(synCorrect, antCorrect, hasDef, showDef);
 }
 
 function reviseOpts(correct, exclude) {
@@ -560,7 +565,7 @@ function reviseOpts(correct, exclude) {
     : S.fixedOptions;
   const maxRight = Math.max(1, Math.floor(total * S.correctPercent / 100));
   const picked   = shuffle([...correct]).slice(0, Math.min(correct.length, maxRight));
-  const pool     = csvData.map(r => r.word).filter(w => !exclude.includes(w));
+  const pool     = studyList.filter(w => !exclude.includes(w));
   const fillers  = shuffle(pool).slice(0, total - picked.length);
   return shuffle([...picked, ...fillers]).map(w => ({ word: w, correct: picked.includes(w) }));
 }
