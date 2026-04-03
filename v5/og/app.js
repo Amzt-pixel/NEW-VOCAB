@@ -442,54 +442,69 @@ function setCards(syns, ants, showDef, simSyms = [], simAnts = []) {
   document.getElementById('antCount').textContent = ants.length || '';
 }
 
-// ── Study mode ──
-/*function showStudy(word, entry) {
-  const syns   = getSyns(word);
-  const ants   = getAnts(word);
-  const hasDef = !!entry?.definition;
-
-  document.getElementById('synChips').innerHTML = syns.map(w => studyChip(w, 'syn')).join('');
-  document.getElementById('antChips').innerHTML = ants.map(w => studyChip(w, 'ant')).join('');
-
-  document.getElementById('defContent').innerHTML = hasDef
-    ? '<div class="def-text">' + esc(entry.definition) + '</div>'
-      + (entry.example ? '<div class="def-example">"' + esc(entry.example) + '"</div>' : '')
-    : '';
-
-  setCards(syns, ants, hasDef);
-  reorderTabs();
-  activateFirstTab(syns, ants, hasDef, false);
-}*/
-
 function showStudy(word, entry) {
-  const syns    = getSyns(word);
-  const ants    = getAnts(word);
-  const simSyms = S.showSimilar ? getSimilarSyns(word) : [];
-  const simAnts = S.showSimilar ? getSimilarAnts(word) : [];
-  const hasDef  = !!entry?.definition;
+  const syns     = getSyns(word);
+  const ants     = getAnts(word);
+  const simSyms  = S.showSimilar ? getSimilarSyns(word) : [];
+  const simAnts  = S.showSimilar ? getSimilarAnts(word) : [];
+  const hasDef   = !!entry?.definition;
+  const hasTrans = S.showTranslation && !!entry?.bengaliDef;
 
+  // Syn chips
   let synHTML = syns.map(w => studyChip(w, 'syn')).join('');
   if (simSyms.length) {
-    synHTML += '<div class="similar-divider"></div>'
+    synHTML += '<div class="divider-primary"></div>'
+      + '<div class="similar-label">Similar Words</div>'
       + simSyms.map(w => studyChip(w, 'syn')).join('');
   }
   document.getElementById('synChips').innerHTML = synHTML;
 
+  // Ant chips
   let antHTML = ants.map(w => studyChip(w, 'ant')).join('');
   if (simAnts.length) {
-    antHTML += '<div class="similar-divider"></div>'
+    antHTML += '<div class="divider-primary"></div>'
+      + '<div class="similar-label">Similar Words</div>'
       + simAnts.map(w => studyChip(w, 'ant')).join('');
   }
   document.getElementById('antChips').innerHTML = antHTML;
 
-  document.getElementById('defContent').innerHTML = hasDef
-    ? '<div class="def-text">' + esc(entry.definition) + '</div>'
-      + (entry.example ? '<div class="def-example">"' + esc(entry.example) + '"</div>' : '')
-    : '';
+  // Meaning card
+  let defHTML = '';
+  let hasContent = false;
 
-  setCards(syns, ants, hasDef, simSyms, simAnts);
+  if (hasDef) {
+    defHTML += '<div class="content-label">Definition</div>'
+      + '<div class="detail-def">' + esc(entry.definition) + '</div>';
+    hasContent = true;
+
+    const examples = [entry.example, entry.example2, entry.example3, entry.example4, entry.example5].filter(Boolean);
+    if (examples.length) {
+      defHTML += '<div class="divider-primary"></div>'
+        + '<div class="content-label">Examples</div>'
+        + examples.map(ex => '<div class="def-example">"' + esc(ex) + '"</div>').join('');
+    }
+  }
+
+  if (hasTrans) {
+    if (hasContent) defHTML += '<div class="divider-primary"></div>';
+    defHTML += '<div class="content-label">Translation</div>'
+      + '<div class="detail-def">' + esc(entry.bengaliDef) + '</div>';
+    hasContent = true;
+
+    const bExamples = [entry.bengaliEx1, entry.bengaliEx2, entry.bengaliEx3].filter(Boolean);
+    if (bExamples.length) {
+      defHTML += '<div class="divider-primary"></div>'
+        + '<div class="content-label">Bengali Examples</div>'
+        + bExamples.map(ex => '<div class="def-example">"' + esc(ex) + '"</div>').join('');
+    }
+  }
+
+  document.getElementById('defContent').innerHTML = defHTML;
+
+  const showDef = hasDef || hasTrans;
+  setCards(syns, ants, showDef, simSyms, simAnts);
   reorderTabs();
-  activateFirstTab(syns, ants, hasDef, false);
+  activateFirstTab(syns, ants, showDef, false);
 }
 
 function studyChip(word, type) {
