@@ -2,7 +2,7 @@
    DICTIONARY — app.js
    ══════════════════════════════════════ */
 
-const PASSWORD     = 'MGM5*';
+const PASSWORD     = 'Milton23';
 const CSV_URL      = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/dict_demo.csv';
 const HOLD_MS      = 700;
 
@@ -455,8 +455,6 @@ function showStudy(word, entry) {
   if (syns.length) {
     synHTML += '<div class="card-subheader syn-header"><span class="dot"></span> Synonyms</div>'
       + '<div class="chips-wrap">' + syns.map(w => studyChip(w, 'syn')).join('') + '</div>';
-  } else {
-    synHTML += '<div class="empty-state">No synonyms exist.</div>';
   }
   if (simSyms.length) {
     synHTML += '<div class="card-subheader syn-header" style="margin-top:12px"><span class="dot"></span> Similar Words</div>'
@@ -469,8 +467,6 @@ function showStudy(word, entry) {
   if (ants.length) {
     antHTML += '<div class="card-subheader ant-header"><span class="dot"></span> Antonyms</div>'
       + '<div class="chips-wrap">' + ants.map(w => studyChip(w, 'ant')).join('') + '</div>';
-  } else {
-    antHTML += '<div class="empty-state">No antonyms exist.</div>';
   }
   if (simAnts.length) {
     antHTML += '<div class="card-subheader ant-header" style="margin-top:12px"><span class="dot"></span> Similar Words</div>'
