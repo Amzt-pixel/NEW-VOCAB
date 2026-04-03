@@ -77,6 +77,7 @@ let panelScrolled = false;
 let pendingAddTo      = {};
 let detailWord        = null;
 let wrongAttempts     = 0;
+let settingsTab = 'display';
 
 // ══════════════════════════════════════
 // INIT
@@ -907,11 +908,27 @@ function quitSession() {
 // ══════════════════════════════════════
 // SETTINGS
 // ══════════════════════════════════════
-function openSettings() {
+
+/*function openSettings() {
   pending = Object.assign({}, S);
   syncSettingsUI();
   showConditional(S.mode);
   document.getElementById('settingsOverlay').classList.remove('hidden');
+}*/
+function openSettings() {
+  pending = Object.assign({}, S);
+  settingsTab = 'display';
+  syncSettingsTabUI();
+  syncSettingsUI();
+  showConditional(S.mode);
+  document.getElementById('settingsOverlay').classList.remove('hidden');
+}
+
+function syncSettingsTabUI() {
+  document.getElementById('settingsDisplayTab').classList.toggle('hidden', settingsTab !== 'display');
+  document.getElementById('settingsNavTab').classList.toggle('hidden', settingsTab !== 'navigation');
+  document.querySelectorAll('.settings-tab-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.settingsTab === settingsTab));
 }
 
 function showConditional(mode) {
@@ -1167,6 +1184,13 @@ function bindSettingsEvents() {
   });
 
   // Close
+   // Settings tabs
+  document.querySelectorAll('.settings-tab-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      settingsTab = b.dataset.settingsTab;
+      syncSettingsTabUI();
+    });
+  });
   document.getElementById('settingsClose').addEventListener('click', () => {
     pending = null;
     closeModal('settingsOverlay');
@@ -1457,6 +1481,7 @@ function bindAll() {
   // Quick Nav popup
   document.getElementById('quickNavClose').addEventListener('click', () => { pendingNav = null; closeModal('quickNavOverlay'); });
   document.getElementById('quickNavSave').addEventListener('click', () => {
+    document.getElementById('quickNavSave').addEventListener('click', () => {
     if (pendingNav) {
       Object.assign(S, pendingNav);
       saveSettings();
@@ -1464,7 +1489,6 @@ function bindAll() {
       syncSettingsUI();
     }
     pendingNav = null;
-    closeModal('quickNavOverlay');
   });
   document.getElementById('quickNavOverlay').addEventListener('click', e => { if (e.target.id === 'quickNavOverlay') { pendingNav = null; closeModal('quickNavOverlay'); } });
   bindQuickNavSettings();
