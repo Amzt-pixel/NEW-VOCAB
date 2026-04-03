@@ -229,6 +229,25 @@ function getAnts(word) {
   if (!e?.id) return [];
   return csvData.filter(r => r.id === -e.id).map(r => r.word);
 }
+function getSimilarSyns(word) {
+  const e = csvData.find(r => r.word === word);
+  if (!e?.id) return [];
+  const N = e.id;
+  const match = N >= 0
+    ? r => Math.floor(r.id) === Math.floor(N) && r.id !== N
+    : r => Math.ceil(r.id)  === Math.ceil(N)  && r.id !== N;
+  return csvData.filter(r => match(r) && r.word !== word).map(r => r.word);
+}
+
+function getSimilarAnts(word) {
+  const e = csvData.find(r => r.word === word);
+  if (!e?.id) return [];
+  const N = -e.id;
+  const match = N >= 0
+    ? r => Math.floor(r.id) === Math.floor(N) && r.id !== N
+    : r => Math.ceil(r.id)  === Math.ceil(N)  && r.id !== N;
+  return csvData.filter(r => match(r) && r.word !== word).map(r => r.word);
+}
 
 function buildRootList() {
   const seen = new Set();
@@ -247,6 +266,14 @@ function updateStats() {
 
 function buildStudyList() {
   let words = [...new Set(csvData.map(r => r.word))];
+
+// ── Category filter ──
+const cat = document.getElementById('categorySelect').value;
+if (cat) words = words.filter(w => {
+  const e = csvData.find(r => r.word === w);
+  return e?.category === parseInt(cat);
+});
+   
   if (S.filter === 'root') {
     const roots = new Set(rootWordList.map(r => r.word));
     words = words.filter(w => roots.has(w));
@@ -401,20 +428,22 @@ function activateFirstTab(syns, ants, hasDef, reviseDef) {
   switchTab('syn');
 }
 
-function setCards(syns, ants, showDef) {
-  document.getElementById('synCard').classList.toggle('hidden',   !syns.length);
-  document.getElementById('antCard').classList.toggle('hidden',   !ants.length);
+function setCards(syns, ants, showDef, simSyms = [], simAnts = []) {
+  const showSyn = syns.length > 0 || (S.showSimilar && simSyms.length > 0);
+  const showAnt = ants.length > 0 || (S.showSimilar && simAnts.length > 0);
+  document.getElementById('synCard').classList.toggle('hidden',   !showSyn);
+  document.getElementById('antCard').classList.toggle('hidden',   !showAnt);
   document.getElementById('defCard').classList.toggle('hidden',   !showDef);
-  document.getElementById('emptyCard').classList.toggle('hidden', syns.length > 0 || ants.length > 0 || showDef);
-  document.getElementById('tabSyn').classList.toggle('hidden',    !syns.length);
-  document.getElementById('tabAnt').classList.toggle('hidden',    !ants.length);
+  document.getElementById('emptyCard').classList.toggle('hidden', showSyn || showAnt || showDef);
+  document.getElementById('tabSyn').classList.toggle('hidden',    !showSyn);
+  document.getElementById('tabAnt').classList.toggle('hidden',    !showAnt);
   document.getElementById('tabDef').classList.toggle('hidden',    !showDef);
   document.getElementById('synCount').textContent = syns.length || '';
   document.getElementById('antCount').textContent = ants.length || '';
 }
 
 // ── Study mode ──
-function showStudy(word, entry) {
+/*function showStudy(word, entry) {
   const syns   = getSyns(word);
   const ants   = getAnts(word);
   const hasDef = !!entry?.definition;
@@ -428,6 +457,37 @@ function showStudy(word, entry) {
     : '';
 
   setCards(syns, ants, hasDef);
+  reorderTabs();
+  activateFirstTab(syns, ants, hasDef, false);
+}*/
+
+function showStudy(word, entry) {
+  const syns    = getSyns(word);
+  const ants    = getAnts(word);
+  const simSyms = S.showSimilar ? getSimilarSyns(word) : [];
+  const simAnts = S.showSimilar ? getSimilarAnts(word) : [];
+  const hasDef  = !!entry?.definition;
+
+  let synHTML = syns.map(w => studyChip(w, 'syn')).join('');
+  if (simSyms.length) {
+    synHTML += '<div class="similar-divider"></div>'
+      + simSyms.map(w => studyChip(w, 'syn')).join('');
+  }
+  document.getElementById('synChips').innerHTML = synHTML;
+
+  let antHTML = ants.map(w => studyChip(w, 'ant')).join('');
+  if (simAnts.length) {
+    antHTML += '<div class="similar-divider"></div>'
+      + simAnts.map(w => studyChip(w, 'ant')).join('');
+  }
+  document.getElementById('antChips').innerHTML = antHTML;
+
+  document.getElementById('defContent').innerHTML = hasDef
+    ? '<div class="def-text">' + esc(entry.definition) + '</div>'
+      + (entry.example ? '<div class="def-example">"' + esc(entry.example) + '"</div>' : '')
+    : '';
+
+  setCards(syns, ants, hasDef, simSyms, simAnts);
   reorderTabs();
   activateFirstTab(syns, ants, hasDef, false);
 }
