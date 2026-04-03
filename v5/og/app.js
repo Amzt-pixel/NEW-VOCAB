@@ -2,7 +2,7 @@
    DICTIONARY — app.js
    ══════════════════════════════════════ */
 
-const PASSWORD     = '1947';
+const PASSWORD     = '1971';
 const CSV_URL      = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/dict_demo.csv';
 const HOLD_MS      = 700;
 
@@ -533,8 +533,13 @@ function showRevise(word, entry) {
   const synCorrect = [...syns, ...simSyms];
   const antCorrect = [...ants, ...simAnts];
 
-  if (synCorrect.length) document.getElementById('synChips').innerHTML = buildReviseChips(reviseOpts(synCorrect, [word, ...synCorrect, ...antCorrect]), 'syn');
-  if (antCorrect.length) document.getElementById('antChips').innerHTML = buildReviseChips(reviseOpts(antCorrect, [word, ...antCorrect, ...synCorrect]), 'ant');
+  if (synCorrect.length) document.getElementById('synChips').innerHTML =
+  '<div class="card-subheader syn-header"><span class="dot"></span> Synonyms</div>'
+  + '<div class="chips-wrap">' + buildReviseChips(reviseOpts(synCorrect, [word, ...synCorrect, ...antCorrect]), 'syn') + '</div>';
+
+  if (antCorrect.length) document.getElementById('antChips').innerHTML =
+  '<div class="card-subheader ant-header"><span class="dot"></span> Antonyms</div>'
+  + '<div class="chips-wrap">' + buildReviseChips(reviseOpts(antCorrect, [word, ...antCorrect, ...synCorrect]), 'ant') + '</div>';
 
   const showDef = hasDef && S.showMeaning;
   const defEl   = document.getElementById('defContent');
