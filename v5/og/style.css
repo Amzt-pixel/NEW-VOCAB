@@ -420,9 +420,8 @@ input  { font-family: 'DM Sans', sans-serif; }
   text-transform: uppercase;
   letter-spacing: 1px;
   color: var(--text-secondary);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   margin-top: 4px;
-  padding-left: 14px;
 }
 .similar-label {
   font-size: 11px;
@@ -436,3 +435,19 @@ input  { font-family: 'DM Sans', sans-serif; }
   align-items: center;
   gap: 6px;
 }
+.card-subheader {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.card-subheader.syn-header { color: var(--syn); }
+.card-subheader.syn-header .dot { background: var(--syn); }
+.card-subheader.ant-header { color: var(--ant); }
+.card-subheader.ant-header .dot { background: var(--ant); }
+.card-subheader.def-header { color: var(--def); }
+.card-subheader.def-header .dot { background: var(--def); }
