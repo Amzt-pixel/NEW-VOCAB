@@ -2,7 +2,7 @@
    DICTIONARY — app.js
    ══════════════════════════════════════ */
 
-const PASSWORD     = 'Milton23';
+const PASSWORD     = '1947';
 const CSV_URL      = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/dict_demo.csv';
 const HOLD_MS      = 700;
 
@@ -457,7 +457,7 @@ function showStudy(word, entry) {
       + '<div class="chips-wrap">' + syns.map(w => studyChip(w, 'syn')).join('') + '</div>';
   }
   if (simSyms.length) {
-    synHTML += '<div class="card-subheader syn-header" style="margin-top:12px"><span class="dot"></span> Similar Words</div>'
+    synHTML += '<div class="card-subheader syn-header"' + (syns.length ? ' style="margin-top:12px"' : '') + '><span class="dot"></span> Similar Words</div>'
       + '<div class="chips-wrap">' + simSyms.map(w => studyChip(w, 'syn')).join('') + '</div>';
   }
   document.getElementById('synChips').innerHTML = synHTML;
@@ -469,7 +469,7 @@ function showStudy(word, entry) {
       + '<div class="chips-wrap">' + ants.map(w => studyChip(w, 'ant')).join('') + '</div>';
   }
   if (simAnts.length) {
-    antHTML += '<div class="card-subheader ant-header" style="margin-top:12px"><span class="dot"></span> Similar Words</div>'
+    antHTML += '<div class="card-subheader ant-header"' + (ants.length ? ' style="margin-top:12px"' : '') + '><span class="dot"></span> Similar Words</div>'
       + '<div class="chips-wrap">' + simAnts.map(w => studyChip(w, 'ant')).join('') + '</div>';
   }
   document.getElementById('antChips').innerHTML = antHTML;
