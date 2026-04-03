@@ -1488,6 +1488,7 @@ function bindAll() {
       syncSettingsUI();
     }
     pendingNav = null;
+     closeModal('quickNavOverlay');
   });
   document.getElementById('quickNavOverlay').addEventListener('click', e => { if (e.target.id === 'quickNavOverlay') { pendingNav = null; closeModal('quickNavOverlay'); } });
   bindQuickNavSettings();
