@@ -383,3 +383,16 @@ input  { font-family: 'DM Sans', sans-serif; }
 }
 
 .nav-variation-fallback-row.hidden { display: none; }
+/* Settings tabs */
+.settings-tab-bar { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; }
+.settings-tab-btn {
+  display: flex; align-items: center; justify-content: center;
+  padding: 10px 28px; border-radius: 30px; border: 1.5px solid var(--border);
+  background: transparent; color: var(--text-secondary); cursor: pointer;
+  transition: all .2s;
+}
+.settings-tab-btn.active {
+  background: var(--navy); color: var(--accent-light);
+  border-color: var(--navy); box-shadow: 0 3px 10px rgba(27,46,75,.2);
+}
+.settings-tab-btn svg { width: 20px; height: 20px; }
