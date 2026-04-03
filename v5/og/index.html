@@ -227,12 +227,29 @@
     </div>
   </div>
 
-  <!-- ══════════════ SETTINGS MODAL ══════════════ -->
-  <div class="modal-overlay hidden" id="settingsOverlay">
-    <div class="modal">
-      <div class="modal-title">Settings</div>
+<!-- ══════════════ SETTINGS MODAL ══════════════ -->
+<div class="modal-overlay hidden" id="settingsOverlay">
+  <div class="modal">
+    <div class="modal-title">Settings</div>
 
-      <!-- Mode selection — mutual exclusive toggles -->
+    <!-- Tab bar -->
+    <div class="settings-tab-bar">
+      <button class="settings-tab-btn active" data-settings-tab="display" title="Display">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+      </button>
+      <button class="settings-tab-btn" data-settings-tab="navigation" title="Navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- ── Display tab ── -->
+    <div id="settingsDisplayTab">
+
+      <!-- Mode selection -->
       <div class="setting-section">
         <div class="setting-section-title">Mode</div>
         <div class="setting-row">
@@ -249,132 +266,7 @@
         </div>
       </div>
 
-      <!-- Always visible: Navigation -->
-      <div class="setting-section">
-        <div class="setting-section-title">Navigation</div>
-        <div class="setting-row">
-          <div class="setting-label">Step Size</div>
-          <div class="size-btns">
-            <button class="size-btn active" data-step="1">1</button>
-            <button class="size-btn" data-step="3">3</button>
-            <button class="size-btn" data-step="5">5</button>
-            <button class="size-btn" data-step="10">10</button>
-            <button class="size-btn" data-step="50">50</button>
-            <button class="size-btn" data-step="200">200</button>
-            <button class="size-btn" data-step="500">500</button>
-          </div>
-        </div>
-        <div class="setting-row">
-          <div class="setting-label">Loop Mode</div>
-          <label class="toggle"><input type="checkbox" id="loopToggle"/><span class="toggle-slider"></span></label>
-        </div>
-        <div class="setting-row">
-          <div class="setting-label">Step Action (Each)</div>
-          <label class="toggle"><input type="checkbox" id="stepActionToggle"/><span class="toggle-slider"></span></label>
-        </div>
-        <div class="setting-row">
-          <div class="setting-label">Navigation Filter</div>
-          <label class="toggle"><input type="checkbox" id="navFilterToggle"/><span class="toggle-slider"></span></label>
-        </div>
-        <div class="setting-row">
-          <div class="setting-label">Allow Multiple</div>
-          <label class="toggle"><input type="checkbox" id="allowMultipleToggle" checked/><span class="toggle-slider"></span></label>
-        </div>
-        <div class="setting-row allow-multiple-row">
-          <div class="setting-label">Join: OR</div>
-          <label class="toggle"><input type="checkbox" id="joinConditionToggle"/><span class="toggle-slider"></span></label>
-        </div>
-
-        <!-- Nav filter options — shown when navFilter ON -->
-        <div class="nav-filter-options hidden" id="navFilterOptions">
-          <div class="setting-row setting-row-indent">
-            <label class="check-label">
-              <input type="checkbox" id="navSynAntChk" checked/>
-              <span>Syn / Ant</span>
-            </label>
-          </div>
-          <div class="setting-row setting-row-indent">
-            <label class="check-label">
-              <input type="checkbox" id="navDefinedChk"/>
-              <span>Defined</span>
-            </label>
-          </div>
-          <div class="setting-row setting-row-indent">
-            <label class="check-label">
-              <input type="checkbox" id="navRootwiseChk"/>
-              <span>Rootwise</span>
-            </label>
-          </div>
-          <!-- Rootwise sub-options — shown when Rootwise checked -->
-          <div class="nav-rootwise-options hidden" id="navRootwiseOptions">
-             <div class="setting-row setting-row-indent">
-  <div class="setting-label">Necessary</div>
-  <label class="toggle"><input type="checkbox" id="necessaryToggle" checked/><span class="toggle-slider"></span></label>
-</div>
-<div class="setting-subsection-title">Next Behavior</div>
-<div class="setting-row setting-row-indent2">
-  <div class="setting-label">Exclusive</div>
-  <label class="toggle"><input type="checkbox" id="nxtBehaviorToggle" checked/><span class="toggle-slider"></span></label>
-</div>
-<div class="setting-row setting-row-indent2">
-  <div class="setting-label">Avoid Opposites</div>
-  <label class="toggle"><input type="checkbox" id="avoidOppositesToggle"/><span class="toggle-slider"></span></label>
-</div>
-<div class="setting-subsection-title">Prev Behavior</div>
-<div class="setting-row setting-row-indent2">
-  <label class="check-label">
-    <input type="checkbox" id="prevExactChk" checked/>
-    <span>Exact</span>
-  </label>
-</div>
-<div class="setting-row setting-row-indent2">
-  <label class="check-label">
-    <input type="checkbox" id="prevVariationChk"/>
-    <span>Variation</span>
-  </label>
-</div>
-<div class="setting-row setting-row-indent2 nav-variation-fallback-row hidden" id="navVariationFallbackRow">
-  <div class="setting-label">Variation Fallback</div>
-  <label class="toggle"><input type="checkbox" id="variationFallbackToggle"/><span class="toggle-slider"></span></label>
-</div>
-          </div>
-        </div>
-
-        <!-- Random Navigation — shown in A→Z / Z→A modes only -->
-        <div class="nav-random-section hidden" id="navRandomSection">
-          <div class="setting-row">
-            <div class="setting-label">Random Navigation</div>
-            <label class="toggle"><input type="checkbox" id="randomNavToggle"/><span class="toggle-slider"></span></label>
-          </div>
-          <!-- Neighborhood + Suggest Marked — shown when randomNav ON -->
-          <div class="nav-random-options hidden" id="navRandomOptions">
-            <div class="setting-row setting-row-indent">
-              <div class="setting-label">Neighborhood (Δ)</div>
-              <div class="size-btns">
-                <button class="size-btn active" data-delta="2">2</button>
-                <button class="size-btn" data-delta="4">4</button>
-                <button class="size-btn" data-delta="6">6</button>
-                <button class="size-btn" data-delta="8">8</button>
-                <button class="size-btn" data-delta="10">10</button>
-              </div>
-            </div>
-            <div class="setting-row setting-row-indent">
-              <div class="setting-label">Suggest Marked</div>
-              <label class="toggle"><input type="checkbox" id="suggestMarkedToggle"/><span class="toggle-slider"></span></label>
-            </div>
-          </div>
-        </div>
-
-        <!-- Suggest Marked for Random order — always shown when orderMode is random -->
-        <div class="nav-random-order-section hidden" id="navRandomOrderSection">
-          <div class="setting-row">
-            <div class="setting-label">Suggest Marked</div>
-            <label class="toggle"><input type="checkbox" id="suggestMarkedRandomToggle"/><span class="toggle-slider"></span></label>
-          </div>
-        </div>
-      </div>
-
-      <!-- Always visible: Tab Order -->
+      <!-- Tab Order -->
       <div class="setting-section">
         <div class="setting-section-title">Tab Order</div>
         <div class="setting-row">
@@ -502,12 +394,142 @@
         </div>
       </div>
 
-      <div class="settings-btn-row">
-        <button class="modal-btn-secondary" id="settingsClose">Close</button>
-        <button class="modal-close-btn flex1" id="settingsSave">Save</button>
+    </div><!-- end settingsDisplayTab -->
+
+    <!-- ── Navigation tab ── -->
+    <div id="settingsNavTab" class="hidden">
+
+      <div class="setting-section">
+        <div class="setting-section-title">Navigation</div>
+        <div class="setting-row">
+          <div class="setting-label">Step Size</div>
+          <div class="size-btns">
+            <button class="size-btn active" data-step="1">1</button>
+            <button class="size-btn" data-step="3">3</button>
+            <button class="size-btn" data-step="5">5</button>
+            <button class="size-btn" data-step="10">10</button>
+            <button class="size-btn" data-step="50">50</button>
+            <button class="size-btn" data-step="200">200</button>
+            <button class="size-btn" data-step="500">500</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Loop Mode</div>
+          <label class="toggle"><input type="checkbox" id="loopToggle"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Step Action (Each)</div>
+          <label class="toggle"><input type="checkbox" id="stepActionToggle"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Navigation Filter</div>
+          <label class="toggle"><input type="checkbox" id="navFilterToggle"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Allow Multiple</div>
+          <label class="toggle"><input type="checkbox" id="allowMultipleToggle" checked/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row allow-multiple-row">
+          <div class="setting-label">Join: OR</div>
+          <label class="toggle"><input type="checkbox" id="joinConditionToggle"/><span class="toggle-slider"></span></label>
+        </div>
+
+        <!-- Nav filter options -->
+        <div class="nav-filter-options hidden" id="navFilterOptions">
+          <div class="setting-row setting-row-indent">
+            <label class="check-label">
+              <input type="checkbox" id="navSynAntChk" checked/>
+              <span>Syn / Ant</span>
+            </label>
+          </div>
+          <div class="setting-row setting-row-indent">
+            <label class="check-label">
+              <input type="checkbox" id="navDefinedChk"/>
+              <span>Defined</span>
+            </label>
+          </div>
+          <div class="setting-row setting-row-indent">
+            <label class="check-label">
+              <input type="checkbox" id="navRootwiseChk"/>
+              <span>Rootwise</span>
+            </label>
+          </div>
+          <!-- Rootwise sub-options -->
+          <div class="nav-rootwise-options hidden" id="navRootwiseOptions">
+            <div class="setting-row setting-row-indent">
+              <div class="setting-label">Necessary</div>
+              <label class="toggle"><input type="checkbox" id="necessaryToggle" checked/><span class="toggle-slider"></span></label>
+            </div>
+            <div class="setting-subsection-title">Next Behavior</div>
+            <div class="setting-row setting-row-indent2">
+              <div class="setting-label">Exclusive</div>
+              <label class="toggle"><input type="checkbox" id="nxtBehaviorToggle" checked/><span class="toggle-slider"></span></label>
+            </div>
+            <div class="setting-row setting-row-indent2">
+              <div class="setting-label">Avoid Opposites</div>
+              <label class="toggle"><input type="checkbox" id="avoidOppositesToggle"/><span class="toggle-slider"></span></label>
+            </div>
+            <div class="setting-subsection-title">Prev Behavior</div>
+            <div class="setting-row setting-row-indent2">
+              <label class="check-label">
+                <input type="checkbox" id="prevExactChk" checked/>
+                <span>Exact</span>
+              </label>
+            </div>
+            <div class="setting-row setting-row-indent2">
+              <label class="check-label">
+                <input type="checkbox" id="prevVariationChk"/>
+                <span>Variation</span>
+              </label>
+            </div>
+            <div class="setting-row setting-row-indent2 nav-variation-fallback-row hidden" id="navVariationFallbackRow">
+              <div class="setting-label">Variation Fallback</div>
+              <label class="toggle"><input type="checkbox" id="variationFallbackToggle"/><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Random Navigation — shown in A→Z / Z→A modes only -->
+        <div class="nav-random-section hidden" id="navRandomSection">
+          <div class="setting-row">
+            <div class="setting-label">Random Navigation</div>
+            <label class="toggle"><input type="checkbox" id="randomNavToggle"/><span class="toggle-slider"></span></label>
+          </div>
+          <div class="nav-random-options hidden" id="navRandomOptions">
+            <div class="setting-row setting-row-indent">
+              <div class="setting-label">Neighborhood (Δ)</div>
+              <div class="size-btns">
+                <button class="size-btn active" data-delta="2">2</button>
+                <button class="size-btn" data-delta="4">4</button>
+                <button class="size-btn" data-delta="6">6</button>
+                <button class="size-btn" data-delta="8">8</button>
+                <button class="size-btn" data-delta="10">10</button>
+              </div>
+            </div>
+            <div class="setting-row setting-row-indent">
+              <div class="setting-label">Suggest Marked</div>
+              <label class="toggle"><input type="checkbox" id="suggestMarkedToggle"/><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Suggest Marked for Random order -->
+        <div class="nav-random-order-section hidden" id="navRandomOrderSection">
+          <div class="setting-row">
+            <div class="setting-label">Suggest Marked</div>
+            <label class="toggle"><input type="checkbox" id="suggestMarkedRandomToggle"/><span class="toggle-slider"></span></label>
+          </div>
+        </div>
       </div>
+
+    </div><!-- end settingsNavTab -->
+
+    <div class="settings-btn-row">
+      <button class="modal-btn-secondary" id="settingsClose">Close</button>
+      <button class="modal-close-btn flex1" id="settingsSave">Save</button>
     </div>
   </div>
+</div>
 
   <!-- ══════════════ WORD DETAIL MODAL — Change 1: View Word btn ══════════════ -->
   <div class="modal-overlay hidden" id="wordDetailOverlay">
