@@ -2,7 +2,7 @@
    DICTIONARY — app.js
    ══════════════════════════════════════ */
 
-const PASSWORD     = 'Abcd0000';
+const PASSWORD     = 'MGM5*';
 const CSV_URL      = 'https://raw.githubusercontent.com/Amzt-pixel/NEW-VOCAB/main/dict_demo.csv';
 const HOLD_MS      = 700;
 
@@ -429,8 +429,8 @@ function activateFirstTab(syns, ants, hasDef, reviseDef) {
 }
 
 function setCards(syns, ants, showDef, simSyms = [], simAnts = []) {
-  const showSyn = syns.length > 0 || (S.showSimilar && simSyms.length > 0);
-  const showAnt = ants.length > 0 || (S.showSimilar && simAnts.length > 0);
+  const showSyn = syns.length > 0 || simSyms.length > 0;
+  const showAnt = ants.length > 0 || simAnts.length > 0;
   document.getElementById('synCard').classList.toggle('hidden',   !showSyn);
   document.getElementById('antCard').classList.toggle('hidden',   !showAnt);
   document.getElementById('defCard').classList.toggle('hidden',   !showDef);
@@ -450,21 +450,31 @@ function showStudy(word, entry) {
   const hasDef   = !!entry?.definition;
   const hasTrans = S.showTranslation && !!entry?.bengaliDef;
 
-  // Syn chips
-  let synHTML = syns.map(w => studyChip(w, 'syn')).join('');
+  // Syn card
+  let synHTML = '';
+  if (syns.length) {
+    synHTML += '<div class="card-subheader syn-header"><span class="dot"></span> Synonyms</div>'
+      + '<div class="chips-wrap">' + syns.map(w => studyChip(w, 'syn')).join('') + '</div>';
+  } else {
+    synHTML += '<div class="empty-state">No synonyms exist.</div>';
+  }
   if (simSyms.length) {
-    synHTML += '<div class="divider-primary"></div>'
-      + '<div class="similar-label">Similar Words</div>'
-      + simSyms.map(w => studyChip(w, 'syn')).join('');
+    synHTML += '<div class="card-subheader syn-header" style="margin-top:12px"><span class="dot"></span> Similar Words</div>'
+      + '<div class="chips-wrap">' + simSyms.map(w => studyChip(w, 'syn')).join('') + '</div>';
   }
   document.getElementById('synChips').innerHTML = synHTML;
 
-  // Ant chips
-  let antHTML = ants.map(w => studyChip(w, 'ant')).join('');
+  // Ant card
+  let antHTML = '';
+  if (ants.length) {
+    antHTML += '<div class="card-subheader ant-header"><span class="dot"></span> Antonyms</div>'
+      + '<div class="chips-wrap">' + ants.map(w => studyChip(w, 'ant')).join('') + '</div>';
+  } else {
+    antHTML += '<div class="empty-state">No antonyms exist.</div>';
+  }
   if (simAnts.length) {
-    antHTML += '<div class="divider-primary"></div>'
-      + '<div class="similar-label">Similar Words</div>'
-      + simAnts.map(w => studyChip(w, 'ant')).join('');
+    antHTML += '<div class="card-subheader ant-header" style="margin-top:12px"><span class="dot"></span> Similar Words</div>'
+      + '<div class="chips-wrap">' + simAnts.map(w => studyChip(w, 'ant')).join('') + '</div>';
   }
   document.getElementById('antChips').innerHTML = antHTML;
 
@@ -476,26 +486,22 @@ function showStudy(word, entry) {
     defHTML += '<div class="content-label">Definition</div>'
       + '<div class="detail-def">' + esc(entry.definition) + '</div>';
     hasContent = true;
-
     const examples = [entry.example, entry.example2, entry.example3, entry.example4, entry.example5].filter(Boolean);
     if (examples.length) {
-      defHTML += '<div class="divider-primary"></div>'
-        + '<div class="content-label">Examples</div>'
-        + examples.map(ex => '<div class="def-example">"' + esc(ex) + '"</div>').join('');
+      defHTML += '<div class="content-label" style="margin-top:10px">Examples</div>'
+        + examples.map(ex => '<div class="detail-example">"' + esc(ex) + '"</div>').join('');
     }
   }
 
   if (hasTrans) {
-    if (hasContent) defHTML += '<div class="divider-primary"></div>';
-    defHTML += '<div class="content-label">Translation</div>'
-      + '<div class="detail-def">' + esc(entry.bengaliDef) + '</div>';
+    if (hasContent) defHTML += '<div class="card-subheader def-header" style="margin-top:16px"><span class="dot"></span> Translation</div>';
+    else defHTML += '<div class="card-subheader def-header"><span class="dot"></span> Translation</div>';
+    defHTML += '<div class="detail-def">' + esc(entry.bengaliDef) + '</div>';
     hasContent = true;
-
     const bExamples = [entry.bengaliEx1, entry.bengaliEx2, entry.bengaliEx3].filter(Boolean);
     if (bExamples.length) {
-      defHTML += '<div class="divider-primary"></div>'
-        + '<div class="content-label">Bengali Examples</div>'
-        + bExamples.map(ex => '<div class="def-example">"' + esc(ex) + '"</div>').join('');
+      defHTML += '<div class="content-label" style="margin-top:10px">Bengali Examples</div>'
+        + bExamples.map(ex => '<div class="detail-example">"' + esc(ex) + '"</div>').join('');
     }
   }
 
