@@ -421,6 +421,7 @@ input  { font-family: 'DM Sans', sans-serif; }
   letter-spacing: 1px;
   color: var(--text-secondary);
   margin-bottom: 6px;
+  padding-left: 14px;
   margin-top: 4px;
 }
 .similar-label {
