@@ -1481,7 +1481,6 @@ function bindAll() {
   // Quick Nav popup
   document.getElementById('quickNavClose').addEventListener('click', () => { pendingNav = null; closeModal('quickNavOverlay'); });
   document.getElementById('quickNavSave').addEventListener('click', () => {
-    document.getElementById('quickNavSave').addEventListener('click', () => {
     if (pendingNav) {
       Object.assign(S, pendingNav);
       saveSettings();
