@@ -332,7 +332,7 @@ function renderHomeList(n) {
     const pos    = idx >= 0 ? idx + 1 : i + 1;
     return '<div class="word-list-item" onclick="handleWordListClick(\'' + esc(w) + '\',' + pos + ')">'
       + '<span class="word-list-num">' + pos + '</span>'
-      + '<span class="wl-word">' + esc(w) + ' <span class="wl-id">#' + (e?.id || '—') + '</span></span>'
+      + '<span class="wl-word">' + esc(w) + '</span><span class="wl-id">(#' + (e?.id || '—') + ')</span>'
       + '<span class="wl-level ' + lvlCls[lvl] + '">' + lvlMap[lvl] + '</span>'
       + (dot ? '<span class="dot-indicator ' + dot + '"></span>' : '')
       + '</div>';
