@@ -190,7 +190,15 @@ function renderQueueCards() {
       : 'No past session';
   }
 
-  renderPinnedGrid();
+  // Latest Custom Queue
+  const queue = JSON.parse(localStorage.getItem('dictCurrentQueue') || 'null');
+  const queueMeta = document.getElementById('latestQueueMeta');
+  if (queueMeta) {
+    queueMeta.textContent = (queue?.length)
+      ? queue.length + ' words | ' + formatSessionDate(queue[0]?.addedAt)
+      : 'No queue active';
+  }
+   renderPinnedGrid();
 }
 
 function renderPinnedGrid() {
@@ -234,7 +242,7 @@ function formatSessionDate(isoStr) {
     return t + ' ' + d.toLocaleDateString([], { day: 'numeric', month: 'short' });
   } catch(e) { return '—'; }
 }
-
+/*
 function openQueue(id) {
   if (homeSelMode !== 'custom') {
     const selBtns = document.querySelectorAll('.sel-toggle .sel-btn');
@@ -244,6 +252,14 @@ function openQueue(id) {
     document.getElementById('normalPanel').style.display = 'none';
     document.getElementById('customPanel').style.display = 'block';
   }
+  const inp = document.getElementById('queueIdInput');
+  if (inp) inp.value = id;
+  document.querySelector('.start-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+*/
+
+function openQueue(id) {
+  switchStartTab('custom', document.querySelectorAll('.start-tab')[1]);
   const inp = document.getElementById('queueIdInput');
   if (inp) inp.value = id;
   document.querySelector('.start-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -344,7 +360,8 @@ function handleWordListClick(word, pos) {
 }
 
 function feedStartAt(pos) {
-  const inp = document.getElementById('startAtNormal');
+  const idMap = { normal: 'startAtNormal', custom: 'startAtCustom', import: 'startAtImport' };
+  const inp = document.getElementById(idMap[homeSelMode] || 'startAtNormal');
   if (inp) { inp.value = pos; inp.focus(); inp.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
 }
 
@@ -458,4 +475,44 @@ function bindStartEvents() {
     b.classList.add('active');
     demoStudyList = buildDemoStudyList(); homeShown = CHUNK; renderHomeList();
   });
+
+   // System/Saved seg-btns — Custom
+  document.getElementById('customModeBtns').addEventListener('click', e => {
+    const b = e.target.closest('.seg-btn'); if (!b) return;
+    document.querySelectorAll('#customModeBtns .seg-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+  });
+
+  // System/Saved seg-btns — Import
+  document.getElementById('importModeBtns').addEventListener('click', e => {
+    const b = e.target.closest('.seg-btn'); if (!b) return;
+    document.querySelectorAll('#importModeBtns .seg-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+  });
 }
+
+function switchStartTab(tab, btn) {
+  document.querySelectorAll('.start-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ['normal','custom','import'].forEach(t => {
+    document.getElementById('panel-' + t).style.display = t === tab ? 'block' : 'none';
+  });
+  homeSelMode = tab;
+}
+
+function resetStartAt(inputId) {
+  const inp = document.getElementById(inputId);
+  if (inp) inp.value = '1';
+}
+
+function openSetup() {
+  document.getElementById('setupOverlay').classList.remove('hidden');
+}
+
+function handleImportFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const label = document.getElementById('importFileName');
+  if (label) label.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+}
+
