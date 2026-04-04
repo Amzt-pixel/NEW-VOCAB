@@ -66,66 +66,117 @@
   <!-- ── Start a Session ── -->
   <div class="home-section">
     <div class="home-sec-row"><span class="section-label">Start a Session</span></div>
+
     <div class="start-card">
-      <div class="start-card-top">Configure &amp; Study</div>
 
-      <!-- Normal / Custom toggle -->
-      <div class="sel-toggle">
-        <button class="sel-btn active" id="selNormalBtn" onclick="setSelMode('normal',this)">Normal</button>
-        <button class="sel-btn" id="selCustomBtn" onclick="setSelMode('custom',this)">Custom</button>
+  <!-- Tab bar -->
+  <div class="start-tabs">
+    <button class="start-tab active" onclick="switchStartTab('normal',this)">Normal</button>
+    <button class="start-tab" onclick="switchStartTab('custom',this)">Custom</button>
+    <button class="start-tab" onclick="switchStartTab('import',this)">Import</button>
+  </div>
+
+  <!-- NORMAL panel -->
+  <div class="start-tab-panel" id="panel-normal">
+    <div class="seg-group">
+      <div class="seg-group-label">Category</div>
+      <div class="seg-buttons" id="catBtns">
+        <button class="seg-btn active" data-cat="">All</button>
+        <button class="seg-btn" data-cat="1">Dictionary</button>
+        <button class="seg-btn" data-cat="2">Idioms &amp; Phrases</button>
+        <button class="seg-btn" data-cat="3">Phrasal Verbs</button>
       </div>
-
-      <!-- Normal panel -->
-      <div id="normalPanel">
-        <div class="seg-group">
-          <div class="seg-group-label">Category</div>
-          <div class="seg-buttons" id="catBtns">
-            <button class="seg-btn active" data-cat="">All</button>
-            <button class="seg-btn" data-cat="1">Dictionary</button>
-            <button class="seg-btn" data-cat="2">Idioms &amp; Phrases</button>
-            <button class="seg-btn" data-cat="3">Phrasal Verbs</button>
-          </div>
-        </div>
-        <div class="seg-group">
-          <div class="seg-group-label">Order</div>
-          <div class="seg-buttons" id="orderBtns">
-            <button class="seg-btn active" data-order="az">A → Z</button>
-            <button class="seg-btn" data-order="za">Z → A</button>
-            <button class="seg-btn" data-order="random">Random</button>
-          </div>
-        </div>
-        <div class="startat-row">
-          <span class="startat-label">Start at</span>
-          <input class="startat-input" type="number" min="1" value="1" id="startAtNormal"/>
-          <span class="startat-hint" id="startAtHint">of —</span>
-        </div>
+    </div>
+    <div class="seg-group">
+      <div class="seg-group-label">Order</div>
+      <div class="seg-buttons" id="orderBtns">
+        <button class="seg-btn active" data-order="az">A → Z</button>
+        <button class="seg-btn" data-order="za">Z → A</button>
+        <button class="seg-btn" data-order="random">Random</button>
       </div>
-
-      <!-- Custom panel -->
-      <div id="customPanel" style="display:none;">
-        <div class="seg-group">
-          <div class="seg-group-label">Queue ID</div>
-          <input class="custom-queue-input" type="text" id="queueIdInput" placeholder="e.g. local:756374"/>
-        </div>
-        <div class="seg-group">
-          <div class="seg-group-label">Mode</div>
-          <div class="seg-buttons" id="customModeBtns">
-            <button class="seg-btn active" data-cmode="default">Default</button>
-            <button class="seg-btn" data-cmode="saved">Saved</button>
-          </div>
-        </div>
-        <div class="startat-row">
-          <span class="startat-label">Start at</span>
-          <input class="startat-input" type="number" min="1" value="1" id="startAtCustom"/>
-          <span class="startat-hint">of —</span>
-        </div>
+    </div>
+    <div class="seg-group">
+      <div class="seg-group-label">Start at</div>
+      <div class="startat-field">
+        <input class="startat-value" type="text" id="startAtNormal" value="1"/>
+        <span class="startat-total" id="startAtTotal">/—</span>
+        <button class="startat-reset" onclick="resetStartAt('startAtNormal')">Reset</button>
       </div>
-
+    </div>
+    <div class="start-action-row">
+      <button class="setup-btn" onclick="openSetup()">⚙️</button>
       <button class="start-btn" id="startBtn">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
         Study
       </button>
     </div>
+  </div>
+
+  <!-- CUSTOM panel -->
+  <div class="start-tab-panel" id="panel-custom" style="display:none;">
+    <div class="seg-group">
+      <div class="seg-group-label">Queue ID</div>
+      <input class="custom-queue-input" type="text" id="queueIdInput" placeholder="e.g. local:756374"/>
+    </div>
+    <div class="seg-group">
+      <div class="seg-group-label">Mode</div>
+      <div class="seg-buttons" id="customModeBtns">
+        <button class="seg-btn active" data-cmode="system">System</button>
+        <button class="seg-btn" data-cmode="saved">Saved</button>
+      </div>
+    </div>
+    <div class="seg-group">
+      <div class="seg-group-label">Start at</div>
+      <div class="startat-field">
+        <input class="startat-value" type="text" id="startAtCustom" value="1"/>
+        <span class="startat-total">/—</span>
+        <button class="startat-reset" onclick="resetStartAt('startAtCustom')">Reset</button>
+      </div>
+    </div>
+    <div class="start-action-row">
+      <button class="setup-btn" onclick="openSetup()">⚙️</button>
+      <button class="start-btn">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        Study
+      </button>
+    </div>
+  </div>
+
+  <!-- IMPORT panel -->
+  <div class="start-tab-panel" id="panel-import" style="display:none;">
+    <div class="seg-group">
+      <div class="seg-group-label">Upload JSON</div>
+      <label class="import-file-label">
+        <span class="import-file-text" id="importFileName">No file selected</span>
+        <input type="file" accept=".json" id="importFileInput" onchange="handleImportFile(this)"/>
+        <span class="import-file-btn">Browse</span>
+      </label>
+    </div>
+    <div class="seg-group">
+      <div class="seg-group-label">Mode</div>
+      <div class="seg-buttons" id="importModeBtns">
+        <button class="seg-btn active" data-imode="system">System</button>
+        <button class="seg-btn" data-imode="saved">Saved</button>
+      </div>
+    </div>
+    <div class="seg-group">
+      <div class="seg-group-label">Start at</div>
+      <div class="startat-field">
+        <input class="startat-value" type="text" id="startAtImport" value="1"/>
+        <span class="startat-total">/—</span>
+        <button class="startat-reset" onclick="resetStartAt('startAtImport')">Reset</button>
+      </div>
+    </div>
+    <div class="start-action-row">
+      <button class="setup-btn" onclick="openSetup()">⚙️</button>
+      <button class="start-btn">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        Study
+      </button>
+    </div>
+  </div>
+
+</div>
   </div>
 
   <div class="home-divider"></div>
@@ -146,9 +197,9 @@
         <span class="qc-badge badge-live">Live</span>
       </div>
       <div class="qc-actions" onclick="event.stopPropagation()">
-        <button class="qc-btn qc-primary" id="latestContinueBtn">Continue</button>
         <button class="qc-btn qc-accent" id="latestPinBtn">Pin</button>
         <button class="qc-btn" id="latestSaveBtn">Save</button>
+        <button class="qc-btn qc-danger" id="latestClearBtn">Clear</button>
       </div>
     </div>
 
@@ -162,9 +213,24 @@
         <span class="qc-badge badge-past">Past</span>
       </div>
       <div class="qc-actions" onclick="event.stopPropagation()">
-        <button class="qc-btn qc-primary" id="pastResumeBtn">Resume</button>
         <button class="qc-btn qc-accent" id="pastPinBtn">Pin</button>
         <button class="qc-btn" id="pastSaveBtn">Save</button>
+        <button class="qc-btn qc-danger" id="pastClearBtn">Clear</button>
+      </div>
+    </div>
+    <!-- Latest Custom Queue -->
+    <div class="queue-card" id="latestQueueCard" onclick="openQueue('queue')">
+      <div class="qc-top">
+        <div>
+          <div class="qc-name">Latest Custom Queue</div>
+          <div class="qc-meta" id="latestQueueMeta">No queue active</div>
+        </div>
+        <span class="qc-badge badge-queue">Queue</span>
+      </div>
+      <div class="qc-actions" onclick="event.stopPropagation()">
+        <button class="qc-btn qc-primary" id="queueModifyBtn">Modify</button>
+        <button class="qc-btn" id="queueSaveBtn">Save</button>
+        <button class="qc-btn qc-danger" id="queueDeleteBtn">Delete</button>
       </div>
     </div>
 
@@ -705,6 +771,52 @@
       <div class="settings-btn-row">
         <button class="modal-btn-secondary" id="customiseClose">Close</button>
         <button class="modal-close-btn flex1" id="customiseSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ START SETUP PANEL ══════════════ -->
+  <div class="modal-overlay hidden" id="setupOverlay">
+    <div class="modal">
+      <div class="modal-title">Session Setup</div>
+
+      <div class="setting-section">
+        <div class="setting-section-title">Mode</div>
+        <div class="seg-buttons">
+          <button class="seg-btn active" data-setup-mode="read">Read</button>
+          <button class="seg-btn" data-setup-mode="revise">Revise</button>
+          <button class="seg-btn" data-setup-mode="mcq">MCQ</button>
+        </div>
+      </div>
+
+      <div class="setting-section">
+        <div class="setting-section-title">Focus</div>
+        <div class="seg-buttons">
+          <button class="seg-btn active" data-setup-focus="syn">Synonyms</button>
+          <button class="seg-btn active" data-setup-focus="ant">Antonyms</button>
+          <button class="seg-btn active" data-setup-focus="def">Meaning</button>
+        </div>
+      </div>
+
+      <div class="setting-section">
+        <div class="setting-section-title">Options</div>
+        <div class="setting-row">
+          <div class="setting-label">Temporary Session</div>
+          <label class="toggle"><input type="checkbox" id="setupTempToggle"/><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+
+      <div class="setting-section">
+        <div class="setting-section-title">List Type</div>
+        <div class="seg-buttons">
+          <button class="seg-btn active" data-setup-listtype="group">Group</button>
+          <button class="seg-btn" data-setup-listtype="queue">Queue</button>
+        </div>
+      </div>
+
+      <div class="settings-btn-row">
+        <button class="modal-btn-secondary" onclick="closeModal('setupOverlay')">Cancel</button>
+        <button class="modal-close-btn flex1" onclick="closeModal('setupOverlay')">Apply</button>
       </div>
     </div>
   </div>
