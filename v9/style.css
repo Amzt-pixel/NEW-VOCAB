@@ -153,7 +153,7 @@ input  { font-family: 'DM Sans', sans-serif; }
 }
 .start-tab:last-child { border-right: none; }
 .start-tab.active {
-  background: var(--surface); color: var(--accent);
+  background: var(--surface); color: var(--text);
   border-bottom: 2px solid var(--accent); margin-bottom: -1px;
 }
 
@@ -196,6 +196,7 @@ input  { font-family: 'DM Sans', sans-serif; }
 .startat-total {
   color: var(--accent); font-size: 14px; font-weight: 700;
   white-space: nowrap; flex-shrink: 0; padding-right: 8px;
+  flex: 1;
 }
 .startat-reset {
   padding: 0 14px; height: calc(100% - 6px);
@@ -653,3 +654,9 @@ input  { font-family: 'DM Sans', sans-serif; }
   flex-shrink: 0; transition: background .15s;
 }
 .import-file-label:hover .import-file-btn { background: var(--navy-light); }
+
+.wl-level { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 999px; flex-shrink: 0; }
+.wl-level-0 { background: var(--surface2); color: var(--text-secondary); }
+.wl-level-1 { background: var(--syn-bg); color: var(--syn); }
+.wl-level-2 { background: var(--def-bg); color: var(--def); }
+.wl-level-3 { background: var(--ant-bg); color: var(--ant); }
