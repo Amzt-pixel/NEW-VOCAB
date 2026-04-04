@@ -326,11 +326,14 @@ function renderHomeList(n) {
     const dot = s && a ? 'dot-both' : s ? 'dot-syn' : a ? 'dot-ant' : '';
     const e   = csvData.find(r => r.word === w);
     const idx = source.indexOf(w);
-    return '<div class="word-list-item" onclick="handleWordListClick(\'' + esc(w) + '\',' + (i+1) + ')">'
-      + '<span class="word-list-num">' + (i+1) + '</span>'
-      + '<span class="wl-word">' + esc(w) + '</span>'
-      + '<span class="wl-id">#' + (e?.id || '—') + '</span>'
-      + (idx >= 0 ? '<span class="word-list-idx">@' + (idx+1) + '</span>' : '')
+    const lvlMap = { 0:'Common', 1:'Unique', 2:'Specific', 3:'Colloquial' };
+    const lvlCls = { 0:'wl-level-0', 1:'wl-level-1', 2:'wl-level-2', 3:'wl-level-3' };
+    const lvl    = e?.level ?? 0;
+    const pos    = idx >= 0 ? idx + 1 : i + 1;
+    return '<div class="word-list-item" onclick="handleWordListClick(\'' + esc(w) + '\',' + pos + ')">'
+      + '<span class="word-list-num">' + pos + '</span>'
+      + '<span class="wl-word">' + esc(w) + ' <span class="wl-id">#' + (e?.id || '—') + '</span></span>'
+      + '<span class="wl-level ' + lvlCls[lvl] + '">' + lvlMap[lvl] + '</span>'
       + (dot ? '<span class="dot-indicator ' + dot + '"></span>' : '')
       + '</div>';
   }).join('');
@@ -489,6 +492,21 @@ function bindStartEvents() {
     document.querySelectorAll('#importModeBtns .seg-btn').forEach(x => x.classList.remove('active'));
     b.classList.add('active');
   });
+
+   // Setup panel seg-btns
+  ['data-setup-mode', 'data-setup-focus', 'data-setup-listtype'].forEach(attr => {
+    document.querySelectorAll('[' + attr + ']').forEach(b => {
+      b.addEventListener('click', () => {
+        document.querySelectorAll('[' + attr + ']').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+      });
+    });
+  });
+
+  // Setup overlay close on backdrop click
+  document.getElementById('setupOverlay').addEventListener('click', e => {
+    if (e.target.id === 'setupOverlay') closeModal('setupOverlay');
+  });
 }
 
 function switchStartTab(tab, btn) {
@@ -514,5 +532,36 @@ function handleImportFile(input) {
   if (!file) return;
   const label = document.getElementById('importFileName');
   if (label) label.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+}
+
+// ── Setup panel state ──
+let setupState = {
+  mode: 'read',
+  focus: 'syn',
+  temporary: false,
+  listType: 'group',
+};
+
+function saveSetup() {
+  // Save to local state — wiring to S deferred
+  setupState.mode      = document.querySelector('[data-setup-mode].active')?.dataset.setupMode || 'read';
+  setupState.focus     = document.querySelector('[data-setup-focus].active')?.dataset.setupFocus || 'syn';
+  setupState.temporary = document.getElementById('setupTempToggle').checked;
+  setupState.listType  = document.querySelector('[data-setup-listtype].active')?.dataset.setupListtype || 'group';
+}
+
+function resetSetup() {
+  setupState = { mode: 'read', focus: 'syn', temporary: false, listType: 'group' };
+  syncSetupUI();
+}
+
+function syncSetupUI() {
+  document.querySelectorAll('[data-setup-mode]').forEach(b =>
+    b.classList.toggle('active', b.dataset.setupMode === setupState.mode));
+  document.querySelectorAll('[data-setup-focus]').forEach(b =>
+    b.classList.toggle('active', b.dataset.setupFocus === setupState.focus));
+  document.getElementById('setupTempToggle').checked = setupState.temporary;
+  document.querySelectorAll('[data-setup-listtype]').forEach(b =>
+    b.classList.toggle('active', b.dataset.setupListtype === setupState.listType));
 }
 
