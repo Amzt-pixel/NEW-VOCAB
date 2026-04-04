@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dictionary</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body class="accent-gold">
+
+  <!-- ══════════════ PASSWORD GATE ══════════════ -->
+  <div class="screen active" id="gateScreen">
+    <div class="gate-wrap">
+      <div class="gate-title">Dictionary Web</div>
+      <div class="gate-subtitle">Personal Vocabulary Library</div>
+      <div class="gate-form">
+        <div class="gate-input-wrap">
+          <input type="password" id="gateInput" class="gate-input" placeholder="Enter password" autocomplete="off"/>
+          <button type="button" class="gate-eye" id="gateEye" title="Show/hide password">👁</button>
+        </div>
+        <label class="gate-remember">
+          <input type="checkbox" id="rememberMe" checked/>
+          <span>Remember me</span>
+        </label>
+        <button class="gate-btn" id="gateBtn">Unlock</button>
+        <div class="gate-error hidden" id="gateError">Incorrect password</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ HOME SCREEN ══════════════ -->
+  <div class="home-screen">
+
+  <!-- Hero -->
+  <div class="home-hero">
+    <div class="home-title">Dictionary</div>
+    <div class="home-subtitle">Your personal vocabulary library</div>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-num" id="statRootWords">—</div><div class="stat-label">Root Words</div></div>
+    <div class="stat-card"><div class="stat-num" id="statTotalWords">—</div><div class="stat-label">Total Words</div></div>
+    <div class="stat-card"><div class="stat-num" id="statCategories">—</div><div class="stat-label">Categories</div></div>
+  </div>
+
+  <!-- ── Start a Session ── -->
+  <div class="home-section">
+    <div class="home-sec-row"><span class="section-label">Start a Session</span></div>
+    <div class="start-card">
+      <div class="start-card-top">Configure &amp; Study</div>
+
+      <!-- Normal / Custom toggle -->
+      <div class="sel-toggle">
+        <button class="sel-btn active" id="selNormalBtn" onclick="setSelMode('normal',this)">Normal</button>
+        <button class="sel-btn" id="selCustomBtn" onclick="setSelMode('custom',this)">Custom</button>
+      </div>
+
+      <!-- Normal panel -->
+      <div id="normalPanel">
+        <div class="seg-group">
+          <div class="seg-group-label">Category</div>
+          <div class="seg-buttons" id="catBtns">
+            <button class="seg-btn active" data-cat="">All</button>
+            <button class="seg-btn" data-cat="1">Dictionary</button>
+            <button class="seg-btn" data-cat="2">Idioms &amp; Phrases</button>
+            <button class="seg-btn" data-cat="3">Phrasal Verbs</button>
+          </div>
+        </div>
+        <div class="seg-group">
+          <div class="seg-group-label">Order</div>
+          <div class="seg-buttons" id="orderBtns">
+            <button class="seg-btn active" data-order="az">A → Z</button>
+            <button class="seg-btn" data-order="za">Z → A</button>
+            <button class="seg-btn" data-order="random">Random</button>
+          </div>
+        </div>
+        <div class="startat-row">
+          <span class="startat-label">Start at</span>
+          <input class="startat-input" type="number" min="1" value="1" id="startAtNormal"/>
+          <span class="startat-hint" id="startAtHint">of —</span>
+        </div>
+      </div>
+
+      <!-- Custom panel -->
+      <div id="customPanel" style="display:none;">
+        <div class="seg-group">
+          <div class="seg-group-label">Queue ID</div>
+          <input class="custom-queue-input" type="text" id="queueIdInput" placeholder="e.g. local:756374"/>
+        </div>
+        <div class="seg-group">
+          <div class="seg-group-label">Mode</div>
+          <div class="seg-buttons" id="customModeBtns">
+            <button class="seg-btn active" data-cmode="default">Default</button>
+            <button class="seg-btn" data-cmode="saved">Saved</button>
+          </div>
+        </div>
+        <div class="startat-row">
+          <span class="startat-label">Start at</span>
+          <input class="startat-input" type="number" min="1" value="1" id="startAtCustom"/>
+          <span class="startat-hint">of —</span>
+        </div>
+      </div>
+
+      <button class="start-btn" id="startBtn">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        Study
+      </button>
+    </div>
+  </div>
+
+  <div class="home-divider"></div>
+
+  <!-- ── Active Queues ── -->
+  <div class="home-section">
+    <div class="home-sec-row"><span class="section-label">Active Queues</span></div>
+
+    <div class="home-sub-label">Live</div>
+
+    <!-- Latest Session -->
+    <div class="queue-card" id="latestSessionCard" onclick="openQueue('latest')">
+      <div class="qc-top">
+        <div>
+          <div class="qc-name">Latest Session</div>
+          <div class="qc-meta" id="latestSessionMeta">No active session</div>
+        </div>
+        <span class="qc-badge badge-live">Live</span>
+      </div>
+      <div class="qc-actions" onclick="event.stopPropagation()">
+        <button class="qc-btn qc-primary" id="latestContinueBtn">Continue</button>
+        <button class="qc-btn qc-accent" id="latestPinBtn">Pin</button>
+        <button class="qc-btn" id="latestSaveBtn">Save</button>
+      </div>
+    </div>
+
+    <!-- Past Session -->
+    <div class="queue-card" id="pastSessionCard" onclick="openQueue('past')">
+      <div class="qc-top">
+        <div>
+          <div class="qc-name">Past Session</div>
+          <div class="qc-meta" id="pastSessionMeta">No past session</div>
+        </div>
+        <span class="qc-badge badge-past">Past</span>
+      </div>
+      <div class="qc-actions" onclick="event.stopPropagation()">
+        <button class="qc-btn qc-primary" id="pastResumeBtn">Resume</button>
+        <button class="qc-btn qc-accent" id="pastPinBtn">Pin</button>
+        <button class="qc-btn" id="pastSaveBtn">Save</button>
+      </div>
+    </div>
+
+    <div class="home-sub-label" style="margin-top:16px;">Pinned</div>
+
+    <!-- Pinned 2x2 grid -->
+    <div class="pin-grid" id="pinnedGrid">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+
+  <div class="home-divider"></div>
+
+  <!-- ── Word List ── -->
+  <div class="home-section">
+    <div class="home-sec-row">
+      <span class="section-label" id="homeListLabel">Root Words | Dynamic</span>
+      <div style="display:flex;gap:5px;">
+        <button class="wl-icon-btn" id="homeListBtn1" title="Toggle Root/All">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        </button>
+        <button class="wl-icon-btn" id="homeListBtn2" title="Toggle Dynamic/Static">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="word-list-card">
+      <div class="word-list-header">
+        <span class="count" id="rootWordCount">—</span>
+      </div>
+      <div id="rootWordItems"><div class="list-loading">Loading words…</div></div>
+    </div>
+  </div>
+
+</div>
+  <!-- end home-screen -->
+
+
+  <!-- ══════════════ STUDY SCREEN ══════════════ -->
+  <div class="screen" id="studyScreen">
+    <nav class="navbar">
+      <!-- Change 7: Home btn goes to home WITHOUT resetting -->
+      <button class="nav-btn" id="studyHomeBtn" title="Home">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </button>
+      <div class="app-title">Dictionary</div>
+      <div class="nav-right">
+        <button class="nav-btn" id="infoBtn" title="Info">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </button>
+        <button class="nav-btn" id="settingsBtn" title="Settings">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+        <button class="nav-btn" id="wordListBtn" title="Word List">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        </button>
+      </div>
+    </nav>
+
+    <div class="session-bar">
+      <div class="session-meta">
+        <div class="meta-chip">Step: <span id="sessionStep">1</span><span id="sessionLoopIcon"></span></div>
+        <div class="meta-chip" id="sessionFilterChip"></div>
+      </div>
+      <div class="session-right">
+        <div class="meta-chip" id="sessionNumId">—</div>
+        <div class="progress-pill" id="progressPill">— / —</div>
+      </div>
+    </div>
+
+    <div class="main" id="studyMain">
+
+      <!-- Word hero: level badge top-right, role below word -->
+      <div class="word-hero">
+        <div class="word-main">
+          <div class="word-label">Current Word</div>
+          <div class="word-text" id="currentWord">—</div>
+          <div class="word-role" id="currentRole"></div>
+        </div>
+        <div class="word-level-wrap">
+          <div class="word-level-badge" id="levelBadge">Common</div>
+        </div>
+      </div>
+
+      <div class="focus-tabs" id="focusTabs">
+        <button class="focus-tab syn active" id="tabSyn" onclick="switchTab('syn')">Synonyms <span class="tab-count" id="synCount"></span></button>
+        <button class="focus-tab ant" id="tabAnt" onclick="switchTab('ant')">Antonyms <span class="tab-count" id="antCount"></span></button>
+        <button class="focus-tab def" id="tabDef" onclick="switchTab('def')">Meaning</button>
+      </div>
+
+      <div class="content-card hidden" id="synCard">
+        <div id="synChips"></div>
+      </div>
+
+      <div class="content-card hidden" id="antCard">
+        <div id="antChips"></div>
+      </div>
+
+      <div class="content-card hidden" id="defCard">
+        <div class="card-header def-header"><span class="dot"></span> Meaning</div>
+        <div id="defContent"></div>
+      </div>
+
+      <div class="content-card hidden" id="emptyCard">
+        <div class="empty-state">No synonyms, antonyms, or definition available for this word.</div>
+      </div>
+    </div>
+
+    <div class="nav-footer">
+      <button class="nav-foot-btn prev-btn" id="prevBtn">← Previous</button>
+      <button class="nav-foot-btn next-btn" id="nextBtn">Next →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════ SEARCH SCREEN ══════════════ -->
+  <div class="screen" id="searchScreen">
+    <nav class="navbar">
+      <button class="nav-btn" id="searchBackBtn" title="Back">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      </button>
+      <div class="app-title">Search</div>
+    </nav>
+    <div class="search-wrap">
+      <div class="search-bar">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search words… (min 3 chars)"/>
+        <button class="search-clear hidden" id="searchClear">✕</button>
+      </div>
+      <div class="search-results" id="searchResults">
+        <div class="search-hint">Type at least 3 characters to search</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ WORD LIST PANEL — Changes 2, 5, 6 ══════════════ -->
+  <div class="panel-overlay hidden" id="wordListOverlay">
+    <div class="panel" id="wordListPanel">
+      <div class="panel-header">
+        <span class="panel-title">Word List</span>
+        <button class="panel-close" id="wordListClose">✕</button>
+      </div>
+      <!-- Change 5: search inside panel -->
+      <div class="panel-search-wrap">
+        <input type="text" id="panelSearchInput" class="panel-search-input" placeholder="Filter…"/>
+      </div>
+      <!-- Change 6: Words / Queue / History tabs -->
+      <div class="panel-tabs">
+        <button class="panel-tab active" data-panel-tab="list">Words</button>
+        <button class="panel-tab" data-panel-tab="queue">Queue</button>
+        <button class="panel-tab" data-panel-tab="history">History</button>
+      </div>
+      <!-- Save bar -->
+      <div class="panel-save-bar">
+        <input class="panel-save-name" id="panelSaveName" type="text" placeholder="List name…"/>
+        <button class="panel-save-btn" id="panelSaveBtn">Save</button>
+      </div>
+      <div class="panel-content" id="wordListContent"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ INFO MODAL ══════════════ -->
+  <div class="modal-overlay hidden" id="infoOverlay">
+    <div class="modal">
+      <div class="modal-title">Session Info</div>
+      <div id="infoContent"></div>
+      <div class="settings-btn-row">
+        <button class="modal-btn-secondary" id="infoClose">Close</button>
+        <button class="modal-btn-quit" id="infoQuit">Quit Session</button>
+      </div>
+    </div>
+  </div>
+
+<!-- ══════════════ SETTINGS MODAL ══════════════ -->
+<div class="modal-overlay hidden" id="settingsOverlay">
+  <div class="modal">
+    <div class="modal-title">Settings</div>
+
+    <!-- Tab bar -->
+    <div class="settings-tab-bar">
+      <button class="settings-tab-btn active" data-settings-tab="display" title="Display">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+      </button>
+      <button class="settings-tab-btn" data-settings-tab="navigation" title="Navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- ── Display tab ── -->
+    <div id="settingsDisplayTab">
+
+      <!-- Mode selection -->
+      <div class="setting-section">
+        <div class="setting-section-title">Mode</div>
+        <div class="setting-row">
+          <div class="setting-label">📖 Study</div>
+          <label class="toggle"><input type="checkbox" id="modeStudyToggle" checked/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">🔄 Revise</div>
+          <label class="toggle"><input type="checkbox" id="modeReviseToggle"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">❓ MCQ</div>
+          <label class="toggle"><input type="checkbox" id="modeMCQToggle"/><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+
+      <!-- Tab Order -->
+      <div class="setting-section">
+        <div class="setting-section-title">Tab Order</div>
+        <div class="setting-row">
+          <div class="setting-label">Display Order</div>
+          <div class="size-btns">
+            <button class="size-btn active" data-taborder="san">S→A→M</button>
+            <button class="size-btn" data-taborder="ans">A→S→M</button>
+            <button class="size-btn" data-taborder="msa">M→S→A</button>
+            <button class="size-btn" data-taborder="mas">M→A→S</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Study mode only -->
+      <div class="setting-section study-only">
+        <div class="setting-section-title">Study Mode</div>
+        <div class="setting-row">
+          <div class="setting-label">Show Translation</div>
+          <label class="toggle"><input type="checkbox" id="translationToggle"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Word Highlight</div>
+          <label class="toggle"><input type="checkbox" id="highlightToggle"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Show Similar Words</div>
+          <label class="toggle"><input type="checkbox" id="showSimilarToggle"/><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+
+      <!-- Revise mode only -->
+      <div class="setting-section revise-only hidden">
+        <div class="setting-section-title">Revise Mode</div>
+        <div class="setting-row">
+          <div class="setting-label">Show Meaning</div>
+          <label class="toggle"><input type="checkbox" id="showMeaningToggle"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row meaning-options-row hidden">
+          <div class="setting-label">Meaning as Options</div>
+          <label class="toggle"><input type="checkbox" id="meaningOptionsToggle"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Correct %</div>
+          <div class="size-btns">
+            <button class="size-btn" data-correctpct="20">20</button>
+            <button class="size-btn" data-correctpct="30">30</button>
+            <button class="size-btn active" data-correctpct="50">50</button>
+            <button class="size-btn" data-correctpct="60">60</button>
+            <button class="size-btn" data-correctpct="80">80</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Random Option Count</div>
+          <label class="toggle"><input type="checkbox" id="randomOptToggle"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row random-opts-row hidden">
+          <div class="setting-label">Min Options</div>
+          <div class="size-btns">
+            <button class="size-btn" data-minopt="3">3</button>
+            <button class="size-btn active" data-minopt="4">4</button>
+            <button class="size-btn" data-minopt="5">5</button>
+            <button class="size-btn" data-minopt="6">6</button>
+          </div>
+        </div>
+        <div class="setting-row random-opts-row hidden">
+          <div class="setting-label">Max Options</div>
+          <div class="size-btns">
+            <button class="size-btn" data-maxopt="6">6</button>
+            <button class="size-btn" data-maxopt="7">7</button>
+            <button class="size-btn active" data-maxopt="8">8</button>
+            <button class="size-btn" data-maxopt="10">10</button>
+            <button class="size-btn" data-maxopt="12">12</button>
+          </div>
+        </div>
+        <div class="setting-row fixed-opts-row">
+          <div class="setting-label">Options Count</div>
+          <div class="size-btns">
+            <button class="size-btn" data-fixedopt="4">4</button>
+            <button class="size-btn" data-fixedopt="5">5</button>
+            <button class="size-btn active" data-fixedopt="6">6</button>
+            <button class="size-btn" data-fixedopt="7">7</button>
+            <button class="size-btn" data-fixedopt="8">8</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Reveal Correct</div>
+          <label class="toggle"><input type="checkbox" id="revealCorrectToggle"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Word Button Action</div>
+          <label class="toggle"><input type="checkbox" id="reviseWordActionToggle"/><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+
+      <!-- MCQ mode only -->
+      <div class="setting-section mcq-only hidden">
+        <div class="setting-section-title">MCQ Mode</div>
+        <div class="setting-row">
+          <div class="setting-label">Number of Options</div>
+          <div class="size-btns">
+            <button class="size-btn active" data-mcqopt="4">4</button>
+            <button class="size-btn" data-mcqopt="5">5</button>
+            <button class="size-btn" data-mcqopt="6">6</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Max Correct Options</div>
+          <div class="size-btns">
+            <button class="size-btn active" data-mcqmaxcorrect="1">1</button>
+            <button class="size-btn" data-mcqmaxcorrect="2">2</button>
+            <button class="size-btn" data-mcqmaxcorrect="3">3</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Randomize Correct Count</div>
+          <label class="toggle"><input type="checkbox" id="mcqRandomizeToggle"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Show Clock</div>
+          <label class="toggle"><input type="checkbox" id="showClockToggle"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Word Button Action</div>
+          <label class="toggle"><input type="checkbox" id="mcqWordActionToggle"/><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+
+    </div><!-- end settingsDisplayTab -->
+
+    <!-- ── Navigation tab ── -->
+    <div id="settingsNavTab" class="hidden">
+
+      <div class="setting-section">
+        <div class="setting-section-title">Navigation</div>
+        <div class="setting-row">
+          <div class="setting-label">Step Size</div>
+          <div class="size-btns">
+            <button class="size-btn active" data-step="1">1</button>
+            <button class="size-btn" data-step="3">3</button>
+            <button class="size-btn" data-step="5">5</button>
+            <button class="size-btn" data-step="10">10</button>
+            <button class="size-btn" data-step="50">50</button>
+            <button class="size-btn" data-step="200">200</button>
+            <button class="size-btn" data-step="500">500</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Loop Mode</div>
+          <label class="toggle"><input type="checkbox" id="loopToggle"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Step Action (Each)</div>
+          <label class="toggle"><input type="checkbox" id="stepActionToggle"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Navigation Filter</div>
+          <label class="toggle"><input type="checkbox" id="navFilterToggle"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Allow Multiple</div>
+          <label class="toggle"><input type="checkbox" id="allowMultipleToggle" checked/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row allow-multiple-row">
+          <div class="setting-label">Join: OR</div>
+          <label class="toggle"><input type="checkbox" id="joinConditionToggle"/><span class="toggle-slider"></span></label>
+        </div>
+
+        <!-- Nav filter options -->
+        <div class="nav-filter-options hidden" id="navFilterOptions">
+          <div class="setting-row setting-row-indent">
+            <label class="check-label">
+              <input type="checkbox" id="navSynAntChk" checked/>
+              <span>Syn / Ant</span>
+            </label>
+          </div>
+          <div class="setting-row setting-row-indent">
+            <label class="check-label">
+              <input type="checkbox" id="navDefinedChk"/>
+              <span>Defined</span>
+            </label>
+          </div>
+          <div class="setting-row setting-row-indent">
+            <label class="check-label">
+              <input type="checkbox" id="navRootwiseChk"/>
+              <span>Rootwise</span>
+            </label>
+          </div>
+          <!-- Rootwise sub-options -->
+          <div class="nav-rootwise-options hidden" id="navRootwiseOptions">
+            <div class="setting-row setting-row-indent">
+              <div class="setting-label">Necessary</div>
+              <label class="toggle"><input type="checkbox" id="necessaryToggle" checked/><span class="toggle-slider"></span></label>
+            </div>
+            <div class="setting-subsection-title">Next Behavior</div>
+            <div class="setting-row setting-row-indent2">
+              <div class="setting-label">Exclusive</div>
+              <label class="toggle"><input type="checkbox" id="nxtBehaviorToggle" checked/><span class="toggle-slider"></span></label>
+            </div>
+            <div class="setting-row setting-row-indent2">
+              <div class="setting-label">Avoid Opposites</div>
+              <label class="toggle"><input type="checkbox" id="avoidOppositesToggle"/><span class="toggle-slider"></span></label>
+            </div>
+            <div class="setting-subsection-title">Prev Behavior</div>
+            <div class="setting-row setting-row-indent2">
+              <label class="check-label">
+                <input type="checkbox" id="prevExactChk" checked/>
+                <span>Exact</span>
+              </label>
+            </div>
+            <div class="setting-row setting-row-indent2">
+              <label class="check-label">
+                <input type="checkbox" id="prevVariationChk"/>
+                <span>Variation</span>
+              </label>
+            </div>
+            <div class="setting-row setting-row-indent2 nav-variation-fallback-row hidden" id="navVariationFallbackRow">
+              <div class="setting-label">Variation Fallback</div>
+              <label class="toggle"><input type="checkbox" id="variationFallbackToggle"/><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Random Navigation — shown in A→Z / Z→A modes only -->
+        <div class="nav-random-section hidden" id="navRandomSection">
+          <div class="setting-row">
+            <div class="setting-label">Random Navigation</div>
+            <label class="toggle"><input type="checkbox" id="randomNavToggle"/><span class="toggle-slider"></span></label>
+          </div>
+          <div class="nav-random-options hidden" id="navRandomOptions">
+            <div class="setting-row setting-row-indent">
+              <div class="setting-label">Neighborhood (Δ)</div>
+              <div class="size-btns">
+                <button class="size-btn active" data-delta="2">2</button>
+                <button class="size-btn" data-delta="4">4</button>
+                <button class="size-btn" data-delta="6">6</button>
+                <button class="size-btn" data-delta="8">8</button>
+                <button class="size-btn" data-delta="10">10</button>
+              </div>
+            </div>
+            <div class="setting-row setting-row-indent">
+              <div class="setting-label">Suggest Marked</div>
+              <label class="toggle"><input type="checkbox" id="suggestMarkedToggle"/><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Suggest Marked for Random order -->
+        <div class="nav-random-order-section hidden" id="navRandomOrderSection">
+          <div class="setting-row">
+            <div class="setting-label">Suggest Marked</div>
+            <label class="toggle"><input type="checkbox" id="suggestMarkedRandomToggle"/><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end settingsNavTab -->
+
+    <div class="settings-btn-row">
+      <button class="modal-btn-secondary" id="settingsClose">Close</button>
+      <button class="modal-close-btn flex1" id="settingsSave">Save</button>
+    </div>
+  </div>
+</div>
+
+  <!-- ══════════════ WORD DETAIL MODAL — Change 1: View Word btn ══════════════ -->
+  <div class="modal-overlay hidden" id="wordDetailOverlay">
+    <div class="modal modal-tall">
+      <div class="modal-title" id="detailWord">—</div>
+      <div class="detail-meta" id="detailMeta"></div>
+      <div id="detailContent"></div>
+      <div class="settings-btn-row">
+        <button class="modal-btn-secondary" id="wordDetailClose">Close</button>
+        <button class="modal-close-btn flex1" id="wordDetailView">View Word</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ ADD TO POPUP ══════════════ -->
+  <div class="modal-overlay hidden" id="addToOverlay">
+    <div class="modal modal-small">
+      <div class="modal-title" id="addToWordTitle">Add to…</div>
+      <div class="addto-grid">
+        <button class="addto-btn" data-flag="bookmark">🔖<span>Bookmark</span></button>
+        <button class="addto-btn" data-flag="important">⭐<span>Important</span></button>
+        <button class="addto-btn" data-flag="learned">✅<span>Learned</span></button>
+        <button class="addto-btn" data-flag="favorite">❤️<span>Favorite</span></button>
+        <button class="addto-btn" data-flag="queue">📋<span>Queue</span></button>
+        <button class="addto-btn" data-flag="hide" id="addToHideBtn">🚫<span id="addToHideLabel">Hide</span></button>
+      </div>
+      <div class="settings-btn-row">
+        <button class="modal-btn-secondary" id="addToClear">Clear</button>
+        <button class="modal-close-btn flex1" id="addToClose">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ CUSTOMISE MODAL ══════════════ -->
+  <div class="modal-overlay hidden" id="customiseOverlay">
+    <div class="modal">
+      <div class="modal-title">Customise</div>
+      <div class="setting-section">
+        <div class="setting-section-title">Appearance</div>
+        <div class="setting-row">
+          <div class="setting-label">Font Size</div>
+          <div class="size-btns">
+            <button class="size-btn" data-size="small">S</button>
+            <button class="size-btn active" data-size="normal">M</button>
+            <button class="size-btn" data-size="large">L</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Accent Color</div>
+          <div class="color-picker">
+            <div class="color-swatch gold selected" data-accent="gold" title="Gold"></div>
+            <div class="color-swatch green" data-accent="green" title="Green"></div>
+            <div class="color-swatch blue" data-accent="blue" title="Sky Blue"></div>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Theme Color</div>
+          <div class="color-picker">
+            <div class="color-swatch theme-navy selected" data-theme="navy" title="Navy"></div>
+            <div class="color-swatch theme-charcoal" data-theme="charcoal" title="Charcoal"></div>
+            <div class="color-swatch theme-forest" data-theme="forest" title="Forest"></div>
+          </div>
+        </div>
+      </div>
+      <div class="settings-btn-row">
+        <button class="modal-btn-secondary" id="customiseClose">Close</button>
+        <button class="modal-close-btn flex1" id="customiseSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ QUICK NAV POPUP ══════════════ -->
+  <div class="modal-overlay hidden" id="quickNavOverlay">
+    <div class="modal">
+      <div class="modal-title">Navigation</div>
+
+      <!-- Like / Dislike -->
+      <div class="quick-nav-marks">
+        <button class="quick-mark-btn" id="quickLikeBtn">🥰 Like</button>
+        <button class="quick-mark-btn" id="quickDislikeBtn">😤 Dislike</button>
+      </div>
+      <div class="quick-nav-word" id="quickNavWord"></div>
+
+      <!-- Navigation settings (mirrored from Settings modal) -->
+      <div class="setting-section">
+        <div class="setting-row">
+          <div class="setting-label">Step Size</div>
+          <div class="size-btns">
+            <button class="size-btn" data-qstep="1">1</button>
+            <button class="size-btn" data-qstep="3">3</button>
+            <button class="size-btn" data-qstep="5">5</button>
+            <button class="size-btn" data-qstep="10">10</button>
+            <button class="size-btn" data-qstep="50">50</button>
+            <button class="size-btn" data-qstep="200">200</button>
+            <button class="size-btn" data-qstep="500">500</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Loop Mode</div>
+          <label class="toggle"><input type="checkbox" id="qLoopToggle"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Step Action (Each)</div>
+          <label class="toggle"><input type="checkbox" id="qStepActionToggle"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Navigation Filter</div>
+          <label class="toggle"><input type="checkbox" id="qNavFilterToggle"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Allow Multiple</div>
+          <label class="toggle"><input type="checkbox" id="qAllowMultipleToggle" checked/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row allow-multiple-row">
+          <div class="setting-label">Join: OR</div>
+          <label class="toggle"><input type="checkbox" id="qJoinConditionToggle"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="nav-filter-options hidden" id="qNavFilterOptions">
+          <div class="setting-row setting-row-indent">
+            <label class="check-label"><input type="checkbox" id="qNavSynAntChk" checked/><span>Syn / Ant</span></label>
+          </div>
+          <div class="setting-row setting-row-indent">
+            <label class="check-label"><input type="checkbox" id="qNavDefinedChk"/><span>Defined</span></label>
+          </div>
+          <div class="setting-row setting-row-indent">
+            <label class="check-label"><input type="checkbox" id="qNavRootwiseChk"/><span>Rootwise</span></label>
+          </div>
+          <div class="nav-rootwise-options hidden" id="qNavRootwiseOptions">
+            <div class="setting-row setting-row-indent">
+  <div class="setting-label">Necessary</div>
+  <label class="toggle"><input type="checkbox" id="qNecessaryToggle" checked/><span class="toggle-slider"></span></label>
+</div>
+<div class="setting-subsection-title">Next Behavior</div>
+<div class="setting-row setting-row-indent2">
+  <div class="setting-label">Exclusive</div>
+  <label class="toggle"><input type="checkbox" id="qNxtBehaviorToggle" checked/><span class="toggle-slider"></span></label>
+</div>
+<div class="setting-row setting-row-indent2">
+  <div class="setting-label">Avoid Opposites</div>
+  <label class="toggle"><input type="checkbox" id="qAvoidOppositesToggle"/><span class="toggle-slider"></span></label>
+</div>
+<div class="setting-subsection-title">Prev Behavior</div>
+<div class="setting-row setting-row-indent2">
+  <label class="check-label">
+    <input type="checkbox" id="qPrevExactChk" checked/>
+    <span>Exact</span>
+  </label>
+</div>
+<div class="setting-row setting-row-indent2">
+  <label class="check-label">
+    <input type="checkbox" id="qPrevVariationChk"/>
+    <span>Variation</span>
+  </label>
+</div>
+<div class="setting-row setting-row-indent2 nav-variation-fallback-row hidden" id="qNavVariationFallbackRow">
+  <div class="setting-label">Variation Fallback</div>
+  <label class="toggle"><input type="checkbox" id="qVariationFallbackToggle"/><span class="toggle-slider"></span></label>
+</div>
+          </div>
+        </div>
+        <div class="nav-random-section hidden" id="qNavRandomSection">
+          <div class="setting-row">
+            <div class="setting-label">Random Navigation</div>
+            <label class="toggle"><input type="checkbox" id="qRandomNavToggle"/><span class="toggle-slider"></span></label>
+          </div>
+          <div class="nav-random-options hidden" id="qNavRandomOptions">
+            <div class="setting-row setting-row-indent">
+              <div class="setting-label">Neighborhood (Δ)</div>
+              <div class="size-btns">
+                <button class="size-btn active" data-qdelta="2">2</button>
+                <button class="size-btn" data-qdelta="4">4</button>
+                <button class="size-btn" data-qdelta="6">6</button>
+                <button class="size-btn" data-qdelta="8">8</button>
+                <button class="size-btn" data-qdelta="10">10</button>
+              </div>
+            </div>
+            <div class="setting-row setting-row-indent">
+              <div class="setting-label">Suggest Marked</div>
+              <label class="toggle"><input type="checkbox" id="qSuggestMarkedToggle"/><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+        </div>
+        <div class="nav-random-order-section hidden" id="qNavRandomOrderSection">
+          <div class="setting-row">
+            <div class="setting-label">Suggest Marked</div>
+            <label class="toggle"><input type="checkbox" id="qSuggestMarkedRandomToggle"/><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-btn-row">
+        <button class="modal-btn-secondary" id="quickNavClose">Close</button>
+        <button class="modal-close-btn flex1" id="quickNavSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script src="navigation.js"></script>
+</body>
+</html>
