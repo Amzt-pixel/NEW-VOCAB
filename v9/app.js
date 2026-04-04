@@ -2,7 +2,7 @@
    DICTIONARY — app.js  (core)
    ══════════════════════════════════════ */
 
-const PASSWORD = 'AmiManUsh';
+const PASSWORD = 'SinSity';
 const HOLD_MS  = 700;
 
 // ── Data ──
