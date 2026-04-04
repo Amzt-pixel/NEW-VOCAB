@@ -1056,7 +1056,7 @@ function bindAll() {
     if (document.querySelector('.screen.active')?.id !== 'studyScreen') return;
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') nextWord();
     if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   prevWord();
-    if (e.key === 'Escape') ['settingsOverlay','infoOverlay','wordDetailOverlay','wordListOverlay','addToOverlay','quickNavOverlay'].forEach(closeModal);
+    if (e.key === 'Escape') ['settingsOverlay','infoOverlay','wordDetailOverlay','wordListOverlay','addToOverlay','quickNavOverlay','setupOverlay'].forEach(closeModal);
   });
 }
 
