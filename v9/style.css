@@ -147,7 +147,7 @@ input  { font-family: 'DM Sans', sans-serif; }
 .start-tabs { display: flex; border-bottom: 1px solid var(--border); }
 .start-tab {
   flex: 1; padding: 11px 6px; border: none; background: var(--surface2);
-  font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+  font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
   color: var(--text-secondary); cursor: pointer; transition: all .15s;
   border-right: 1px solid var(--border);
 }
@@ -660,5 +660,5 @@ input  { font-family: 'DM Sans', sans-serif; }
 .wl-level-1 { background: var(--syn-bg); color: var(--syn); }
 .wl-level-2 { background: var(--def-bg); color: var(--def); }
 .wl-level-3 { background: var(--ant-bg); color: var(--ant); }
-.wl-word { font-size: 14px; font-weight: 500; color: var(--text); }
+.wl-word { font-size: 14px; font-weight: 500; color: var(--text); flex: 1; }
 .wl-id   { font-size: 11px; color: var(--text-secondary); font-weight: 400; margin-left: 4px; }
