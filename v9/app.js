@@ -2,7 +2,7 @@
    DICTIONARY — app.js  (core)
    ══════════════════════════════════════ */
 
-const PASSWORD = 'SinSity';
+const PASSWORD = 'HankyMan31';
 const HOLD_MS  = 700;
 
 // ── Data ──
@@ -600,10 +600,10 @@ function bindAddTo() {
 // INFO / QUIT
 // ══════════════════════════════════════
 function showInfo() {
-  const elapsed = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
-  const m = Math.floor(elapsed / 60), s = elapsed % 60;
+  const elapsed = startTime ? Math.floor((Date.now() - startTime.getTime()) / 1000) : 0;
+  const m = Math.floor(elapsed / 60), s = Math.abs(elapsed % 60);
   document.getElementById('infoContent').innerHTML =
-    row('Time', m + 'm ' + s + 's', true) + row('Set', 'Dictionary') +
+    row('Time', pad(m) + ':' + pad(s), true) + row('Set', 'Dictionary') +
     row('Order', S.orderMode === 'az' ? 'A→Z' : S.orderMode === 'za' ? 'Z→A' : 'Random') +
     row('Mode', S.mode) + row('Total', studyList.length) + row('Seen', wordsSeen) +
     row('Position', (currentIndex+1) + ' / ' + studyList.length) +
