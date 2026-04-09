@@ -22,6 +22,7 @@ async function loadData() {
     parseCSV(await res.text());
     buildRootList();
     demoStudyList = buildDemoStudyList();
+     updateStartAtTotal(demoStudyList.length);
     updateStats();
     renderHomeList();
     renderQueueCards();
@@ -468,7 +469,7 @@ function bindStartEvents() {
     const b = e.target.closest('.seg-btn'); if (!b) return;
     document.querySelectorAll('#catBtns .seg-btn').forEach(x => x.classList.remove('active'));
     b.classList.add('active');
-    demoStudyList = buildDemoStudyList(); homeShown = CHUNK; renderHomeList();
+    demoStudyList = buildDemoStudyList(); homeShown = CHUNK; renderHomeList(); updateStartAtTotal(demoStudyList.length);
   });
 
   // Seg-btn listeners — Order
@@ -476,7 +477,7 @@ function bindStartEvents() {
     const b = e.target.closest('.seg-btn'); if (!b) return;
     document.querySelectorAll('#orderBtns .seg-btn').forEach(x => x.classList.remove('active'));
     b.classList.add('active');
-    demoStudyList = buildDemoStudyList(); homeShown = CHUNK; renderHomeList();
+    demoStudyList = buildDemoStudyList(); homeShown = CHUNK; renderHomeList(); updateStartAtTotal(demoStudyList.length);
   });
 
    // System/Saved seg-btns — Custom
@@ -565,3 +566,8 @@ function syncSetupUI() {
     b.classList.toggle('active', b.dataset.setupListtype === setupState.listType));
 }
 
+function updateStartAtTotal(count) {
+  document.querySelectorAll('.startat-total').forEach(el => {
+    el.textContent = '/' + count;
+  });
+}
