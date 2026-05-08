@@ -662,3 +662,129 @@ input  { font-family: 'DM Sans', sans-serif; }
 .wl-level-3 { background: var(--ant-bg); color: var(--ant); }
 .wl-word { font-size: 14px; font-weight: 500; color: var(--text); flex: 1; }
 .wl-id   { font-size: 11px; color: var(--text-secondary); font-weight: 400; margin-left: 4px; }
+
+
+/* ── 17. MCQ CARD ── */
+.mcq-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  border: 1.5px solid var(--border);
+  margin-top: 4px;
+}
+
+.mcq-hint {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.mcq-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mcq-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--surface2);
+  text-align: left;
+  cursor: pointer;
+  transition: all .15s;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.mcq-option:hover:not(.mcq-correct):not(.mcq-incorrect):not(.mcq-disabled) {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.mcq-option:active:not(.mcq-correct):not(.mcq-incorrect):not(.mcq-disabled) {
+  transform: scale(.99);
+}
+
+.mcq-option-letter {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+  transition: all .15s;
+}
+
+.mcq-option-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text);
+  flex: 1;
+}
+
+/* Correct answer */
+.mcq-option.mcq-correct {
+  border-color: #81C784;
+  background: #E8F5E9;
+  cursor: default;
+}
+.mcq-option.mcq-correct .mcq-option-letter {
+  background: #2E7D32;
+  color: #fff;
+}
+.mcq-option.mcq-correct .mcq-option-text {
+  color: #1B5E20;
+}
+
+/* Incorrect answer */
+.mcq-option.mcq-incorrect {
+  border-color: #EF9A9A;
+  background: #FFEBEE;
+  cursor: default;
+}
+.mcq-option.mcq-incorrect .mcq-option-letter {
+  background: #C62828;
+  color: #fff;
+}
+.mcq-option.mcq-incorrect .mcq-option-text {
+  color: #B71C1C;
+}
+
+/* Revealed correct (shown after wrong pick in single mode) */
+.mcq-option.mcq-revealed {
+  border-color: #90CAF9;
+  background: #E3F2FD;
+  cursor: default;
+}
+.mcq-option.mcq-revealed .mcq-option-letter {
+  background: #1565C0;
+  color: #fff;
+}
+.mcq-option.mcq-revealed .mcq-option-text {
+  color: #0D47A1;
+}
+
+/* Disabled (other options after wrong pick in single mode) */
+.mcq-option.mcq-disabled {
+  opacity: .4;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* mcqMultipleCorrectOptions hidden rule */
+#mcqMultipleCorrectOptions.hidden { display: none; }
+
