@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════
-   DICTIONARY — app.js  (core)
+   DICTIONARY — app1.js  (core)
    ══════════════════════════════════════ */
 
 const PASSWORD = 'Abcd135';
@@ -17,22 +17,23 @@ let customQueue  = [];
 let hiddenWords  = new Set();
 let sessionLive  = false;
 
-// ── MCQ history — keyed by word, persists options+states for session ──
-let mcqHistory = {};
+// ── MCQ History ──
+// Each entry: { word, synOptions, antOptions, states, interacted }
+// states: { [word_tab]: null | 0 | 1 | 2 }
+let mcqHistory = [];
 
 // ── Settings ──
 let S = {
   accent: 'gold', fontSize: 'normal', theme: 'navy',
   stepNumber: 1, loopMode: false, filter: 'all',
-  tabOrder: 'san',
-  mode: 'study',
+  tabOrder: 'san', mode: 'study',
   showTranslation: false, wordHighlight: false, showSimilar: false,
   showMeaning: false, meaningOptions: false,
   correctPercent: 50, randomOptionCount: false,
   minOptions: 4, maxOptions: 8, fixedOptions: 6,
   revealCorrect: false, reviseWordAction: false,
   mcqOptions: 4, mcqMultipleCorrect: false, mcqMaxCorrect: 2,
-  mcqShowMeaning: false, mcqShowSimilar: false,
+  mcqRandomize: false, mcqShowMeaning: false, mcqShowSimilar: false,
   navFilter: false,
   navSynAnt: true, navDefined: false, navRootwise: false,
   necessary: true, exclusive: true, avoidOpposites: false,
@@ -53,6 +54,7 @@ const panelScroll = { list: 0, queue: 0, history: 0 };
 let prevTimer = null; let nextTimer = null;
 let chipTimer = null; let chipHeld  = false;
 let panelTimer = null; let panelHeld = false; let panelScrolled = false;
+let mcqHoldTimer = null; let mcqHeld = false;
 
 // ── Misc ──
 let pendingAddTo = {}; let detailWord = null;
@@ -115,13 +117,11 @@ function bindGate() {
   const err = document.getElementById('gateError');
   const eye = document.getElementById('gateEye');
   const rem = document.getElementById('rememberMe');
-
   eye.addEventListener('click', () => {
     const show = inp.type === 'password';
     inp.type = show ? 'text' : 'password';
     eye.textContent = show ? '🙈' : '👁';
   });
-
   function attempt() {
     if (inp.value.trim() !== PASSWORD) {
       wrongAttempts++;
@@ -138,44 +138,38 @@ function bindGate() {
     else             { sessionStorage.setItem('dictSession','unlocked'); localStorage.removeItem('dictSession'); }
     showScreen('home'); loadData();
   }
-
   btn.addEventListener('click', attempt);
   inp.addEventListener('keydown', e => { if (e.key === 'Enter') attempt(); });
   inp.addEventListener('input',   () => err.classList.add('hidden'));
 }
 
 // ══════════════════════════════════════
-// WORD RELATIONSHIP FUNCTIONS
+// LIBRARY
 // ══════════════════════════════════════
 function getSyns(word) {
   const e = csvData.find(r => r.word === word);
   if (!e?.id) return [];
   return csvData.filter(r => r.id === e.id && r.word !== word).map(r => r.word);
 }
-
 function getAnts(word) {
   const e = csvData.find(r => r.word === word);
   if (!e?.id) return [];
   return csvData.filter(r => r.id === -e.id).map(r => r.word);
 }
-
 function getSimilarSyns(word) {
   const e = csvData.find(r => r.word === word);
   if (!e?.id) return [];
   const N = e.id;
-  const match = N >= 0
-    ? r => Math.floor(r.id) === Math.floor(N) && r.id !== N
-    : r => Math.ceil(r.id)  === Math.ceil(N)  && r.id !== N;
+  const match = N >= 0 ? r => Math.floor(r.id) === Math.floor(N) && r.id !== N
+                       : r => Math.ceil(r.id)  === Math.ceil(N)  && r.id !== N;
   return csvData.filter(r => match(r) && r.word !== word).map(r => r.word);
 }
-
 function getSimilarAnts(word) {
   const e = csvData.find(r => r.word === word);
   if (!e?.id) return [];
   const N = -e.id;
-  const match = N >= 0
-    ? r => Math.floor(r.id) === Math.floor(N) && r.id !== N
-    : r => Math.ceil(r.id)  === Math.ceil(N)  && r.id !== N;
+  const match = N >= 0 ? r => Math.floor(r.id) === Math.floor(N) && r.id !== N
+                       : r => Math.ceil(r.id)  === Math.ceil(N)  && r.id !== N;
   return csvData.filter(r => match(r) && r.word !== word).map(r => r.word);
 }
 
@@ -191,48 +185,41 @@ function show() {
   document.getElementById('sessionNumId').textContent = entry?.id ? '#' + entry.id : '—';
   document.getElementById('currentWord').textContent  = word;
   document.getElementById('currentRole').textContent  = entry?.role || '';
-  const lvl    = entry?.level ?? 0;
+  const lvl = entry?.level ?? 0;
   const lvlMap = { 0:['Common','level-0'], 1:['Unique','level-1'], 2:['Specific','level-2'], 3:['Colloquial','level-3'] };
   const badge  = document.getElementById('levelBadge');
   badge.textContent = lvlMap[lvl][0];
   badge.className   = 'word-level-badge ' + lvlMap[lvl][1];
-
   if      (S.mode === 'study')  showStudy(word, entry);
   else if (S.mode === 'revise') showRevise(word, entry);
   else if (S.mode === 'mcq')    showMCQ(word, entry);
-
   if (!document.getElementById('wordListOverlay').classList.contains('hidden')) updatePanel();
 }
 
 function tabOrder() {
   return { san:['syn','ant','def'], ans:['ant','syn','def'], msa:['def','syn','ant'], mas:['def','ant','syn'] }[S.tabOrder] || ['syn','ant','def'];
 }
-
 function reorderTabs() {
   const wrap = document.getElementById('focusTabs');
   const els  = { syn: document.getElementById('tabSyn'), ant: document.getElementById('tabAnt'), def: document.getElementById('tabDef') };
   tabOrder().forEach(t => wrap.appendChild(els[t]));
 }
-
-function activateFirstTab(syns, ants, hasDef, showDef) {
+function activateFirstTab(syns, ants, showDef) {
   for (const t of tabOrder()) {
-    if (t === 'syn' && syns.length) { switchTab('syn'); return; }
-    if (t === 'ant' && ants.length) { switchTab('ant'); return; }
-    if (t === 'def' && showDef)     { switchTab('def'); return; }
+    if (t === 'syn' && syns.length)  { switchTab('syn'); return; }
+    if (t === 'ant' && ants.length)  { switchTab('ant'); return; }
+    if (t === 'def' && showDef)      { switchTab('def'); return; }
   }
   switchTab('syn');
 }
-
-function setCards(synCount, antCount, showDef) {
-  document.getElementById('synCard').classList.toggle('hidden',   !synCount);
-  document.getElementById('antCard').classList.toggle('hidden',   !antCount);
+function setCards(hasSyn, hasAnt, showDef) {
+  document.getElementById('synCard').classList.toggle('hidden',   !hasSyn);
+  document.getElementById('antCard').classList.toggle('hidden',   !hasAnt);
   document.getElementById('defCard').classList.toggle('hidden',   !showDef);
-  document.getElementById('emptyCard').classList.toggle('hidden', synCount || antCount || showDef);
-  document.getElementById('tabSyn').classList.toggle('hidden',    !synCount);
-  document.getElementById('tabAnt').classList.toggle('hidden',    !antCount);
+  document.getElementById('emptyCard').classList.toggle('hidden', hasSyn || hasAnt || showDef);
+  document.getElementById('tabSyn').classList.toggle('hidden',    !hasSyn);
+  document.getElementById('tabAnt').classList.toggle('hidden',    !hasAnt);
   document.getElementById('tabDef').classList.toggle('hidden',    !showDef);
-  document.getElementById('synCount').textContent = synCount || '';
-  document.getElementById('antCount').textContent = antCount || '';
 }
 
 // ══════════════════════════════════════
@@ -243,7 +230,7 @@ function showStudy(word, entry) {
   const ants    = getAnts(word);
   const simSyms = S.showSimilar ? getSimilarSyns(word) : [];
   const simAnts = S.showSimilar ? getSimilarAnts(word) : [];
-  const hasDef   = !!entry?.definition;
+  const hasDef  = !!entry?.definition;
   const hasTrans = S.showTranslation && !!entry?.bengaliDef;
 
   let synHTML = '';
@@ -265,15 +252,21 @@ function showStudy(word, entry) {
   }
   if (hasTrans) {
     defHTML += (hasContent ? '<div class="card-subheader def-header" style="margin-top:16px">' : '<div class="card-subheader def-header">') + '<span class="dot"></span> Translation</div><div class="detail-def">' + esc(entry.bengaliDef) + '</div>';
+    hasContent = true;
     const bEx = [entry.bengaliEx1, entry.bengaliEx2, entry.bengaliEx3].filter(Boolean);
     if (bEx.length) defHTML += '<div class="content-label" style="margin-top:10px">Bengali Examples</div>' + bEx.map(ex => '<div class="detail-example">"' + esc(ex) + '"</div>').join('');
   }
   document.getElementById('defContent').innerHTML = defHTML;
 
   const showDef = hasDef || hasTrans;
-  setCards(syns.length + simSyms.length, ants.length + simAnts.length, showDef);
+  const hasSyn  = syns.length > 0 || simSyms.length > 0;
+  const hasAnt  = ants.length > 0 || simAnts.length > 0;
+  document.getElementById('synCount').textContent = syns.length || '';
+  document.getElementById('antCount').textContent = ants.length || '';
+  setCards(hasSyn, hasAnt, showDef);
   reorderTabs();
-  activateFirstTab(syns, ants, showDef, showDef);
+  activateFirstTab(hasSyn ? [1] : [], hasAnt ? [1] : [], showDef);
+
 }
 
 function studyChip(word, type) {
@@ -288,34 +281,27 @@ function studyChip(word, type) {
 // REVISE MODE
 // ══════════════════════════════════════
 function showRevise(word, entry) {
-  const exactSyns = getSyns(word);
-  const exactAnts = getAnts(word);
-  // Similar words only included when showSimilar is ON
-  const simSyms   = S.showSimilar ? getSimilarSyns(word) : [];
-  const simAnts   = S.showSimilar ? getSimilarAnts(word) : [];
-  const hasDef    = !!entry?.definition;
-  const allExclude = [word, ...exactSyns, ...exactAnts, ...simSyms, ...simAnts];
+  const synExact   = getSyns(word);
+  const antExact   = getAnts(word);
+  const synSimilar = S.showSimilar ? getSimilarSyns(word) : [];
+  const antSimilar = S.showSimilar ? getSimilarAnts(word) : [];
+  const hasDef     = !!entry?.definition;
+  const allSyn     = [...synExact, ...synSimilar];
+  const allAnt     = [...antExact, ...antSimilar];
 
-  const hasSyn = exactSyns.length || simSyms.length;
-  const hasAnt = exactAnts.length || simAnts.length;
-
-  if (hasSyn) {
-    const opts = buildReviseOpts(exactSyns, simSyms, allExclude);
+  if (allSyn.length) {
+    const opts = buildReviseOpts(synExact, synSimilar, [word, ...allSyn, ...allAnt]);
     document.getElementById('synChips').innerHTML =
       '<div class="card-subheader syn-header"><span class="dot"></span> Synonyms</div>'
       + '<div class="chips-wrap">' + buildReviseChips(opts, 'syn') + '</div>';
-  } else {
-    document.getElementById('synChips').innerHTML = '';
-  }
+  } else { document.getElementById('synChips').innerHTML = ''; }
 
-  if (hasAnt) {
-    const opts = buildReviseOpts(exactAnts, simAnts, allExclude);
+  if (allAnt.length) {
+    const opts = buildReviseOpts(antExact, antSimilar, [word, ...allAnt, ...allSyn]);
     document.getElementById('antChips').innerHTML =
       '<div class="card-subheader ant-header"><span class="dot"></span> Antonyms</div>'
       + '<div class="chips-wrap">' + buildReviseChips(opts, 'ant') + '</div>';
-  } else {
-    document.getElementById('antChips').innerHTML = '';
-  }
+  } else { document.getElementById('antChips').innerHTML = ''; }
 
   const showDef = hasDef && S.showMeaning;
   const defEl   = document.getElementById('defContent');
@@ -323,49 +309,39 @@ function showRevise(word, entry) {
     if (S.meaningOptions) {
       const pool = csvData.filter(r => r.definition && r.word !== word).map(r => r.definition);
       const opts = [entry.definition, ...shuffle(pool).slice(0, S.fixedOptions - 1)].sort(() => Math.random() - 0.5);
-      defEl.innerHTML = opts.map(d =>
-        '<button class="chip revise-chip def-revise-chip" data-correct="' + (d === entry.definition ? 'exact' : 'false') + '" onclick="reviseClick(this)">'
-        + esc(d) + '</button>'
-      ).join('');
+      defEl.innerHTML = opts.map(d => '<button class="chip revise-chip def-revise-chip" data-kind="' + (d === entry.definition ? 'exact' : 'distractor') + '" onclick="reviseClick(this)">' + esc(d) + '</button>').join('');
     } else {
-      defEl.innerHTML = '<div class="def-text">' + esc(entry.definition) + '</div>'
-        + (entry.example ? '<div class="def-example">"' + esc(entry.example) + '"</div>' : '');
+      defEl.innerHTML = '<div class="def-text">' + esc(entry.definition) + '</div>' + (entry.example ? '<div class="def-example">"' + esc(entry.example) + '"</div>' : '');
     }
-  } else {
-    defEl.innerHTML = '';
-  }
+  } else { defEl.innerHTML = ''; }
 
-  setCards(hasSyn, hasAnt, showDef);
+  document.getElementById('synCount').textContent = synExact.length || '';
+  document.getElementById('antCount').textContent = antExact.length || '';
+  setCards(allSyn.length > 0, allAnt.length > 0, showDef);
   reorderTabs();
-  activateFirstTab(
-    [...exactSyns, ...simSyms],
-    [...exactAnts, ...simAnts],
-    hasDef, showDef
-  );
+  activateFirstTab(allSyn, allAnt, showDef);
+
 }
 
-// Builds option array with tagged exact/similar/distractor entries
+// Returns array of { word, kind: 'exact'|'similar'|'distractor' }
 function buildReviseOpts(exactCorrect, similarCorrect, exclude) {
   const total    = S.randomOptionCount
     ? Math.floor(Math.random() * (S.maxOptions - S.minOptions + 1)) + S.minOptions
     : S.fixedOptions;
   const allCorrect = [...exactCorrect, ...similarCorrect];
   const maxRight   = Math.max(1, Math.floor(total * S.correctPercent / 100));
-  const pickedCorrect = shuffle([...allCorrect]).slice(0, Math.min(allCorrect.length, maxRight));
-
-  const tagged = pickedCorrect.map(w => ({
-    word: w,
-    correctVal: exactCorrect.includes(w) ? 'exact' : 'similar',
-  }));
-
-  const pool    = studyList.filter(w => !exclude.includes(w));
-  const fillers = shuffle(pool).slice(0, total - tagged.length).map(w => ({ word: w, correctVal: 'false' }));
-  return shuffle([...tagged, ...fillers]);
+  const picked     = shuffle([...allCorrect]).slice(0, Math.min(allCorrect.length, maxRight));
+  const pool       = studyList.filter(w => !exclude.includes(w));
+  const fillers    = shuffle(pool).slice(0, total - picked.length);
+  return shuffle([
+    ...picked.map(w => ({ word: w, kind: exactCorrect.includes(w) ? 'exact' : 'similar' })),
+    ...fillers.map(w => ({ word: w, kind: 'distractor' }))
+  ]);
 }
 
 function buildReviseChips(opts, type) {
   return opts.map(o =>
-    '<button class="chip ' + type + '-chip revise-chip" data-correct="' + o.correctVal + '" onclick="reviseClick(this)"'
+    '<button class="chip ' + type + '-chip revise-chip" data-kind="' + o.kind + '" onclick="reviseClick(this)"'
     + ' onmousedown="chipDown(event,\'' + esc(o.word) + '\')" onmouseup="chipUp()" onmouseleave="chipCancel()"'
     + ' ontouchstart="chipDown(event,\'' + esc(o.word) + '\')" ontouchmove="chipCancel()" ontouchend="chipUp()" ontouchcancel="chipCancel()"'
     + '>' + esc(o.word) + '</button>'
@@ -374,19 +350,20 @@ function buildReviseChips(opts, type) {
 
 function reviseClick(btn) {
   if (chipHeld) { chipHeld = false; return; }
-  if (btn.classList.contains('revise-correct') || btn.classList.contains('revise-similar') || btn.classList.contains('revise-incorrect')) return;
-  const correctVal = btn.dataset.correct;
-  btn.classList.add('revise-selected');
-  if (correctVal === 'exact') {
-    btn.classList.add('revise-correct');
-  } else if (correctVal === 'similar') {
-    btn.classList.add('revise-similar');
-  } else {
+  if (btn.classList.contains('revise-state-set')) return;
+  const kind = btn.dataset.kind;
+  btn.classList.add('revise-state-set');
+  if (kind === 'exact')        btn.classList.add('revise-correct');
+  else if (kind === 'similar') btn.classList.add('revise-similar');
+  else {
     btn.classList.add('revise-incorrect');
     if (S.revealCorrect) {
-      btn.closest('.content-card').querySelectorAll('[data-correct="exact"],[data-correct="similar"]').forEach(el => {
-        if (!el.classList.contains('revise-correct') && !el.classList.contains('revise-similar'))
-          el.classList.add('revise-revealed');
+      const card = btn.closest('.content-card');
+      card.querySelectorAll('[data-kind="exact"]:not(.revise-state-set)').forEach(el => {
+        el.classList.add('revise-state-set', 'revise-revealed');
+      });
+      card.querySelectorAll('[data-kind="similar"]:not(.revise-state-set)').forEach(el => {
+        el.classList.add('revise-state-set', 'revise-revealed-similar');
       });
     }
   }
@@ -396,40 +373,9 @@ function reviseClick(btn) {
 // MCQ MODE
 // ══════════════════════════════════════
 function showMCQ(word, entry) {
-  const exactSyns = getSyns(word);
-  const exactAnts = getAnts(word);
-  const simSyms   = S.mcqShowSimilar ? getSimilarSyns(word) : [];
-  const simAnts   = S.mcqShowSimilar ? getSimilarAnts(word) : [];
-  const hasDef    = !!entry?.definition;
-
-  // Build snapshot on first visit, restore on revisit
-  if (!mcqHistory[word]) {
-    mcqHistory[word] = buildMCQSnapshot(word, exactSyns, exactAnts, simSyms, simAnts);
-  }
-  const snap = mcqHistory[word];
-
-  // Syn tab — MCQ tiles
-  const hasSyn = snap.synOptions.length > 0;
-  if (hasSyn) {
-    document.getElementById('synChips').innerHTML =
-      '<div class="card-subheader syn-header"><span class="dot"></span> Synonyms</div>'
-      + '<div class="mcq-tiles-wrap">' + renderMCQTiles(snap.synOptions, snap.synStates, word, 'syn') + '</div>';
-  } else {
-    document.getElementById('synChips').innerHTML = '';
-  }
-
-  // Ant tab — MCQ tiles
-  const hasAnt = snap.antOptions.length > 0;
-  if (hasAnt) {
-    document.getElementById('antChips').innerHTML =
-      '<div class="card-subheader ant-header"><span class="dot"></span> Antonyms</div>'
-      + '<div class="mcq-tiles-wrap">' + renderMCQTiles(snap.antOptions, snap.antStates, word, 'ant') + '</div>';
-  } else {
-    document.getElementById('antChips').innerHTML = '';
-  }
-
-  // Meaning tab — read style only
+  const hasDef  = !!entry?.definition;
   const showDef = hasDef && S.mcqShowMeaning;
+
   if (showDef) {
     document.getElementById('defContent').innerHTML =
       '<div class="def-text">' + esc(entry.definition) + '</div>'
@@ -438,112 +384,155 @@ function showMCQ(word, entry) {
     document.getElementById('defContent').innerHTML = '';
   }
 
-  setCards(hasSyn, hasAnt, showDef);
-  reorderTabs();
-  activateFirstTab(
-    [...exactSyns, ...simSyms],
-    [...exactAnts, ...simAnts],
-    hasDef, showDef
-  );
-}
-
-function buildMCQSnapshot(word, exactSyns, exactAnts, simSyms, simAnts) {
-  const total      = S.mcqOptions;
-  const allExclude = [word, ...exactSyns, ...exactAnts, ...simSyms, ...simAnts];
-  const pool       = studyList.filter(w => !allExclude.includes(w));
-
-  function buildSide(exactCorrect, similarCorrect) {
-    const allCorrect = S.mcqShowSimilar
-      ? [...exactCorrect, ...similarCorrect]
-      : [...exactCorrect];
-
-    let pickedCorrect = [];
-    if (S.mcqMultipleCorrect) {
-      // Random count 1..mcqMaxCorrect, capped by available
-      const maxPossible = Math.min(allCorrect.length, S.mcqMaxCorrect);
-      const count = maxPossible > 0 ? Math.floor(Math.random() * maxPossible) + 1 : 0;
-      pickedCorrect = shuffle([...allCorrect]).slice(0, count);
-    } else {
-      // Single correct — exactly 1
-      pickedCorrect = allCorrect.length ? [shuffle([...allCorrect])[0]] : [];
-    }
-
-    const fillers  = shuffle([...pool]).slice(0, total - pickedCorrect.length);
-    const options  = shuffle([
-      ...pickedCorrect.map(w => ({ word: w, correctVal: exactCorrect.includes(w) ? 'exact' : 'similar' })),
-      ...fillers.map(w => ({ word: w, correctVal: 'false' })),
-    ]);
-    const states = {};
-    options.forEach(o => { states[o.word] = null; });
-    return { options, states };
+  const existing = mcqHistory.find(h => h.word === word);
+  if (existing) {
+    renderMCQTiles(existing, showDef);
+  } else {
+    buildMCQFresh(word, showDef);
   }
 
-  const syn = buildSide(exactSyns, simSyms);
-  const ant = buildSide(exactAnts, simAnts);
-
-  return {
-    synOptions: syn.options,
-    synStates:  syn.states,
-    antOptions: ant.options,
-    antStates:  ant.states,
-    interacted: false,
-  };
 }
 
-function renderMCQTiles(options, states, parentWord, type) {
-  const allCorrectDone = checkMCQWordAction(parentWord, type, options, states);
-  return options.map(o => {
-    const state = states[o.word]; // null | 0 | 1 | 2
-    const stateClass = state === 1 ? ' mcq-tile-correct'
-                     : state === 2 ? ' mcq-tile-similar'
-                     : state === 0 ? ' mcq-tile-wrong'
-                     : '';
-    const locked = state !== null ? ' mcq-tile-locked' : '';
-    // Word detail press+hold only when all correct answered
-    const holdAttrs = allCorrectDone
-      ? ' onmousedown="chipDown(event,\'' + esc(o.word) + '\')" onmouseup="chipUp()" onmouseleave="chipCancel()"'
-        + ' ontouchstart="chipDown(event,\'' + esc(o.word) + '\')" ontouchmove="chipCancel()" ontouchend="chipUp()" ontouchcancel="chipCancel()"'
-      : '';
-    return '<button class="mcq-tile' + stateClass + locked + '"'
-      + ' data-tileword="' + esc(o.word) + '"'
-      + ' data-correct="' + o.correctVal + '"'
-      + ' data-mcqtype="' + type + '"'
-      + ' data-parentword="' + esc(parentWord) + '"'
-      + ' onclick="mcqTileClick(this)"'
-      + holdAttrs + '>'
-      + esc(o.word)
-      + '</button>';
-  }).join('');
+function buildMCQFresh(word, showDef) {
+  const synExact   = getSyns(word);
+  const antExact   = getAnts(word);
+  const synSimilar = S.mcqShowSimilar ? getSimilarSyns(word) : [];
+  const antSimilar = S.mcqShowSimilar ? getSimilarAnts(word) : [];
+
+  const synOptions = buildMCQOptions(word, synExact, synSimilar, 'syn');
+  const antOptions = buildMCQOptions(word, antExact, antSimilar, 'ant');
+
+  const states = {};
+  synOptions.forEach(o => { states[o.word + '_syn'] = null; });
+  antOptions.forEach(o => { states[o.word + '_ant'] = null; });
+
+  const hist = { word, synOptions, antOptions, states, interacted: false };
+  mcqHistory.push(hist);
+  renderMCQTiles(hist, showDef);
+}
+
+function buildMCQOptions(word, exactCorrect, similarCorrect, tab) {
+  const total      = S.mcqOptions;
+  const allCorrect = [...exactCorrect, ...similarCorrect];
+
+  let correctCount;
+  if (!S.mcqMultipleCorrect || allCorrect.length === 0) {
+    correctCount = allCorrect.length > 0 ? 1 : 0;
+  } else {
+    const maxPossible = Math.min(allCorrect.length, total - 1);
+    const maxAllowed  = Math.min(S.mcqMaxCorrect, maxPossible);
+    correctCount = maxAllowed > 0 ? Math.floor(Math.random() * maxAllowed) + 1 : 0;
+  }
+
+  const picked   = shuffle([...allCorrect]).slice(0, correctCount);
+  const exclude  = new Set([word, ...exactCorrect, ...similarCorrect]);
+  const pool     = studyList.filter(w => !exclude.has(w));
+  const fillers  = shuffle(pool).slice(0, total - picked.length);
+
+  return shuffle([
+    ...picked.map(w => ({ word: w, tab, kind: exactCorrect.includes(w) ? 'exact' : 'similar' })),
+    ...fillers.map(w => ({ word: w, tab, kind: 'distractor' }))
+  ]);
+}
+
+function renderMCQTiles(hist, showDef) {
+  const hasSyn = hist.synOptions.length > 0;
+  const hasAnt = hist.antOptions.length > 0;
+
+  if (hasSyn) {
+    document.getElementById('synChips').innerHTML =
+      '<div class="card-subheader syn-header"><span class="dot"></span> Synonyms</div>'
+      + '<div class="mcq-tiles-wrap">'
+      + hist.synOptions.map(o => mcqTileHTML(o, hist.states[o.word + '_syn'], hist.word, hist)).join('')
+      + '</div>';
+  } else { document.getElementById('synChips').innerHTML = ''; }
+
+  if (hasAnt) {
+    document.getElementById('antChips').innerHTML =
+      '<div class="card-subheader ant-header"><span class="dot"></span> Antonyms</div>'
+      + '<div class="mcq-tiles-wrap">'
+      + hist.antOptions.map(o => mcqTileHTML(o, hist.states[o.word + '_ant'], hist.word, hist)).join('')
+      + '</div>';
+  } else { document.getElementById('antChips').innerHTML = ''; }
+
+  const synExact = hist.synOptions.filter(o => o.kind !== 'distractor').map(o => o.word);
+  const antExact = hist.antOptions.filter(o => o.kind !== 'distractor').map(o => o.word);
+  document.getElementById('synCount').textContent = synExact.length || '';
+  document.getElementById('antCount').textContent = antExact.length || '';
+  setCards(hasSyn, hasAnt, showDef);
+  reorderTabs();
+  activateFirstTab(hasSyn ? [1] : [], hasAnt ? [1] : [], showDef);
+}
+
+function allCorrectDoneForTab(hist, tab) {
+  const opts = tab === 'syn' ? hist.synOptions : hist.antOptions;
+  return opts.filter(o => o.kind !== 'distractor').every(o => {
+    const s = hist.states[o.word + '_' + tab];
+    return s === 1 || s === 2;
+  });
+}
+
+function mcqTileHTML(opt, state, currentWord, hist) {
+  const tab         = opt.tab;
+  const stateClass  = state === null ? '' : state === 1 ? ' mcq-tile-correct' : state === 2 ? ' mcq-tile-similar' : ' mcq-tile-wrong';
+  const lockedClass = state !== null ? ' mcq-tile-locked' : '';
+  const holdUnlocked = allCorrectDoneForTab(hist, tab);
+
+  const holdAttrs = holdUnlocked
+    ? ' onmousedown="mcqTileHoldDown(event,\'' + esc(opt.word) + '\')" onmouseup="mcqTileHoldUp()" onmouseleave="mcqTileHoldUp()"'
+    + ' ontouchstart="mcqTileHoldDown(event,\'' + esc(opt.word) + '\')" ontouchmove="mcqTileHoldUp()" ontouchend="mcqTileHoldUp()" ontouchcancel="mcqTileHoldUp()"'
+    : '';
+
+  return '<button class="mcq-tile' + stateClass + lockedClass + '"'
+    + ' data-word="' + esc(opt.word) + '" data-kind="' + opt.kind + '" data-tab="' + tab + '" data-current="' + esc(currentWord) + '"'
+    + ' onclick="mcqTileClick(this)"'
+    + holdAttrs
+    + '>' + esc(opt.word) + '</button>';
 }
 
 function mcqTileClick(btn) {
-  if (chipHeld) { chipHeld = false; return; }
+  if (mcqHeld) { mcqHeld = false; return; }
   if (btn.classList.contains('mcq-tile-locked')) return;
 
-  const parentWord = btn.dataset.parentword;
-  const tileWord   = btn.dataset.tileword;
-  const correctVal = btn.dataset.correct;
-  const type       = btn.dataset.mcqtype;
-  const snap       = mcqHistory[parentWord];
-  if (!snap) return;
+  const kind        = btn.dataset.kind;
+  const tab         = btn.dataset.tab;
+  const word        = btn.dataset.word;
+  const currentWord = btn.dataset.current;
+  const newState    = kind === 'exact' ? 1 : kind === 'similar' ? 2 : 0;
 
-  snap.interacted = true;
+  const hist = mcqHistory.find(h => h.word === currentWord);
+  if (!hist) return;
 
-  // Assign state: exact→1, similar→2, wrong→0
-  const newState = correctVal === 'exact' ? 1 : correctVal === 'similar' ? 2 : 0;
-  if (type === 'syn') snap.synStates[tileWord] = newState;
-  else                snap.antStates[tileWord] = newState;
+  hist.states[word + '_' + tab] = newState;
+  hist.interacted = true;
 
-  // Re-render the whole MCQ view to update lock state + potential word action unlock
-  const entry = csvData.find(r => r.word === parentWord);
-  showMCQ(parentWord, entry);
+  btn.classList.add('mcq-tile-locked');
+  if (newState === 1)      btn.classList.add('mcq-tile-correct');
+  else if (newState === 2) btn.classList.add('mcq-tile-similar');
+  else                     btn.classList.add('mcq-tile-wrong');
+
+  // If all correct options for this tab are now done, re-render to unlock hold
+  if (allCorrectDoneForTab(hist, tab)) {
+    const wrap = btn.closest('.mcq-tiles-wrap');
+    if (wrap) {
+      const opts = tab === 'syn' ? hist.synOptions : hist.antOptions;
+      wrap.innerHTML = opts.map(o => mcqTileHTML(o, hist.states[o.word + '_' + tab], currentWord, hist)).join('');
+    }
+  }
 }
 
-// Returns true if all correct options in this side have state 1 or 2
-function checkMCQWordAction(parentWord, type, options, states) {
-  const correctOptions = options.filter(o => o.correctVal !== 'false');
-  if (!correctOptions.length) return false;
-  return correctOptions.every(o => states[o.word] === 1 || states[o.word] === 2);
+function mcqTileHoldDown(e, word) {
+  if (mcqHoldTimer) clearTimeout(mcqHoldTimer);
+  mcqHeld = false;
+  mcqHoldTimer = setTimeout(() => {
+    mcqHoldTimer = null; mcqHeld = true;
+    e.preventDefault(); e.stopPropagation();
+    openDetail(word);
+  }, HOLD_MS);
+}
+function mcqTileHoldUp() {
+  if (mcqHoldTimer) { clearTimeout(mcqHoldTimer); mcqHoldTimer = null; }
+  mcqHeld = false;
 }
 
 function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
@@ -570,17 +559,13 @@ function nextDown()  { nextTimer = setTimeout(() => { nextTimer = null; openQuic
 function nextUp()    { if (nextTimer) { clearTimeout(nextTimer); nextTimer = null; } }
 
 // ══════════════════════════════════════
-// CHIP HOLD
+// CHIP HOLD (Study + Revise)
 // ══════════════════════════════════════
 function chipDown(e, word) {
   if (S.mode === 'revise' && !S.reviseWordAction) return;
   if (chipTimer) clearTimeout(chipTimer);
   chipHeld  = false;
-  chipTimer = setTimeout(() => {
-    chipTimer = null; chipHeld = true;
-    e.preventDefault(); e.stopPropagation();
-    openDetail(word);
-  }, HOLD_MS);
+  chipTimer = setTimeout(() => { chipTimer = null; chipHeld = true; e.preventDefault(); e.stopPropagation(); openDetail(word); }, HOLD_MS);
 }
 function chipUp()     { if (chipTimer) { clearTimeout(chipTimer); chipTimer = null; } chipHeld = false; }
 function chipCancel() { if (chipTimer) { clearTimeout(chipTimer); chipTimer = null; } chipHeld = false; }
@@ -608,14 +593,12 @@ function openDetail(word) {
   document.getElementById('detailContent').innerHTML = html;
   document.getElementById('wordDetailOverlay').classList.remove('hidden');
 }
-
 function detailChip(word, type) {
   return '<button class="chip ' + type + '-chip"'
     + ' onmousedown="chipDown(event,\'' + esc(word) + '\')" onmouseup="chipUp()" onmouseleave="chipCancel()"'
     + ' ontouchstart="chipDown(event,\'' + esc(word) + '\')" ontouchmove="chipCancel()" ontouchend="chipUp()" ontouchcancel="chipCancel()"'
     + '>' + esc(word) + '</button>';
 }
-
 function viewDetailWord() {
   if (detailWord) { closeModal('wordDetailOverlay'); startAt(detailWord); }
 }
@@ -637,7 +620,6 @@ function initSearch() {
     inp.focus();
   });
 }
-
 function searchHTML(q) {
   let rx;
   try { rx = new RegExp(q, 'i'); } catch(e) { rx = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'i'); }
@@ -660,7 +642,6 @@ function searchHTML(q) {
   const html = grp('Exact Match', exact) + grp('Close Matches', close) + grp('Matches in Meaning', meaning);
   return html || '<div class="search-hint">No results for "' + esc(q) + '"</div>';
 }
-
 function searchJump(word) {
   if (document.getElementById('searchScreen').classList.contains('active'))
     showScreen(sessionLive ? 'study' : 'home');
@@ -677,12 +658,10 @@ function openPanel() {
   updateSaveBar(); updatePanel();
   document.getElementById('wordListOverlay').classList.remove('hidden');
 }
-
 function updatePanel() {
   const el = document.getElementById('wordListContent');
   const f  = panelFilter.toLowerCase();
   panelScroll[panelTab] = el.scrollTop;
-
   if (panelTab === 'list') {
     if (!studyList.length) { el.innerHTML = '<div class="panel-empty">No session active.</div>'; return; }
     el.innerHTML = studyList.map((w,i) => ({ w, i })).filter(({ w }) => !f || w.toLowerCase().includes(f)).map(({ w, i }) => {
@@ -712,7 +691,6 @@ function updatePanel() {
   }
   el.scrollTop = panelScroll[panelTab];
 }
-
 function panelDown(e, el) {
   if (panelTimer) clearTimeout(panelTimer);
   panelHeld = false; panelScrolled = false;
@@ -726,12 +704,10 @@ function panelUp(e, el) {
   const idx = parseInt(el.dataset.index);
   if (!isNaN(idx)) { currentIndex = idx; show(); closeModal('wordListOverlay'); }
 }
-
 function updateSaveBar() {
   const pfx = { list:'List1', queue:'CustomList', history:'CurrentSession' };
   document.getElementById('panelSaveName').value = listName(pfx[panelTab] || 'List');
 }
-
 function savePanelList() {
   const name  = document.getElementById('panelSaveName').value.trim() || listName('List');
   const words = panelTab === 'list' ? studyList : panelTab === 'queue' ? customQueue.map(q => q.word) : readHistory.map(h => h.word);
@@ -742,7 +718,6 @@ function savePanelList() {
   localStorage.setItem('dictSavedLists', JSON.stringify(saved));
   alert('Saved as "' + name + '"');
 }
-
 function removeFromQueue(word, e) {
   e.stopPropagation();
   customQueue = customQueue.filter(q => q.word !== word);
@@ -759,7 +734,6 @@ function openAddTo(word) {
   syncAddTo();
   document.getElementById('addToOverlay').classList.remove('hidden');
 }
-
 function syncAddTo() {
   document.querySelectorAll('.addto-btn').forEach(b => b.classList.remove('active'));
   if (pendingAddTo.queue) document.querySelector('[data-flag="queue"]').classList.add('active');
@@ -768,7 +742,6 @@ function syncAddTo() {
   if (pendingAddTo.hide) { hBtn.classList.add('active'); hBtn.firstChild.textContent = '👁️'; hLbl.textContent = 'Unhide'; }
   else { hBtn.firstChild.textContent = '🚫'; hLbl.textContent = 'Hide'; }
 }
-
 function bindAddTo() {
   document.querySelectorAll('.addto-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -817,12 +790,10 @@ function showInfo() {
     row('Hidden', hiddenWords.size) + row('Queue', customQueue.length);
   document.getElementById('infoOverlay').classList.remove('hidden');
 }
-
 function row(label, val, accent) {
   return '<div class="info-row"><span class="info-row-label">' + label + '</span>'
     + '<span class="info-row-value' + (accent ? ' accent' : '') + '">' + val + '</span></div>';
 }
-
 function quitSession() {
   if (customQueue.length) {
     const saved = JSON.parse(localStorage.getItem('dictSavedLists') || '[]');
@@ -832,8 +803,8 @@ function quitSession() {
   localStorage.removeItem('dictCurrentSession');
   localStorage.removeItem('dictCurrentQueue');
   studyList = []; currentIndex = 0; wordsSeen = 0;
-  startTime = null; readHistory = []; customQueue = [];
-  sessionLive = false; mcqHistory = {};
+  startTime = null; readHistory = []; customQueue = []; mcqHistory = [];
+  sessionLive = false;
   navSessionStart();
   closeModal('infoOverlay');
   onQuitSession();
@@ -848,19 +819,16 @@ function openSettings() {
   syncSettingsTabUI(); syncSettingsUI(); showConditional(S.mode);
   document.getElementById('settingsOverlay').classList.remove('hidden');
 }
-
 function syncSettingsTabUI() {
   document.getElementById('settingsDisplayTab').classList.toggle('hidden', settingsTab !== 'display');
   document.getElementById('settingsNavTab').classList.toggle('hidden', settingsTab !== 'navigation');
   document.querySelectorAll('.settings-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.settingsTab === settingsTab));
 }
-
 function showConditional(mode) {
   document.querySelectorAll('.study-only').forEach(el  => el.classList.toggle('hidden', mode !== 'study'));
   document.querySelectorAll('.revise-only').forEach(el => el.classList.toggle('hidden', mode !== 'revise'));
   document.querySelectorAll('.mcq-only').forEach(el    => el.classList.toggle('hidden', mode !== 'mcq'));
 }
-
 function syncSettingsUI() {
   const p = pending;
   document.getElementById('modeStudyToggle').checked  = p.mode === 'study';
@@ -875,7 +843,7 @@ function syncSettingsUI() {
   tog('showSimilarToggle','showSimilar'); tog('showMeaningToggle','showMeaning'); tog('meaningOptionsToggle','meaningOptions');
   tog('randomOptToggle','randomOptionCount'); tog('revealCorrectToggle','revealCorrect'); tog('reviseWordActionToggle','reviseWordAction');
   tog('mcqShowMeaningToggle','mcqShowMeaning'); tog('mcqShowSimilarToggle','mcqShowSimilar');
-  tog('mcqMultipleCorrectToggle','mcqMultipleCorrect');
+  tog('mcqMultipleCorrectToggle','mcqMultipleCorrect'); tog('mcqRandomizeToggle','mcqRandomize');
   tog('stepActionToggle','stepAction'); tog('navFilterToggle','navFilter'); tog('allowMultipleToggle','allowMultiple');
   tog('joinConditionToggle','joinCondition'); tog('randomNavToggle','randomNav'); tog('suggestMarkedToggle','suggestMarked');
   tog('necessaryToggle','necessary'); tog('nxtBehaviorToggle','exclusive'); tog('avoidOppositesToggle','avoidOpposites');
@@ -897,21 +865,19 @@ function syncSettingsUI() {
   document.getElementById('navVariationFallbackRow').classList.toggle('hidden', !p.prevVariation);
   document.querySelectorAll('.allow-multiple-row').forEach(r => r.classList.toggle('hidden', !p.allowMultiple));
   document.getElementById('mcqMultipleCorrectOptions').classList.toggle('hidden', !p.mcqMultipleCorrect);
+
   syncNavRandomUI(p);
 }
-
 function syncNavRandomUI(p) {
   const isRandom = p.orderMode === 'random';
   document.getElementById('navRandomSection').classList.toggle('hidden', isRandom);
   document.getElementById('navRandomOrderSection').classList.toggle('hidden', !isRandom);
   if (!isRandom) document.getElementById('navRandomOptions').classList.toggle('hidden', !p.randomNav);
 }
-
 function btn(attr, key, p) {
   const val = String(p[key]);
   document.querySelectorAll('[' + attr + ']').forEach(b => b.classList.toggle('active', b.getAttribute(attr) === val));
 }
-
 function tog(id, key) { const el = document.getElementById(id); if (el) el.checked = !!pending[key]; }
 
 function bindSettingsEvents() {
@@ -927,7 +893,6 @@ function bindSettingsEvents() {
       showConditional(mode);
     });
   });
-
   function bindBtn(attr, key, parse) {
     document.querySelectorAll('[' + attr + ']').forEach(b => {
       b.addEventListener('click', () => {
@@ -938,7 +903,6 @@ function bindSettingsEvents() {
       });
     });
   }
-
   bindBtn('data-step','stepNumber',parseInt); bindBtn('data-filter','filter',null);
   bindBtn('data-taborder','tabOrder',null); bindBtn('data-correctpct','correctPercent',parseInt);
   bindBtn('data-minopt','minOptions',parseInt); bindBtn('data-maxopt','maxOptions',parseInt);
@@ -949,7 +913,6 @@ function bindSettingsEvents() {
     const el = document.getElementById(id); if (!el) return;
     el.addEventListener('change', e => { if (!pending) return; pending[key] = e.target.checked; if (onchange) onchange(e.target.checked); });
   }
-
   bindTog('loopToggle','loopMode'); bindTog('translationToggle','showTranslation'); bindTog('highlightToggle','wordHighlight');
   bindTog('showSimilarToggle','showSimilar');
   bindTog('showMeaningToggle','showMeaning', v => document.querySelector('.meaning-options-row').classList.toggle('hidden', !v));
@@ -963,6 +926,7 @@ function bindSettingsEvents() {
   bindTog('mcqMultipleCorrectToggle','mcqMultipleCorrect', v => {
     document.getElementById('mcqMultipleCorrectOptions').classList.toggle('hidden', !v);
   });
+  bindTog('mcqRandomizeToggle','mcqRandomize');
   bindTog('stepActionToggle','stepAction');
   bindTog('navFilterToggle','navFilter', v => document.getElementById('navFilterOptions').classList.toggle('hidden', !v));
   bindTog('allowMultipleToggle','allowMultiple', v => {
@@ -981,7 +945,6 @@ function bindSettingsEvents() {
   bindTog('joinConditionToggle','joinCondition'); bindTog('necessaryToggle','necessary');
   bindTog('nxtBehaviorToggle','exclusive'); bindTog('avoidOppositesToggle','avoidOpposites');
   bindTog('variationFallbackToggle','variationFallback');
-
   ['prevExactChk','prevVariationChk'].forEach(id => {
     document.getElementById(id).addEventListener('change', e => {
       if (!pending) return;
@@ -990,10 +953,8 @@ function bindSettingsEvents() {
       if (key === 'prevVariation') document.getElementById('navVariationFallbackRow').classList.toggle('hidden', !e.target.checked);
     });
   });
-
   bindTog('randomNavToggle','randomNav', v => document.getElementById('navRandomOptions').classList.toggle('hidden', !v));
   bindTog('suggestMarkedToggle','suggestMarked'); bindTog('suggestMarkedRandomToggle','suggestMarked');
-
   ['navSynAntChk','navDefinedChk','navRootwiseChk'].forEach(id => {
     document.getElementById(id).addEventListener('change', e => {
       if (!pending) return;
@@ -1012,7 +973,6 @@ function bindSettingsEvents() {
       if (key === 'navRootwise') document.getElementById('navRootwiseOptions').classList.toggle('hidden', !e.target.checked);
     });
   });
-
   bindBtn('data-delta','navDelta',parseInt);
 
   document.getElementById('settingsSave').addEventListener('click', () => {
@@ -1030,7 +990,6 @@ function bindSettingsEvents() {
         pending.mcqMaxCorrect !== S.mcqMaxCorrect || pending.mcqShowMeaning !== S.mcqShowMeaning ||
         pending.mcqShowSimilar !== S.mcqShowSimilar
       );
-      if (mcqChanged) mcqHistory = {}; // clear so options rebuild fresh
       Object.assign(S, pending); saveSettings(); applyAppearance();
       document.getElementById('sessionStep').textContent = S.stepNumber;
       updateBar();
@@ -1038,7 +997,6 @@ function bindSettingsEvents() {
     }
     pending = null; closeModal('settingsOverlay');
   });
-
   document.querySelectorAll('.settings-tab-btn').forEach(b => {
     b.addEventListener('click', () => { settingsTab = b.dataset.settingsTab; syncSettingsTabUI(); });
   });
@@ -1076,14 +1034,12 @@ function syncQuickNavUI() {
   document.querySelectorAll('.allow-multiple-row').forEach(r => r.classList.toggle('hidden', !p.allowMultiple));
   syncQuickNavRandomUI(p);
 }
-
 function syncQuickNavRandomUI(p) {
   const isRandom = p.orderMode === 'random';
   document.getElementById('qNavRandomSection').classList.toggle('hidden', isRandom);
   document.getElementById('qNavRandomOrderSection').classList.toggle('hidden', !isRandom);
   if (!isRandom) document.getElementById('qNavRandomOptions').classList.toggle('hidden', !p.randomNav);
 }
-
 function bindQuickNavSettings() {
   document.querySelectorAll('[data-qstep]').forEach(b => b.addEventListener('click', () => {
     if (!pendingNav) return;
@@ -1095,12 +1051,10 @@ function bindQuickNavSettings() {
     document.querySelectorAll('[data-qdelta]').forEach(x => x.classList.remove('active'));
     b.classList.add('active'); pendingNav.navDelta = parseInt(b.dataset.qdelta);
   }));
-
   function qTog(id, key, onchange) {
     const el = document.getElementById(id); if (!el) return;
     el.addEventListener('change', e => { if (!pendingNav) return; pendingNav[key] = e.target.checked; if (onchange) onchange(e.target.checked); });
   }
-
   qTog('qLoopToggle','loopMode'); qTog('qStepActionToggle','stepAction');
   qTog('qNavFilterToggle','navFilter', v => document.getElementById('qNavFilterOptions').classList.toggle('hidden', !v));
   qTog('qAllowMultipleToggle','allowMultiple', v => {
@@ -1119,7 +1073,6 @@ function bindQuickNavSettings() {
   qTog('qJoinConditionToggle','joinCondition'); qTog('qNecessaryToggle','necessary');
   qTog('qNxtBehaviorToggle','exclusive'); qTog('qAvoidOppositesToggle','avoidOpposites');
   qTog('qVariationFallbackToggle','variationFallback');
-
   ['qPrevExactChk','qPrevVariationChk'].forEach(id => {
     document.getElementById(id).addEventListener('change', e => {
       if (!pendingNav) return;
@@ -1128,10 +1081,8 @@ function bindQuickNavSettings() {
       if (key === 'prevVariation') document.getElementById('qNavVariationFallbackRow').classList.toggle('hidden', !e.target.checked);
     });
   });
-
   qTog('qRandomNavToggle','randomNav', v => document.getElementById('qNavRandomOptions').classList.toggle('hidden', !v));
   qTog('qSuggestMarkedToggle','suggestMarked'); qTog('qSuggestMarkedRandomToggle','suggestMarked');
-
   ['qNavSynAntChk','qNavDefinedChk','qNavRootwiseChk'].forEach(id => {
     document.getElementById(id).addEventListener('change', e => {
       if (!pendingNav) return;
@@ -1151,13 +1102,11 @@ function openCustomise() {
   pending = Object.assign({}, S); syncCustomiseUI();
   document.getElementById('customiseOverlay').classList.remove('hidden');
 }
-
 function syncCustomiseUI() {
   document.querySelectorAll('[data-size]').forEach(b   => b.classList.toggle('active',   b.dataset.size   === pending.fontSize));
   document.querySelectorAll('[data-accent]').forEach(b => b.classList.toggle('selected', b.dataset.accent === pending.accent));
   document.querySelectorAll('[data-theme]').forEach(b  => b.classList.toggle('selected', b.dataset.theme  === pending.theme));
 }
-
 function bindCustomiseEvents() {
   document.querySelectorAll('[data-size]').forEach(b => b.addEventListener('click', () => {
     if (!pending) return; document.querySelectorAll('[data-size]').forEach(x => x.classList.remove('active')); b.classList.add('active'); pending.fontSize = b.dataset.size;
@@ -1181,13 +1130,11 @@ function saveSettings() { localStorage.setItem('dictSettings', JSON.stringify(S)
 function loadSettings() {
   try { const saved = JSON.parse(localStorage.getItem('dictSettings') || '{}'); const accent = localStorage.getItem('dictAccent'); Object.assign(S, saved); if (accent) S.accent = accent; } catch(e) {}
 }
-
 function applyAppearance() {
   document.body.className = document.body.className.replace(/accent-\w+/g,'').replace(/theme-\w+/g,'').replace(/font-\w+/g,'').trim();
   document.body.classList.add('accent-' + S.accent, 'theme-' + (S.theme || 'navy'), 'font-' + S.fontSize);
   localStorage.setItem('dictAccent', S.accent);
 }
-
 function saveHiddenWords() { localStorage.setItem('dictHidden', JSON.stringify([...hiddenWords])); }
 function loadHiddenWords()  { try { hiddenWords = new Set(JSON.parse(localStorage.getItem('dictHidden') || '[]')); } catch(e) {} }
 
@@ -1207,7 +1154,6 @@ function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 function bindAll() {
   bindGate(); initSearch(); bindSettingsEvents(); bindCustomiseEvents(); bindAddTo(); bindQuickNavSettings();
   bindStartEvents();
-
   document.getElementById('homeSearchBtn').addEventListener('click', () => showScreen('search'));
   document.getElementById('homeBookBtn').addEventListener('click', handleBook);
   document.getElementById('customiseBtn').addEventListener('click', openCustomise);
@@ -1215,12 +1161,10 @@ function bindAll() {
     if (!confirm('Are you sure you want to logout?')) return;
     localStorage.removeItem('dictSession'); sessionStorage.removeItem('dictSession'); showScreen('gate');
   });
-
   document.getElementById('studyHomeBtn').addEventListener('click', goHome);
   document.getElementById('infoBtn').addEventListener('click', showInfo);
   document.getElementById('settingsBtn').addEventListener('click', openSettings);
   document.getElementById('wordListBtn').addEventListener('click', openPanel);
-
   const pb = document.getElementById('prevBtn');
   const nb = document.getElementById('nextBtn');
   pb.addEventListener('click', prevWord); nb.addEventListener('click', nextWord);
@@ -1228,9 +1172,7 @@ function bindAll() {
   pb.addEventListener('touchstart', prevDown, { passive: true }); pb.addEventListener('touchend', prevUp); pb.addEventListener('touchcancel', prevUp);
   nb.addEventListener('mousedown', nextDown); nb.addEventListener('mouseup', nextUp); nb.addEventListener('mouseleave', nextUp);
   nb.addEventListener('touchstart', nextDown, { passive: true }); nb.addEventListener('touchend', nextUp); nb.addEventListener('touchcancel', nextUp);
-
   document.getElementById('searchBackBtn').addEventListener('click', () => showScreen(sessionLive ? 'study' : 'home'));
-
   document.querySelectorAll('.panel-tab').forEach(t => t.addEventListener('click', () => {
     document.querySelectorAll('.panel-tab').forEach(x => x.classList.remove('active')); t.classList.add('active');
     panelTab = t.dataset.panelTab; updateSaveBar(); updatePanel();
@@ -1239,17 +1181,13 @@ function bindAll() {
   document.getElementById('panelSearchInput').addEventListener('input', e => { panelFilter = e.target.value.trim(); updatePanel(); });
   document.getElementById('wordListClose').addEventListener('click', () => closeModal('wordListOverlay'));
   document.getElementById('wordListOverlay').addEventListener('click', e => { if (e.target.id === 'wordListOverlay') closeModal('wordListOverlay'); });
-
   document.getElementById('infoClose').addEventListener('click', () => closeModal('infoOverlay'));
   document.getElementById('infoQuit').addEventListener('click', quitSession);
   document.getElementById('infoOverlay').addEventListener('click', e => { if (e.target.id === 'infoOverlay') closeModal('infoOverlay'); });
-
   document.getElementById('wordDetailClose').addEventListener('click', () => closeModal('wordDetailOverlay'));
   document.getElementById('wordDetailView').addEventListener('click', viewDetailWord);
   document.getElementById('wordDetailOverlay').addEventListener('click', e => { if (e.target.id === 'wordDetailOverlay') closeModal('wordDetailOverlay'); });
-
   document.getElementById('addToOverlay').addEventListener('click', e => { if (e.target.id === 'addToOverlay') closeModal('addToOverlay'); });
-
   document.getElementById('quickNavClose').addEventListener('click', () => { pendingNav = null; closeModal('quickNavOverlay'); });
   document.getElementById('quickNavSave').addEventListener('click', () => {
     if (pendingNav) { Object.assign(S, pendingNav); saveSettings(); updateBar(); syncSettingsUI(); }
@@ -1258,7 +1196,6 @@ function bindAll() {
   document.getElementById('quickNavOverlay').addEventListener('click', e => { if (e.target.id === 'quickNavOverlay') { pendingNav = null; closeModal('quickNavOverlay'); } });
   bindQuickNavSettings();
   navBindQuickNav();
-
   document.addEventListener('keydown', e => {
     if (document.querySelector('.screen.active')?.id !== 'studyScreen') return;
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') nextWord();
@@ -1276,9 +1213,7 @@ function listName(prefix) {
   const dev = /android/i.test(ua) ? 'Android' : /iphone|ipad/i.test(ua) ? 'iOS' : /windows/i.test(ua) ? 'Windows' : 'Mac';
   return prefix + '-' + pad(n.getHours()) + ':' + pad(n.getMinutes()) + '&' + pad(n.getDate()) + '-' + pad(n.getMonth()+1) + '-' + String(n.getFullYear()).slice(2) + '@' + dev;
 }
-
 function pad(n) { return String(n).padStart(2,'0'); }
-
 function esc(str) {
   if (!str) return '';
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
