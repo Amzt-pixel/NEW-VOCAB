@@ -788,3 +788,115 @@ input  { font-family: 'DM Sans', sans-serif; }
 /* mcqMultipleCorrectOptions hidden rule */
 #mcqMultipleCorrectOptions.hidden { display: none; }
 
+/* ══════════════════════════════════════
+   ADDITIONS — append to bottom of style.css
+   ══════════════════════════════════════ */
+
+/* ── Revise chip states ── */
+/* existing: revise-correct (green), revise-incorrect (red), revise-revealed (blue) */
+/* new states using data-kind approach */
+
+.chip.revise-state-set  { cursor: default; border-width: 2px; }
+
+/* Exact correct — green */
+.chip.revise-correct {
+  background: #E8F5E9 !important;
+  color: #1B5E20 !important;
+  border-color: #81C784 !important;
+}
+
+/* Similar correct — blue */
+.chip.revise-similar {
+  background: #E3F2FD !important;
+  color: #0D47A1 !important;
+  border-color: #90CAF9 !important;
+}
+
+/* Wrong — red */
+.chip.revise-incorrect {
+  background: #FFEBEE !important;
+  color: #B71C1C !important;
+  border-color: #EF9A9A !important;
+}
+
+/* Revealed exact (after wrong pick, revealCorrect ON) */
+.chip.revise-revealed {
+  background: #F1F8E9 !important;
+  color: #33691E !important;
+  border-color: #AED581 !important;
+  opacity: 0.85;
+}
+
+/* Revealed similar */
+.chip.revise-revealed-similar {
+  background: #E8EAF6 !important;
+  color: #283593 !important;
+  border-color: #9FA8DA !important;
+  opacity: 0.85;
+}
+
+/* ── MCQ tiles ── */
+.mcq-tiles-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.mcq-tile {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--surface2);
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  cursor: pointer;
+  transition: all .15s;
+  text-align: left;
+  min-width: 80px;
+}
+
+.mcq-tile:hover:not(.mcq-tile-locked) {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  transform: translateY(-1px);
+}
+
+.mcq-tile:active:not(.mcq-tile-locked) {
+  transform: scale(.98);
+}
+
+/* State 1 — exact correct — green */
+.mcq-tile.mcq-tile-correct {
+  background: #E8F5E9;
+  color: #1B5E20;
+  border-color: #81C784;
+  cursor: default;
+}
+
+/* State 2 — similar correct — blue */
+.mcq-tile.mcq-tile-similar {
+  background: #E3F2FD;
+  color: #0D47A1;
+  border-color: #90CAF9;
+  cursor: default;
+}
+
+/* State 0 — wrong — red */
+.mcq-tile.mcq-tile-wrong {
+  background: #FFEBEE;
+  color: #B71C1C;
+  border-color: #EF9A9A;
+  cursor: default;
+}
+
+/* Locked but uninteracted (shouldn't normally occur visually) */
+.mcq-tile.mcq-tile-locked:not(.mcq-tile-correct):not(.mcq-tile-similar):not(.mcq-tile-wrong) {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* mcqMultipleCorrectOptions hidden rule */
+#mcqMultipleCorrectOptions.hidden { display: none; }
