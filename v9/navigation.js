@@ -16,7 +16,10 @@ const sessionMarks  = {};
 // SESSION TRACKING
 // ══════════════════════════════════════
 function trackVisit(word) {
-  readHistory.push({ word, index: currentIndex, time: new Date().toLocaleTimeString() });
+  // Only push to readHistory in study/revise — not MCQ
+  if (S.mode !== 'mcq') {
+    readHistory.push({ word, index: currentIndex, time: new Date().toLocaleTimeString() });
+  }
   visitedWords.add(word);
   const e = csvData.find(r => r.word === word);
   if (e?.id) {
