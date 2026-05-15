@@ -20,9 +20,10 @@ async function loadData() {
     const res = await fetch(CSV_URL);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     parseCSV(await res.text());
+    buildWordData();        // transfer csvData → wordData, then clear csvData
     buildRootList();
     demoStudyList = buildDemoStudyList();
-     updateStartAtTotal(demoStudyList.length);
+    updateStartAtTotal(demoStudyList.length);
     updateStats();
     renderHomeList();
     renderQueueCards();
@@ -63,6 +64,12 @@ function parseCSV(text) {
   }).filter(r => r.word);
 }
 
+// ── Transfer csvData → wordData, then clear csvData ──
+function buildWordData() {
+  wordData = csvData.map(r => Object.assign({}, r));
+  csvData  = [];
+}
+
 function parseCSVLine(line) {
   const cols = []; let cur = ''; let q = false;
   for (let i = 0; i < line.length; i++) {
@@ -78,7 +85,7 @@ function parseCSVLine(line) {
 function buildRootList() {
   const seen = new Set();
   rootWordList = [];
-  csvData.forEach(r => {
+  wordData.forEach(r => {
     if (!r.id) return;
     const k = Math.abs(r.id);
     if (!seen.has(k)) { seen.add(k); rootWordList.push({ word: r.word, id: r.id }); }
@@ -92,13 +99,13 @@ function updateStats() {
   const source = demoStudyList.length ? demoStudyList : studyList.length ? studyList : null;
   if (!source) {
     document.getElementById('statRootWords').textContent  = rootWordList.length;
-    document.getElementById('statTotalWords').textContent = csvData.length;
+    document.getElementById('statTotalWords').textContent = wordData.length;
     document.getElementById('statCategories').textContent = '3';
     return;
   }
   const sourceSet = new Set(source);
   const rootCount = rootWordList.filter(r => sourceSet.has(r.word)).length;
-  const cats = new Set(source.map(w => { const e = csvData.find(r => r.word === w); return e?.category; }).filter(Boolean));
+  const cats = new Set(source.map(w => { const e = wordData.find(r => r.word === w); return e?.category; }).filter(Boolean));
   document.getElementById('statRootWords').textContent  = rootCount;
   document.getElementById('statTotalWords').textContent = source.length;
   document.getElementById('statCategories').textContent = cats.size;
@@ -108,9 +115,9 @@ function updateStats() {
 // LIST BUILDERS
 // ══════════════════════════════════════
 function buildStudyList() {
-  let words = [...new Set(csvData.map(r => r.word))];
+  let words = [...new Set(wordData.map(r => r.word))];
   const cat = getActiveCat();
-  if (cat) words = words.filter(w => { const e = csvData.find(r => r.word === w); return e?.category === parseInt(cat); });
+  if (cat) words = words.filter(w => { const e = wordData.find(r => r.word === w); return e?.category === parseInt(cat); });
   if (S.filter === 'root') {
     const roots = new Set(rootWordList.map(r => r.word));
     words = words.filter(w => roots.has(w));
@@ -126,8 +133,8 @@ function buildStudyList() {
 function buildDemoStudyList() {
   const cat   = getActiveCat();
   const order = getActiveOrder();
-  let words   = [...new Set(csvData.map(r => r.word))];
-  if (cat) words = words.filter(w => { const e = csvData.find(r => r.word === w); return e?.category === parseInt(cat); });
+  let words   = [...new Set(wordData.map(r => r.word))];
+  if (cat) words = words.filter(w => { const e = wordData.find(r => r.word === w); return e?.category === parseInt(cat); });
   if (order === 'az')      words.sort((a,b) => a.localeCompare(b));
   else if (order === 'za') words.sort((a,b) => b.localeCompare(a));
   else                     words.sort(() => Math.random() - 0.5);
@@ -191,7 +198,6 @@ function renderQueueCards() {
       : 'No past session';
   }
 
-  // Latest Custom Queue
   const queue = JSON.parse(localStorage.getItem('dictCurrentQueue') || 'null');
   const queueMeta = document.getElementById('latestQueueMeta');
   if (queueMeta) {
@@ -199,7 +205,7 @@ function renderQueueCards() {
       ? queue.length + ' words | ' + formatSessionDate(queue[0]?.addedAt)
       : 'No queue active';
   }
-   renderPinnedGrid();
+  renderPinnedGrid();
 }
 
 function renderPinnedGrid() {
@@ -243,21 +249,6 @@ function formatSessionDate(isoStr) {
     return t + ' ' + d.toLocaleDateString([], { day: 'numeric', month: 'short' });
   } catch(e) { return '—'; }
 }
-/*
-function openQueue(id) {
-  if (homeSelMode !== 'custom') {
-    const selBtns = document.querySelectorAll('.sel-toggle .sel-btn');
-    selBtns.forEach(b => b.classList.remove('active'));
-    selBtns[1].classList.add('active');
-    homeSelMode = 'custom';
-    document.getElementById('normalPanel').style.display = 'none';
-    document.getElementById('customPanel').style.display = 'block';
-  }
-  const inp = document.getElementById('queueIdInput');
-  if (inp) inp.value = id;
-  document.querySelector('.start-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
-*/
 
 function openQueue(id) {
   switchStartTab('custom', document.querySelectorAll('.start-tab')[1]);
@@ -325,7 +316,7 @@ function renderHomeList(n) {
     const s   = getSyns(w).length > 0;
     const a   = getAnts(w).length > 0;
     const dot = s && a ? 'dot-both' : s ? 'dot-syn' : a ? 'dot-ant' : '';
-    const e   = csvData.find(r => r.word === w);
+    const e   = wordData.find(r => r.word === w);
     const idx = source.indexOf(w);
     const lvlMap = { 0:'Common', 1:'Unique', 2:'Specific', 3:'Colloquial' };
     const lvlCls = { 0:'wl-level-0', 1:'wl-level-1', 2:'wl-level-2', 3:'wl-level-3' };
@@ -357,7 +348,7 @@ function handleWordListClick(word, pos) {
   if (!sessionLive) { feedStartAt(pos); return; }
   if (homeSourceMode === 'static') {
     const idx = studyList.indexOf(word);
-    if (idx >= 0) { currentIndex = idx; showScreen('study'); show(); }
+    if (idx >= 0) { currentIndex = idx; showScreen('study'); buildCurrent(); }
     return;
   }
   feedStartAt(pos);
@@ -402,7 +393,7 @@ function startSession() {
   updateBar();
   navSessionStart();
   showScreen('study');
-  show();
+  buildCurrent();
 }
 
 function startAt(word) {
@@ -423,7 +414,7 @@ function startAt(word) {
   currentIndex = idx >= 0 ? idx : 0;
   wordsSeen++;
   showScreen('study');
-  show();
+  buildCurrent();
 }
 
 function updateBar() {
@@ -480,7 +471,7 @@ function bindStartEvents() {
     demoStudyList = buildDemoStudyList(); homeShown = CHUNK; renderHomeList(); updateStartAtTotal(demoStudyList.length);
   });
 
-   // System/Saved seg-btns — Custom
+  // System/Saved seg-btns — Custom
   document.getElementById('customModeBtns').addEventListener('click', e => {
     const b = e.target.closest('.seg-btn'); if (!b) return;
     document.querySelectorAll('#customModeBtns .seg-btn').forEach(x => x.classList.remove('active'));
@@ -494,7 +485,7 @@ function bindStartEvents() {
     b.classList.add('active');
   });
 
-   // Setup panel seg-btns
+  // Setup panel seg-btns
   ['data-setup-mode', 'data-setup-focus', 'data-setup-listtype'].forEach(attr => {
     document.querySelectorAll('[' + attr + ']').forEach(b => {
       b.addEventListener('click', () => {
@@ -544,7 +535,6 @@ let setupState = {
 };
 
 function saveSetup() {
-  // Save to local state — wiring to S deferred
   setupState.mode      = document.querySelector('[data-setup-mode].active')?.dataset.setupMode || 'read';
   setupState.focus     = document.querySelector('[data-setup-focus].active')?.dataset.setupFocus || 'syn';
   setupState.temporary = document.getElementById('setupTempToggle').checked;
