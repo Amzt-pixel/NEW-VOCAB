@@ -2,8 +2,8 @@
    DICTIONARY — navigation.js
    Loaded after app.js. Reads globals:
    studyList, currentIndex, hiddenWords,
-   readHistory, S, csvData,
-   getSyns(), getAnts(), show(), closeModal()
+   readHistory, S, wordData,
+   buildCurrent(), closeModal()
    ══════════════════════════════════════ */
 
 // ── Session state ──
@@ -21,7 +21,7 @@ function trackVisit(word) {
     readHistory.push({ word, index: currentIndex, time: new Date().toLocaleTimeString() });
   }
   visitedWords.add(word);
-  const e = csvData.find(r => r.word === word);
+  const e = wordData.find(r => r.word === word);
   if (e?.id) {
     seenNumIds.add(Math.abs(e.id));
     seenSignedIds.add(e.id);
@@ -39,24 +39,24 @@ function navSessionStart() {
 // HELPERS
 // ══════════════════════════════════════
 function hasSynAnt(word) {
-  const e = csvData.find(r => r.word === word);
+  const e = wordData.find(r => r.word === word);
   if (!e?.id) return false;
   const absId = Math.abs(e.id);
-  return csvData.some(r => r.word !== word && Math.abs(r.id) === absId);
+  return wordData.some(r => r.word !== word && Math.abs(r.id) === absId);
 }
 
 function hasDef(word) {
-  const e = csvData.find(r => r.word === word);
+  const e = wordData.find(r => r.word === word);
   return !!(e?.definition);
 }
 
 function getAbsId(word) {
-  const e = csvData.find(r => r.word === word);
+  const e = wordData.find(r => r.word === word);
   return e?.id ? Math.abs(e.id) : 0;
 }
 
 function getSignedId(word) {
-  const e = csvData.find(r => r.word === word);
+  const e = wordData.find(r => r.word === word);
   return e?.id || 0;
 }
 
@@ -90,9 +90,7 @@ function skipBase(word) {
   const synAntOk  = !S.navSynAnt  || hasSynAnt(word);
   const definedOk = !S.navDefined || hasDef(word);
 
-  // OR logic between SynAnt and Defined
- // const basePass = synAntOk || definedOk;
-   const basePass = S.joinCondition
+  const basePass = S.joinCondition
     ? (synAntOk || definedOk)
     : (synAntOk && definedOk);
   return !basePass;
@@ -112,8 +110,6 @@ function skipNext(word) {
 
   const rootPass = rootwisePassNext(word);
 
-  // Necessary ON → (SynAnt OR Def) AND Root
-  // Necessary OFF → (SynAnt OR Def) OR Root
   if (S.necessary) {
     return !(basePass && rootPass);
   } else {
@@ -123,20 +119,15 @@ function skipNext(word) {
 
 // ══════════════════════════════════════
 // SKIP — PREV
-// Evaluates base + rootwise, then applies Prev mode conditions
 // ══════════════════════════════════════
-
-// Pass condition: word was visited (Exact)
 function prevExactPass(word) {
   return visitedWords.has(word);
 }
 
-// Pass condition: |NumId| seen AND word not yet visited (Variation)
 function prevVariationPass(word) {
   return seenNumIds.has(getAbsId(word)) && !visitedWords.has(word);
 }
 
-// Pass condition: |NumId| NOT seen (Neither-checked Exclusive mode)
 function prevExclusivePass(word) {
   return !seenNumIds.has(getAbsId(word));
 }
@@ -144,7 +135,6 @@ function prevExclusivePass(word) {
 function skipPrev(word) {
   if (hiddenWords.has(word)) return true;
   if (!S.navFilter) {
-    // No filter — just apply Prev mode
     return !applyPrevMode(word);
   }
 
@@ -155,7 +145,7 @@ function skipPrev(word) {
     return !(basePass && applyPrevMode(word));
   }
 
-  const rootPass = rootwisePassNext(word); // same root condition logic
+  const rootPass = rootwisePassNext(word);
 
   let filterPass;
   if (S.necessary) {
@@ -172,7 +162,6 @@ function applyPrevMode(word) {
   const useVariation = S.prevVariation;
 
   if (!useExact && !useVariation) {
-    // Neither checked → Exclusive mode
     return prevExclusivePass(word);
   }
 
@@ -264,7 +253,7 @@ function navNext() {
 
   currentIndex = pos;
   wordsSeen++;
-  show();
+  buildCurrent();
 }
 
 // ══════════════════════════════════════
@@ -276,9 +265,8 @@ function navPrev() {
   const step = resolveStep();
   let   pos  = doScan(currentIndex, step, 'prev', skipPrev);
 
-  // Variation Fallback: if Variation is ON, fallback selected, and scan failed
+  // Variation Fallback
   if (pos === -1 && S.prevVariation && S.variationFallback && !S.prevExact) {
-    // Retry using Exact only as fallback
     const fallbackSkip = word => {
       if (hiddenWords.has(word)) return true;
       if (!S.navFilter) return !prevExactPass(word);
@@ -300,7 +288,7 @@ function navPrev() {
 
   currentIndex = pos;
   wordsSeen++;
-  show();
+  buildCurrent();
 }
 
 // ══════════════════════════════════════
@@ -322,10 +310,10 @@ function weightedRandomNext() {
   let   rand    = Math.random() * total;
   for (let i = 0; i < pool.length; i++) {
     rand -= weights[i];
-    if (rand <= 0) { currentIndex = studyList.indexOf(pool[i]); wordsSeen++; show(); return; }
+    if (rand <= 0) { currentIndex = studyList.indexOf(pool[i]); wordsSeen++; buildCurrent(); return; }
   }
   currentIndex = studyList.indexOf(pool[pool.length - 1]);
-  wordsSeen++; show();
+  wordsSeen++; buildCurrent();
 }
 
 // ══════════════════════════════════════
