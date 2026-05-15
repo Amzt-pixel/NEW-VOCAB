@@ -6,7 +6,8 @@ const PASSWORD = 'Abcd135';
 const HOLD_MS  = 700;
 
 // ── Data ──
-let csvData      = [];
+let csvData      = [];   // raw staging — populated by parseCSV(), cleared after buildWordData()
+let wordData     = [];   // persistent rich store — source of truth for all lookups
 let studyList    = [];
 let rootWordList = [];
 let currentIndex = 0;
@@ -17,9 +18,15 @@ let customQueue  = [];
 let hiddenWords  = new Set();
 let sessionLive  = false;
 
+// ── Current Entry Buffer ──
+// Holds the current word's full data cluster.
+// Built by buildCurrent(), read by show() and mode renderers.
+// Cleared and rebuilt by refreshCurrent() on settings changes that need immediate refresh.
+let currentEntry = null;
+
 // ── MCQ History ──
-// Each entry: { word, synOptions, antOptions, states, interacted }
-// states: { [word_tab]: null | 0 | 1 | 2 }
+// Stores options and click states per word for MCQ mode persistence.
+// Structure: { word, synOptions:[{word,kind}], antOptions:[{word,kind}], states:{} }
 let mcqHistory = [];
 
 // ── Settings ──
@@ -144,55 +151,134 @@ function bindGate() {
 }
 
 // ══════════════════════════════════════
-// LIBRARY
+// LIBRARY — kept for openDetail() and searchHTML()
+// which need lookups across all words, not just the current entry
 // ══════════════════════════════════════
 function getSyns(word) {
-  const e = csvData.find(r => r.word === word);
+  const e = wordData.find(r => r.word === word);
   if (!e?.id) return [];
-  return csvData.filter(r => r.id === e.id && r.word !== word).map(r => r.word);
+  return wordData.filter(r => r.id === e.id && r.word !== word).map(r => r.word);
 }
 function getAnts(word) {
-  const e = csvData.find(r => r.word === word);
+  const e = wordData.find(r => r.word === word);
   if (!e?.id) return [];
-  return csvData.filter(r => r.id === -e.id).map(r => r.word);
+  return wordData.filter(r => r.id === -e.id).map(r => r.word);
 }
 function getSimilarSyns(word) {
-  const e = csvData.find(r => r.word === word);
+  const e = wordData.find(r => r.word === word);
   if (!e?.id) return [];
   const N = e.id;
   const match = N >= 0 ? r => Math.floor(r.id) === Math.floor(N) && r.id !== N
                        : r => Math.ceil(r.id)  === Math.ceil(N)  && r.id !== N;
-  return csvData.filter(r => match(r) && r.word !== word).map(r => r.word);
+  return wordData.filter(r => match(r) && r.word !== word).map(r => r.word);
 }
 function getSimilarAnts(word) {
-  const e = csvData.find(r => r.word === word);
+  const e = wordData.find(r => r.word === word);
   if (!e?.id) return [];
   const N = -e.id;
   const match = N >= 0 ? r => Math.floor(r.id) === Math.floor(N) && r.id !== N
                        : r => Math.ceil(r.id)  === Math.ceil(N)  && r.id !== N;
-  return csvData.filter(r => match(r) && r.word !== word).map(r => r.word);
+  return wordData.filter(r => match(r) && r.word !== word).map(r => r.word);
 }
 
 // ══════════════════════════════════════
-// DISPLAY
+// BUILD CURRENT
+// Builds currentEntry from wordData for the current word.
+// Called by navigation, startSession, startAt, panelUp, viewDetailWord, refreshCurrent.
+// Always calls show() after building.
+// ══════════════════════════════════════
+function buildCurrent() {
+  if (!studyList.length) return;
+
+  const word  = studyList[currentIndex];
+  const entry = wordData.find(r => r.word === word);
+  if (!entry) return;
+
+  const syns    = getSyns(word);
+  const ants    = getAnts(word);
+  const simSyms = S.showSimilar ? getSimilarSyns(word) : [];
+  const simAnts = S.showSimilar ? getSimilarAnts(word) : [];
+
+  let synOptions = [];
+  let antOptions = [];
+
+  if (S.mode === 'study') {
+    // Study: correct words only, no distractors
+    synOptions = [
+      ...syns.map(w    => ({ word: w, kind: 'exact' })),
+      ...simSyms.map(w => ({ word: w, kind: 'similar' })),
+    ];
+    antOptions = [
+      ...ants.map(w    => ({ word: w, kind: 'exact' })),
+      ...simAnts.map(w => ({ word: w, kind: 'similar' })),
+    ];
+  } else if (S.mode === 'revise') {
+    // Revise: correct words + distractors, built fresh each navigation
+    const excludeSyn = [word, ...syns, ...simSyms, ...ants, ...simAnts];
+    const excludeAnt = [word, ...ants, ...simAnts, ...syns, ...simSyms];
+    synOptions = (syns.length || simSyms.length) ? buildReviseOpts(syns, simSyms, excludeSyn) : [];
+    antOptions = (ants.length || simAnts.length) ? buildReviseOpts(ants, simAnts, excludeAnt) : [];
+  } else if (S.mode === 'mcq') {
+    // MCQ: check mcqHistory first — if word was visited, reuse stored options
+    const hist = mcqHistory.find(h => h.word === word);
+    if (hist) {
+      synOptions = hist.synOptions;
+      antOptions = hist.antOptions;
+    } else {
+      synOptions = buildMCQOptions(word, syns, simSyms);
+      antOptions = buildMCQOptions(word, ants, simAnts);
+    }
+  }
+
+  currentEntry = {
+    word,
+    id:              entry.id,
+    role:            entry.role,
+    level:           entry.level,
+    category:        entry.category,
+    definition:      entry.definition,
+    definition2:     entry.definition2,
+    examples:        [entry.example, entry.example2, entry.example3, entry.example4, entry.example5].filter(Boolean),
+    bengaliDef:      entry.bengaliDef,
+    bengaliExamples: [entry.bengaliEx1, entry.bengaliEx2, entry.bengaliEx3].filter(Boolean),
+    synOptions,
+    antOptions,
+  };
+
+  show();
+}
+
+// Clears currentEntry and rebuilds.
+// Called on settings changes that need immediate refresh of the current word.
+function refreshCurrent() {
+  currentEntry = null;
+  buildCurrent();
+}
+
+// ══════════════════════════════════════
+// DISPLAY — pure render, reads from currentEntry
 // ══════════════════════════════════════
 function show() {
-  if (!studyList.length) return;
-  const word  = studyList[currentIndex];
-  const entry = csvData.find(r => r.word === word);
-  trackVisit(word);
+  if (!currentEntry) return;
+  const entry = currentEntry;
+
+  trackVisit(entry.word);
+
   document.getElementById('progressPill').textContent = (currentIndex + 1) + ' / ' + studyList.length;
-  document.getElementById('sessionNumId').textContent = entry?.id ? '#' + entry.id : '—';
-  document.getElementById('currentWord').textContent  = word;
-  document.getElementById('currentRole').textContent  = entry?.role || '';
-  const lvl = entry?.level ?? 0;
+  document.getElementById('sessionNumId').textContent = entry.id ? '#' + entry.id : '—';
+  document.getElementById('currentWord').textContent  = entry.word;
+  document.getElementById('currentRole').textContent  = entry.role || '';
+
+  const lvl    = entry.level ?? 0;
   const lvlMap = { 0:['Common','level-0'], 1:['Unique','level-1'], 2:['Specific','level-2'], 3:['Colloquial','level-3'] };
   const badge  = document.getElementById('levelBadge');
   badge.textContent = lvlMap[lvl][0];
   badge.className   = 'word-level-badge ' + lvlMap[lvl][1];
-  if      (S.mode === 'study')  showStudy(word, entry);
-  else if (S.mode === 'revise') showRevise(word, entry);
-  else if (S.mode === 'mcq')    showMCQ(word, entry);
+
+  if      (S.mode === 'study')  showStudy();
+  else if (S.mode === 'revise') showRevise();
+  else if (S.mode === 'mcq')    showMCQ();
+
   if (!document.getElementById('wordListOverlay').classList.contains('hidden')) updatePanel();
 }
 
@@ -204,11 +290,11 @@ function reorderTabs() {
   const els  = { syn: document.getElementById('tabSyn'), ant: document.getElementById('tabAnt'), def: document.getElementById('tabDef') };
   tabOrder().forEach(t => wrap.appendChild(els[t]));
 }
-function activateFirstTab(syns, ants, showDef) {
+function activateFirstTab(hasSyn, hasAnt, showDef) {
   for (const t of tabOrder()) {
-    if (t === 'syn' && syns.length)  { switchTab('syn'); return; }
-    if (t === 'ant' && ants.length)  { switchTab('ant'); return; }
-    if (t === 'def' && showDef)      { switchTab('def'); return; }
+    if (t === 'syn' && hasSyn)  { switchTab('syn'); return; }
+    if (t === 'ant' && hasAnt)  { switchTab('ant'); return; }
+    if (t === 'def' && showDef) { switchTab('def'); return; }
   }
   switchTab('syn');
 }
@@ -225,13 +311,14 @@ function setCards(hasSyn, hasAnt, showDef) {
 // ══════════════════════════════════════
 // STUDY MODE
 // ══════════════════════════════════════
-function showStudy(word, entry) {
-  const syns    = getSyns(word);
-  const ants    = getAnts(word);
-  const simSyms = S.showSimilar ? getSimilarSyns(word) : [];
-  const simAnts = S.showSimilar ? getSimilarAnts(word) : [];
-  const hasDef  = !!entry?.definition;
-  const hasTrans = S.showTranslation && !!entry?.bengaliDef;
+function showStudy() {
+  const entry    = currentEntry;
+  const syns     = entry.synOptions.filter(o => o.kind === 'exact').map(o => o.word);
+  const simSyms  = entry.synOptions.filter(o => o.kind === 'similar').map(o => o.word);
+  const ants     = entry.antOptions.filter(o => o.kind === 'exact').map(o => o.word);
+  const simAnts  = entry.antOptions.filter(o => o.kind === 'similar').map(o => o.word);
+  const hasDef   = !!entry.definition;
+  const hasTrans = S.showTranslation && !!entry.bengaliDef;
 
   let synHTML = '';
   if (syns.length)    synHTML += '<div class="card-subheader syn-header"><span class="dot"></span> Synonyms</div><div class="chips-wrap">' + syns.map(w => studyChip(w,'syn')).join('') + '</div>';
@@ -247,26 +334,23 @@ function showStudy(word, entry) {
   if (hasDef) {
     defHTML += '<div class="content-label">Definition</div><div class="detail-def">' + esc(entry.definition) + '</div>';
     hasContent = true;
-    const examples = [entry.example, entry.example2, entry.example3, entry.example4, entry.example5].filter(Boolean);
-    if (examples.length) defHTML += '<div class="content-label" style="margin-top:10px">Examples</div>' + examples.map(ex => '<div class="detail-example">"' + esc(ex) + '"</div>').join('');
+    if (entry.examples.length) defHTML += '<div class="content-label" style="margin-top:10px">Examples</div>' + entry.examples.map(ex => '<div class="detail-example">"' + esc(ex) + '"</div>').join('');
   }
   if (hasTrans) {
     defHTML += (hasContent ? '<div class="card-subheader def-header" style="margin-top:16px">' : '<div class="card-subheader def-header">') + '<span class="dot"></span> Translation</div><div class="detail-def">' + esc(entry.bengaliDef) + '</div>';
     hasContent = true;
-    const bEx = [entry.bengaliEx1, entry.bengaliEx2, entry.bengaliEx3].filter(Boolean);
-    if (bEx.length) defHTML += '<div class="content-label" style="margin-top:10px">Bengali Examples</div>' + bEx.map(ex => '<div class="detail-example">"' + esc(ex) + '"</div>').join('');
+    if (entry.bengaliExamples.length) defHTML += '<div class="content-label" style="margin-top:10px">Bengali Examples</div>' + entry.bengaliExamples.map(ex => '<div class="detail-example">"' + esc(ex) + '"</div>').join('');
   }
   document.getElementById('defContent').innerHTML = defHTML;
 
   const showDef = hasDef || hasTrans;
-  const hasSyn  = syns.length > 0 || simSyms.length > 0;
-  const hasAnt  = ants.length > 0 || simAnts.length > 0;
+  const hasSyn  = entry.synOptions.length > 0;
+  const hasAnt  = entry.antOptions.length > 0;
   document.getElementById('synCount').textContent = syns.length || '';
   document.getElementById('antCount').textContent = ants.length || '';
   setCards(hasSyn, hasAnt, showDef);
   reorderTabs();
-  activateFirstTab(hasSyn ? [1] : [], hasAnt ? [1] : [], showDef);
-
+  activateFirstTab(hasSyn, hasAnt, showDef);
 }
 
 function studyChip(word, type) {
@@ -280,50 +364,43 @@ function studyChip(word, type) {
 // ══════════════════════════════════════
 // REVISE MODE
 // ══════════════════════════════════════
-function showRevise(word, entry) {
-  const synExact   = getSyns(word);
-  const antExact   = getAnts(word);
-  const synSimilar = S.showSimilar ? getSimilarSyns(word) : [];
-  const antSimilar = S.showSimilar ? getSimilarAnts(word) : [];
-  const hasDef     = !!entry?.definition;
-  const allSyn     = [...synExact, ...synSimilar];
-  const allAnt     = [...antExact, ...antSimilar];
+function showRevise() {
+  const entry  = currentEntry;
+  const hasDef = !!entry.definition;
 
-  if (allSyn.length) {
-    const opts = buildReviseOpts(synExact, synSimilar, [word, ...allSyn, ...allAnt]);
+  if (entry.synOptions.length) {
     document.getElementById('synChips').innerHTML =
       '<div class="card-subheader syn-header"><span class="dot"></span> Synonyms</div>'
-      + '<div class="chips-wrap">' + buildReviseChips(opts, 'syn') + '</div>';
+      + '<div class="chips-wrap">' + buildReviseChips(entry.synOptions, 'syn') + '</div>';
   } else { document.getElementById('synChips').innerHTML = ''; }
 
-  if (allAnt.length) {
-    const opts = buildReviseOpts(antExact, antSimilar, [word, ...allAnt, ...allSyn]);
+  if (entry.antOptions.length) {
     document.getElementById('antChips').innerHTML =
       '<div class="card-subheader ant-header"><span class="dot"></span> Antonyms</div>'
-      + '<div class="chips-wrap">' + buildReviseChips(opts, 'ant') + '</div>';
+      + '<div class="chips-wrap">' + buildReviseChips(entry.antOptions, 'ant') + '</div>';
   } else { document.getElementById('antChips').innerHTML = ''; }
 
   const showDef = hasDef && S.showMeaning;
   const defEl   = document.getElementById('defContent');
   if (showDef) {
     if (S.meaningOptions) {
-      const pool = csvData.filter(r => r.definition && r.word !== word).map(r => r.definition);
+      const pool = wordData.filter(r => r.definition && r.word !== entry.word).map(r => r.definition);
       const opts = [entry.definition, ...shuffle(pool).slice(0, S.fixedOptions - 1)].sort(() => Math.random() - 0.5);
       defEl.innerHTML = opts.map(d => '<button class="chip revise-chip def-revise-chip" data-kind="' + (d === entry.definition ? 'exact' : 'distractor') + '" onclick="reviseClick(this)">' + esc(d) + '</button>').join('');
     } else {
-      defEl.innerHTML = '<div class="def-text">' + esc(entry.definition) + '</div>' + (entry.example ? '<div class="def-example">"' + esc(entry.example) + '"</div>' : '');
+      defEl.innerHTML = '<div class="def-text">' + esc(entry.definition) + '</div>' + (entry.examples[0] ? '<div class="def-example">"' + esc(entry.examples[0]) + '"</div>' : '');
     }
   } else { defEl.innerHTML = ''; }
 
-  document.getElementById('synCount').textContent = synExact.length || '';
-  document.getElementById('antCount').textContent = antExact.length || '';
-  setCards(allSyn.length > 0, allAnt.length > 0, showDef);
+  const synExactCount = entry.synOptions.filter(o => o.kind === 'exact').length;
+  const antExactCount = entry.antOptions.filter(o => o.kind === 'exact').length;
+  document.getElementById('synCount').textContent = synExactCount || '';
+  document.getElementById('antCount').textContent = antExactCount || '';
+  setCards(entry.synOptions.length > 0, entry.antOptions.length > 0, showDef);
   reorderTabs();
-  activateFirstTab(allSyn, allAnt, showDef);
-
+  activateFirstTab(entry.synOptions.length > 0, entry.antOptions.length > 0, showDef);
 }
 
-// Returns array of { word, kind: 'exact'|'similar'|'distractor' }
 function buildReviseOpts(exactCorrect, similarCorrect, exclude) {
   const total    = S.randomOptionCount
     ? Math.floor(Math.random() * (S.maxOptions - S.minOptions + 1)) + S.minOptions
@@ -372,46 +449,33 @@ function reviseClick(btn) {
 // ══════════════════════════════════════
 // MCQ MODE
 // ══════════════════════════════════════
-function showMCQ(word, entry) {
-  const hasDef  = !!entry?.definition;
+function showMCQ() {
+  const entry   = currentEntry;
+  const hasDef  = !!entry.definition;
   const showDef = hasDef && S.mcqShowMeaning;
 
   if (showDef) {
     document.getElementById('defContent').innerHTML =
       '<div class="def-text">' + esc(entry.definition) + '</div>'
-      + (entry.example ? '<div class="def-example">"' + esc(entry.example) + '"</div>' : '');
+      + (entry.examples[0] ? '<div class="def-example">"' + esc(entry.examples[0]) + '"</div>' : '');
   } else {
     document.getElementById('defContent').innerHTML = '';
   }
 
-  const existing = mcqHistory.find(h => h.word === word);
-  if (existing) {
-    renderMCQTiles(existing, showDef);
-  } else {
-    buildMCQFresh(word, showDef);
+  // Get or create mcqHistory entry — options from currentEntry, states initialised to null
+  let hist = mcqHistory.find(h => h.word === entry.word);
+  if (!hist) {
+    const states = {};
+    entry.synOptions.forEach(o => { states[o.word + '_syn'] = null; });
+    entry.antOptions.forEach(o => { states[o.word + '_ant'] = null; });
+    hist = { word: entry.word, synOptions: entry.synOptions, antOptions: entry.antOptions, states };
+    mcqHistory.push(hist);
   }
 
+  renderMCQTiles(entry, hist, showDef);
 }
 
-function buildMCQFresh(word, showDef) {
-  const synExact   = getSyns(word);
-  const antExact   = getAnts(word);
-  const synSimilar = S.mcqShowSimilar ? getSimilarSyns(word) : [];
-  const antSimilar = S.mcqShowSimilar ? getSimilarAnts(word) : [];
-
-  const synOptions = buildMCQOptions(word, synExact, synSimilar, 'syn');
-  const antOptions = buildMCQOptions(word, antExact, antSimilar, 'ant');
-
-  const states = {};
-  synOptions.forEach(o => { states[o.word + '_syn'] = null; });
-  antOptions.forEach(o => { states[o.word + '_ant'] = null; });
-
-  const hist = { word, synOptions, antOptions, states, interacted: false };
-  mcqHistory.push(hist);
-  renderMCQTiles(hist, showDef);
-}
-
-function buildMCQOptions(word, exactCorrect, similarCorrect, tab) {
+function buildMCQOptions(word, exactCorrect, similarCorrect) {
   const total      = S.mcqOptions;
   const allCorrect = [...exactCorrect, ...similarCorrect];
 
@@ -430,20 +494,20 @@ function buildMCQOptions(word, exactCorrect, similarCorrect, tab) {
   const fillers  = shuffle(pool).slice(0, total - picked.length);
 
   return shuffle([
-    ...picked.map(w => ({ word: w, tab, kind: exactCorrect.includes(w) ? 'exact' : 'similar' })),
-    ...fillers.map(w => ({ word: w, tab, kind: 'distractor' }))
+    ...picked.map(w => ({ word: w, kind: exactCorrect.includes(w) ? 'exact' : 'similar' })),
+    ...fillers.map(w => ({ word: w, kind: 'distractor' }))
   ]);
 }
 
-function renderMCQTiles(hist, showDef) {
-  const hasSyn = hist.synOptions.length > 0;
-  const hasAnt = hist.antOptions.length > 0;
+function renderMCQTiles(entry, hist, showDef) {
+  const hasSyn = entry.synOptions.length > 0;
+  const hasAnt = entry.antOptions.length > 0;
 
   if (hasSyn) {
     document.getElementById('synChips').innerHTML =
       '<div class="card-subheader syn-header"><span class="dot"></span> Synonyms</div>'
       + '<div class="mcq-tiles-wrap">'
-      + hist.synOptions.map(o => mcqTileHTML(o, hist.states[o.word + '_syn'], hist.word, hist)).join('')
+      + entry.synOptions.map(o => mcqTileHTML(o, hist.states[o.word + '_syn'], entry.word, hist, 'syn')).join('')
       + '</div>';
   } else { document.getElementById('synChips').innerHTML = ''; }
 
@@ -451,17 +515,17 @@ function renderMCQTiles(hist, showDef) {
     document.getElementById('antChips').innerHTML =
       '<div class="card-subheader ant-header"><span class="dot"></span> Antonyms</div>'
       + '<div class="mcq-tiles-wrap">'
-      + hist.antOptions.map(o => mcqTileHTML(o, hist.states[o.word + '_ant'], hist.word, hist)).join('')
+      + entry.antOptions.map(o => mcqTileHTML(o, hist.states[o.word + '_ant'], entry.word, hist, 'ant')).join('')
       + '</div>';
   } else { document.getElementById('antChips').innerHTML = ''; }
 
-  const synExact = hist.synOptions.filter(o => o.kind !== 'distractor').map(o => o.word);
-  const antExact = hist.antOptions.filter(o => o.kind !== 'distractor').map(o => o.word);
-  document.getElementById('synCount').textContent = synExact.length || '';
-  document.getElementById('antCount').textContent = antExact.length || '';
+  const synExactCount = entry.synOptions.filter(o => o.kind !== 'distractor').length;
+  const antExactCount = entry.antOptions.filter(o => o.kind !== 'distractor').length;
+  document.getElementById('synCount').textContent = synExactCount || '';
+  document.getElementById('antCount').textContent = antExactCount || '';
   setCards(hasSyn, hasAnt, showDef);
   reorderTabs();
-  activateFirstTab(hasSyn ? [1] : [], hasAnt ? [1] : [], showDef);
+  activateFirstTab(hasSyn, hasAnt, showDef);
 }
 
 function allCorrectDoneForTab(hist, tab) {
@@ -472,10 +536,9 @@ function allCorrectDoneForTab(hist, tab) {
   });
 }
 
-function mcqTileHTML(opt, state, currentWord, hist) {
-  const tab         = opt.tab;
-  const stateClass  = state === null ? '' : state === 1 ? ' mcq-tile-correct' : state === 2 ? ' mcq-tile-similar' : ' mcq-tile-wrong';
-  const lockedClass = state !== null ? ' mcq-tile-locked' : '';
+function mcqTileHTML(opt, state, currentWord, hist, tab) {
+  const stateClass   = state === null ? '' : state === 1 ? ' mcq-tile-correct' : state === 2 ? ' mcq-tile-similar' : ' mcq-tile-wrong';
+  const lockedClass  = state !== null ? ' mcq-tile-locked' : '';
   const holdUnlocked = allCorrectDoneForTab(hist, tab);
 
   const holdAttrs = holdUnlocked
@@ -504,19 +567,17 @@ function mcqTileClick(btn) {
   if (!hist) return;
 
   hist.states[word + '_' + tab] = newState;
-  hist.interacted = true;
 
   btn.classList.add('mcq-tile-locked');
   if (newState === 1)      btn.classList.add('mcq-tile-correct');
   else if (newState === 2) btn.classList.add('mcq-tile-similar');
   else                     btn.classList.add('mcq-tile-wrong');
 
-  // If all correct options for this tab are now done, re-render to unlock hold
   if (allCorrectDoneForTab(hist, tab)) {
     const wrap = btn.closest('.mcq-tiles-wrap');
     if (wrap) {
       const opts = tab === 'syn' ? hist.synOptions : hist.antOptions;
-      wrap.innerHTML = opts.map(o => mcqTileHTML(o, hist.states[o.word + '_' + tab], currentWord, hist)).join('');
+      wrap.innerHTML = opts.map(o => mcqTileHTML(o, hist.states[o.word + '_' + tab], currentWord, hist, tab)).join('');
     }
   }
 }
@@ -571,11 +632,11 @@ function chipUp()     { if (chipTimer) { clearTimeout(chipTimer); chipTimer = nu
 function chipCancel() { if (chipTimer) { clearTimeout(chipTimer); chipTimer = null; } chipHeld = false; }
 
 // ══════════════════════════════════════
-// WORD DETAIL
+// WORD DETAIL — uses wordData directly since it can open any word, not just current
 // ══════════════════════════════════════
 function openDetail(word) {
   detailWord = word;
-  const e    = csvData.find(r => r.word === word);
+  const e    = wordData.find(r => r.word === word);
   const syns = getSyns(word);
   const ants = getAnts(word);
   document.getElementById('detailWord').textContent = word;
@@ -604,7 +665,7 @@ function viewDetailWord() {
 }
 
 // ══════════════════════════════════════
-// SEARCH
+// SEARCH — uses wordData to search across all words
 // ══════════════════════════════════════
 function initSearch() {
   const inp = document.getElementById('searchInput');
@@ -623,14 +684,14 @@ function initSearch() {
 function searchHTML(q) {
   let rx;
   try { rx = new RegExp(q, 'i'); } catch(e) { rx = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'i'); }
-  const words   = [...new Set(csvData.map(r => r.word))];
+  const words   = [...new Set(wordData.map(r => r.word))];
   const exact   = words.filter(w => w.toLowerCase() === q.toLowerCase());
   const close   = words.filter(w => rx.test(w) && !exact.includes(w));
-  const meaning = words.filter(w => { const e = csvData.find(r => r.word === w); return e?.definition && rx.test(e.definition) && !exact.includes(w) && !close.includes(w); });
+  const meaning = words.filter(w => { const e = wordData.find(r => r.word === w); return e?.definition && rx.test(e.definition) && !exact.includes(w) && !close.includes(w); });
   function grp(title, list) {
     if (!list.length) return '';
     return '<div><div class="search-group-title">' + title + '</div>' + list.slice(0,20).map(w => {
-      const e = csvData.find(r => r.word === w);
+      const e = wordData.find(r => r.word === w);
       const s = getSyns(w).length; const a = getAnts(w).length;
       const meta = [s ? s+' syn' : '', a ? a+' ant' : ''].filter(Boolean).join(' · ');
       return '<div class="search-item" onclick="searchJump(\'' + esc(w) + '\')">'
@@ -662,6 +723,7 @@ function updatePanel() {
   const el = document.getElementById('wordListContent');
   const f  = panelFilter.toLowerCase();
   panelScroll[panelTab] = el.scrollTop;
+
   if (panelTab === 'list') {
     if (!studyList.length) { el.innerHTML = '<div class="panel-empty">No session active.</div>'; return; }
     el.innerHTML = studyList.map((w,i) => ({ w, i })).filter(({ w }) => !f || w.toLowerCase().includes(f)).map(({ w, i }) => {
@@ -672,22 +734,37 @@ function updatePanel() {
         + ' onmousedown="panelDown(event,this)" onmouseleave="panelCancel()" onmouseup="panelUp(event,this)">'
         + '<span class="panel-item-left"><span class="panel-item-num">' + (i+1) + '</span><span class="panel-item-word">' + esc(w) + '</span></span></div>';
     }).join('');
+
   } else if (panelTab === 'queue') {
     if (!customQueue.length) { el.innerHTML = '<div class="panel-empty">Queue is empty.</div>'; return; }
     el.innerHTML = customQueue.filter(({ word }) => !f || word.toLowerCase().includes(f)).map(({ word }, i) =>
       '<div class="panel-item"><span class="panel-item-left"><span class="panel-item-num">' + (i+1) + '</span><span class="panel-item-word">' + esc(word) + '</span></span>'
       + '<button class="panel-queue-remove" onclick="removeFromQueue(\'' + esc(word) + '\',event)">✕</button></div>'
     ).join('') || '<div class="panel-empty">No matches.</div>';
+
   } else {
-    if (!readHistory.length) { el.innerHTML = '<div class="panel-empty">No words visited yet.</div>'; return; }
-    el.innerHTML = [...readHistory].reverse().filter(({ word }) => !f || word.toLowerCase().includes(f)).map(({ word, time }, i) => {
-      const entry = csvData.find(r => r.word === word);
-      const id    = entry?.id ? ' (#' + entry.id + ')' : '';
-      return '<div class="panel-item" onclick="startAt(\'' + esc(word) + '\')">'
-        + '<span class="panel-item-left"><span class="panel-item-num">' + (i+1) + '</span>'
-        + '<span class="panel-item-word">' + esc(word) + '<span class="panel-item-id">' + id + '</span></span></span>'
-        + '<span style="font-size:11px;color:var(--text-secondary);flex-shrink:0">' + time + '</span></div>';
-    }).join('') || '<div class="panel-empty">No matches.</div>';
+    // History tab — shows mcqHistory in MCQ mode, readHistory otherwise
+    if (S.mode === 'mcq') {
+      if (!mcqHistory.length) { el.innerHTML = '<div class="panel-empty">No MCQ words visited yet.</div>'; return; }
+      el.innerHTML = [...mcqHistory].reverse().filter(({ word }) => !f || word.toLowerCase().includes(f)).map(({ word }, i) => {
+        const entry = wordData.find(r => r.word === word);
+        const id    = entry?.id ? ' (#' + entry.id + ')' : '';
+        return '<div class="panel-item" onclick="startAt(\'' + esc(word) + '\')">'
+          + '<span class="panel-item-left"><span class="panel-item-num">' + (i+1) + '</span>'
+          + '<span class="panel-item-word">' + esc(word) + '<span class="panel-item-id">' + id + '</span></span></span>'
+          + '</div>';
+      }).join('') || '<div class="panel-empty">No matches.</div>';
+    } else {
+      if (!readHistory.length) { el.innerHTML = '<div class="panel-empty">No words visited yet.</div>'; return; }
+      el.innerHTML = [...readHistory].reverse().filter(({ word }) => !f || word.toLowerCase().includes(f)).map(({ word, time }, i) => {
+        const entry = wordData.find(r => r.word === word);
+        const id    = entry?.id ? ' (#' + entry.id + ')' : '';
+        return '<div class="panel-item" onclick="startAt(\'' + esc(word) + '\')">'
+          + '<span class="panel-item-left"><span class="panel-item-num">' + (i+1) + '</span>'
+          + '<span class="panel-item-word">' + esc(word) + '<span class="panel-item-id">' + id + '</span></span></span>'
+          + '<span style="font-size:11px;color:var(--text-secondary);flex-shrink:0">' + time + '</span></div>';
+      }).join('') || '<div class="panel-empty">No matches.</div>';
+    }
   }
   el.scrollTop = panelScroll[panelTab];
 }
@@ -702,7 +779,7 @@ function panelUp(e, el) {
   if (panelTimer) { clearTimeout(panelTimer); panelTimer = null; }
   if (panelHeld || panelScrolled) { panelHeld = false; panelScrolled = false; return; }
   const idx = parseInt(el.dataset.index);
-  if (!isNaN(idx)) { currentIndex = idx; show(); closeModal('wordListOverlay'); }
+  if (!isNaN(idx)) { currentIndex = idx; buildCurrent(); closeModal('wordListOverlay'); }
 }
 function updateSaveBar() {
   const pfx = { list:'List1', queue:'CustomList', history:'CurrentSession' };
@@ -710,7 +787,10 @@ function updateSaveBar() {
 }
 function savePanelList() {
   const name  = document.getElementById('panelSaveName').value.trim() || listName('List');
-  const words = panelTab === 'list' ? studyList : panelTab === 'queue' ? customQueue.map(q => q.word) : readHistory.map(h => h.word);
+  const words = panelTab === 'list'  ? studyList
+    : panelTab === 'queue'           ? customQueue.map(q => q.word)
+    : S.mode === 'mcq'               ? mcqHistory.map(h => h.word)
+    :                                  readHistory.map(h => h.word);
   if (!words.length) { alert('Nothing to save.'); return; }
   const saved = JSON.parse(localStorage.getItem('dictSavedLists') || '[]');
   const type  = panelTab === 'queue' ? 2 : panelTab === 'history' ? 1 : 0;
@@ -804,6 +884,7 @@ function quitSession() {
   localStorage.removeItem('dictCurrentQueue');
   studyList = []; currentIndex = 0; wordsSeen = 0;
   startTime = null; readHistory = []; customQueue = []; mcqHistory = [];
+  currentEntry = null;
   sessionLive = false;
   navSessionStart();
   closeModal('infoOverlay');
@@ -977,23 +1058,36 @@ function bindSettingsEvents() {
 
   document.getElementById('settingsSave').addEventListener('click', () => {
     if (pending) {
-      const modeChanged     = pending.mode    !== S.mode;
-      const tabOrderChanged = pending.tabOrder !== S.tabOrder;
-      const reviseChanged   = S.mode === 'revise' && (
+      const modeChanged        = pending.mode            !== S.mode;
+      const tabOrderChanged    = pending.tabOrder         !== S.tabOrder;
+      const translationChanged = pending.showTranslation  !== S.showTranslation;
+      const similarChanged     = pending.showSimilar      !== S.showSimilar;
+      const reviseChanged      = pending.mode === 'revise' && (
         pending.showMeaning !== S.showMeaning || pending.meaningOptions !== S.meaningOptions ||
         pending.correctPercent !== S.correctPercent || pending.randomOptionCount !== S.randomOptionCount ||
         pending.minOptions !== S.minOptions || pending.maxOptions !== S.maxOptions ||
-        pending.fixedOptions !== S.fixedOptions || pending.showSimilar !== S.showSimilar
+        pending.fixedOptions !== S.fixedOptions
       );
-      const mcqChanged = S.mode === 'mcq' && (
+      const mcqChanged = pending.mode === 'mcq' && (
         pending.mcqOptions !== S.mcqOptions || pending.mcqMultipleCorrect !== S.mcqMultipleCorrect ||
         pending.mcqMaxCorrect !== S.mcqMaxCorrect || pending.mcqShowMeaning !== S.mcqShowMeaning ||
         pending.mcqShowSimilar !== S.mcqShowSimilar
       );
+
       Object.assign(S, pending); saveSettings(); applyAppearance();
       document.getElementById('sessionStep').textContent = S.stepNumber;
       updateBar();
-      if (studyList.length && (modeChanged || tabOrderChanged || reviseChanged || mcqChanged)) show();
+
+      if (studyList.length) {
+        if (modeChanged || reviseChanged || mcqChanged || similarChanged || translationChanged) {
+          // Full rebuild needed
+          refreshCurrent();
+        } else if (tabOrderChanged) {
+          // Re-render only — same data, different tab order
+          show();
+        }
+        // All other settings (step, loop, nav filter etc.) — no refresh
+      }
     }
     pending = null; closeModal('settingsOverlay');
   });
